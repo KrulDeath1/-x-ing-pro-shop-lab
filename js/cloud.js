@@ -122,9 +122,16 @@ export const cloud = {
   get profile() { return profile; },
   get status() { return status; },
   get isPaid() { return !!profile && PAID_PLANS.includes(profile.plan) && PAID_STATUS.includes(profile.plan_status); },
+  get isShop() { return this.isPaid && profile.plan === 'shop'; },
   onChange(f) { listeners.add(f); },
-  /** returns true if the user may use a Pro feature; otherwise shows the upgrade dialog */
-  require(feature) { if (this.isPaid) return true; openUpsell(feature); return false; }
+  /** true if the user's plan includes this feature (no dialog) */
+  can(feature) { return (FEATURES[feature]?.tier || 'pro') === 'shop' ? this.isShop : this.isPaid; },
+  /** returns true if the user may use the feature; otherwise shows the upgrade dialog */
+  require(feature) { if (this.can(feature)) return true; openUpsell(feature); return false; },
+  /** marks every [data-plan] control the user's plan doesn't include as .locked (greyed out + Pro/Shop badge) */
+  markLocks(root = document) {
+    root.querySelectorAll('[data-plan]').forEach(e => e.classList.toggle('locked', !this.can(e.dataset.plan)));
+  }
 };
 
 /* ==================== UI ==================== */
@@ -150,7 +157,11 @@ dialog.xd::backdrop { background:rgba(0,0,0,.55); }
 .xd .link { background:none; border:0; padding:0; color:var(--a); cursor:pointer; font:inherit; font-size:12px; justify-self:start; }
 .xd ul { margin:0; padding-left:18px; }
 .import-banner { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:8px 16px; background:var(--warn-bg); color:var(--warn-ink); border-bottom:1px solid var(--line); font-size:13px; }
-#logBox.locked > span:first-child::after { content:'Pro'; margin-left:8px; font-size:11px; font-weight:700; text-transform:uppercase; padding:1px 7px; border-radius:999px; background:var(--accent); color:var(--accent-ink); }
+#logBox.locked > span:first-child::after, .locked[data-badge]::after { content:attr(data-badge); margin-left:6px; font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:1px 6px; border-radius:999px; background:var(--accent); color:var(--accent-ink); vertical-align:middle; }
+#logBox.locked > span:first-child::after { content:'Pro'; }
+.locked[data-badge] { opacity:.6; white-space:nowrap; }
+.locked[data-badge]:hover { opacity:.85; }
+.plan-lock { display:inline-flex; gap:6px; align-items:center; }
 `;
 const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); Object.assign(e, attrs); if (html) e.innerHTML = html; return e; };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -175,6 +186,9 @@ function mount() {
   // shot log is a Pro feature
   const lb = document.getElementById('logBox');
   if (lb && !cloud.isPaid) lb.classList.add('locked');
+  // every other gated control carries data-plan="<feature>"; the badge text comes from the feature's tier
+  document.querySelectorAll('[data-plan]').forEach(e => { if (!e.dataset.badge) e.dataset.badge = (FEATURES[e.dataset.plan]?.tier === 'shop' ? 'Shop' : 'Pro'); });
+  cloud.markLocks();
 
   if (user && online && cloudEmpty && KEYS.some(k => ls.get(k) != null)) showImportBanner();
 }
@@ -267,15 +281,26 @@ function openAccount() {
   });
 }
 
-const FEATURES = { shotlog: 'The shot log and lane calibration' };
+// every gated feature: what it's called in the upsell and the lowest plan that includes it
+const FEATURES = {
+  shotlog:  { label: 'The shot log and lane calibration', tier: 'pro' },
+  autoline: { label: 'Auto line (best strike line)', tier: 'pro' },
+  strike:   { label: 'Strike chance', tier: 'pro' },
+  lane3d:   { label: 'The 3D lane view', tier: 'pro' },
+  compare:  { label: 'Compare A / B', tier: 'pro' },
+  print:    { label: 'Printing drill and spec sheets', tier: 'pro' },
+  coverage: { label: 'The arsenal coverage chart', tier: 'pro' },
+  export:   { label: 'Exporting your data', tier: 'pro' },
+  driller:  { label: 'Driller mode', tier: 'shop' }
+};
 function openUpsell(feature) {
-  const what = FEATURES[feature];
+  const f = FEATURES[feature], plan = f?.tier === 'shop' ? 'Shop' : 'Pro';
   const d = dialog(`<div class="body">
-    <h2>${what ? esc(what) + ' are part of Pro' : 'X-ING plans'}</h2>
+    <h2>${f ? `${esc(f.label)} is part of ${plan}` : 'X-ING plans'}</h2>
     <ul>
-      <li><b>Free</b>: layouts, PAP, ball motion, arsenal, A/B compare, print sheets.</li>
-      <li><b>Pro</b> (bowlers): plus the shot log and lane calibration that learns your real lane.</li>
-      <li><b>Shop</b> (pro shops): Pro for every bowler you manage.</li>
+      <li><b>Free</b>: unlimited bowlers and balls, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
+      <li><b>Pro</b> (bowlers): plus Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
+      <li><b>Shop</b> (pro shops): everything in Pro, plus Driller mode.</li>
     </ul>
     <div class="hint">${user ? 'Online checkout is coming soon.' : 'Create a free account first, then upgrade.'}</div>
     <div class="row2">

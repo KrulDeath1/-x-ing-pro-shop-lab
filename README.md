@@ -27,9 +27,11 @@ Sign up as a **bowler** or as a **pro shop**. Your bowlers, balls, shot log and 
 
 | Plan | For | Includes |
 |------|-----|----------|
-| **Free** | Everyone | Layouts, PAP, ball motion, arsenal, A/B compare, print sheets |
-| **Pro** | Bowlers | Everything in Free, plus the shot log and lane calibration |
-| **Shop** | Pro shops | Pro for every bowler the shop manages |
+| **Free** | Everyone | Unlimited bowlers and balls, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, arsenal list, import |
+| **Pro** | Bowlers | Everything in Free, plus Auto line (best strike line) and strike chance, the 3D lane, Compare A/B, arsenal coverage chart, printing drill and spec sheets, export, the shot log and lane calibration |
+| **Shop** | Pro shops | Everything in Pro, plus Driller mode (shop branding on prints and a customer list are planned) |
+
+Locked features stay visible, greyed out with a Pro or Shop badge, and clicking one shows the plans. The gates run in the browser only, so they aren't a security boundary.
 
 ## Tech
 

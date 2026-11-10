@@ -139,10 +139,10 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
 <header>
   <div class="brand">X-ING Pro Shop Lab <small>drilling layouts · PAP · ball motion</small></div>
   <div class="hgroup">
-    <div class="seg" id="modeSeg"><button data-mode="simple" class="on">Simple</button><button data-mode="driller">Driller</button></div>
-    <label class="tog"><input type="checkbox" id="compare"> Compare A / B</label>
+    <div class="seg" id="modeSeg"><button data-mode="simple" class="on">Simple</button><button data-mode="driller" data-plan="driller">Driller</button></div>
+    <label class="tog" data-plan="compare"><input type="checkbox" id="compare"> Compare A / B</label>
     <button class="btn primary" id="btnRec">Recommend layout</button>
-    <button class="btn" id="btnPrint">Print drill sheet</button>
+    <button class="btn" id="btnPrint" data-plan="print">Print drill sheet</button>
   </div>
 </header>
 
@@ -341,7 +341,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
     <div class="card">
       <h2>Ball motion</h2>
       <div class="ctl">
-        <div class="seg" id="laneSeg"><button data-v="2d" class="on">Top-down</button><button data-v="3d">3D</button></div>
+        <div class="seg" id="laneSeg"><button data-v="2d" class="on">Top-down</button><button data-v="3d" data-plan="lane3d">3D</button></div>
         <button class="btn primary sm" id="play">▶ Play</button>
         <button class="btn sm" id="runMachine" title="Watch a Kegel Ikon lay this pattern (top-down view)">🛢 Run lane machine</button>
         <select id="slowmo"><option value="1">1×</option><option value="0.5" selected>½×</option><option value="0.25">¼×</option></select>
@@ -378,13 +378,13 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       </div>
       <div class="ctl">
         <button class="btn primary sm" id="arsAdd">+ Add current ball &amp; Layout A</button>
-        <button class="btn sm" id="arsSpec">Print bowler spec sheet</button>
-        <button class="btn sm" id="arsExport">Export (JSON)</button>
+        <button class="btn sm" id="arsSpec" data-plan="print">Print bowler spec sheet</button>
+        <button class="btn sm" id="arsExport" data-plan="export">Export (JSON)</button>
         <button class="btn sm" id="arsCsv">Export arsenal (CSV)</button>
         <label class="btn sm" style="cursor:pointer">Import<input type="file" id="arsImport" accept=".json,application/json" hidden></label>
       </div>
       <div style="overflow-x:auto"><table class="ars" id="arsTable"></table></div>
-      <h2 style="margin-top:14px">Arsenal coverage <span id="covWhere" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
+      <h2 style="margin-top:14px" data-plan="coverage">Arsenal coverage <span id="covWhere" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
       <canvas id="covChart" style="width:100%;height:320px;display:block;border-radius:10px;background:var(--panel-2)"></canvas>
       <p class="hint">Each ball is simulated for this bowler on the selected pattern (on its own best line when Auto line is on, otherwise from the laydown board). Right = more length (later breakpoint), up = more hook. Gaps on the chart are where the next ball should go. The hollow ring is the ball and layout currently on screen.</p>
     </div>
@@ -1285,6 +1285,7 @@ function readState() {
   // "Bowling Beyond the Basics" ch. 6: tracking-system / TV rev rates run ~50% high (true ≈ 2/3 of reported)
   b.revsTrue = Math.round(b.revs * (b.revSrc === 'tracking' ? 2 / 3 : 1));
   const lane = { len: num('patLen') || 40, vol: $('patVol').value, shape: $('patShape').value, cond: $('patCond').value, laydown: isFinite(num('laydown')) ? num('laydown') : 20 };
+  if ($('lineMode').value === 'auto' && !cloud.can('autoline')) $('lineMode').value = 'pocket'; // Auto line is Pro (a loaded bowler may carry it)
   lane.mode = $('lineMode').value; lane.auto = lane.mode === 'auto';
   lane.mine = lane.mode === 'mine' && isFinite(num('myArrows')) ? { arrows: num('myArrows'), bpBoard: numOrNull('myBpBoard'), bpFt: numOrNull('myBpFt') } : null;
   if (lane.mine && !isFinite(lane.mine.bpBoard)) lane.mine.bpBoard = null;
@@ -1309,7 +1310,7 @@ function readState() {
     grit: $('grit').value, pin2psa: clamp(parseIn($('pin2psa').value) || 6.75, 1, 6.75), color: $('ballColor').value, weight: +$('ballWt').value || 15,
   };
   const grip = { span: parseIn($('span').value) || 4.75, fspace: parseIn($('fspace').value) || 1.25 };
-  return { b, lane, ball, grip, compare: $('compare').checked };
+  return { b, lane, ball, grip, compare: $('compare').checked && cloud.can('compare') };
 }
 
 /* ==================== explanations ==================== */
@@ -2017,7 +2018,7 @@ function renderStats(state, res) {
       <dt>Headpin goes</dt><dd>${f(s.impact.pinAngle)}° left at ${f(s.impact.pinMph)} mph</dd>
       <dt>Ball after the hit</dt><dd>knocked ${f(s.impact.deflect)}° right, ${f(s.impact.ballMph)} mph</dd>
       <dt>At the 5-pin</dt><dd>${impactVerdict(s.impact)}</dd>
-      <dt>Strike chance</dt><dd>${(() => { const p = strikeChance(s.impact.board, s.entry); return isFinite(p) ? `~${Math.round(p)}% <span class="hint">(board ${f(s.impact.board)} at ${f(s.entry)}°; a perfect pocket hit at this angle carries ~${Math.round(strikePeak(s.entry))}%${s.entry < 4 ? ' — more entry angle carries better' : ''})</span>` : '—'; })()}</dd>` : ''}
+      <dt>Strike chance</dt><dd>${!cloud.can('strike') ? `<button class="btn sm locked" type="button" data-plan="strike" data-badge="Pro" data-upsell="strike">See strike chance</button>` : (() => { const p = strikeChance(s.impact.board, s.entry); return isFinite(p) ? `~${Math.round(p)}% <span class="hint">(board ${f(s.impact.board)} at ${f(s.entry)}°; a perfect pocket hit at this angle carries ~${Math.round(strikePeak(s.entry))}%${s.entry < 4 ? ' — more entry angle carries better' : ''})</span>` : '—'; })()}</dd>` : ''}
       ${s.thr && s.thr.adjusted ? `<dt>With this ball</dt><dd>${f(s.thr.mph)} mph · ${Math.round(s.thr.rpm)} rpm <span class="hint">(same release, different weight/RG)</span></dd>` : ''}
     </dl>
     <p class="hint" style="margin-top:6px"><b>Play it:</b> lay down on ${s.laydown}, cross ${f(s.arrows)} at the arrows, leave the oil near ${f(s.exit)}${isFinite(s.exit) && Math.abs(s.exit - s.exitTarget) > 3 ? ` (Rule of 31 says ${s.exitTarget} — ${s.exit > s.exitTarget ? 'this ball wants to be deeper than the rule; a stronger ball or rougher surface lets you play closer to it' : 'this ball needs more room outside than the rule; a weaker ball or smoother surface would bring it in'})` : ''}.
@@ -2086,8 +2087,14 @@ function patternUI() {
 }
 $('patPreset').addEventListener('change', e => { const p = PATTERNS[e.target.value]; if (p) { $('patLen').value = p.len; $('patVol').value = p.vol; $('patShape').value = p.shape; } patternUI(); schedule(); });
 fillPatterns(); patternUI();
-$('modeSeg').addEventListener('click', e => { const m = e.target.dataset.mode; if (!m) return; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m)); store.set('layoutlab.mode', m); });
-$('compare').addEventListener('change', () => { if ($('compare').checked && recCache) setLayoutInputs('B', stepLayout(recCache.s, 1).layout); schedule(); });
+document.addEventListener('click', e => { const f = e.target.closest('[data-upsell]')?.dataset.upsell; if (f) cloud.require(f); });
+{ // Free: Auto line shows as a Pro option; picking it opens the upsell and falls back to "Pocket from laydown"
+  const o = $('lineMode').querySelector('option[value="auto"]');
+  if (!cloud.can('autoline')) { o.textContent = 'Auto line (Pro)'; $('lineMode').value = 'pocket'; }
+  $('lineMode').addEventListener('change', e => { if (e.target.value === 'auto' && !cloud.require('autoline')) { e.target.value = 'pocket'; schedule(); } });
+}
+$('modeSeg').addEventListener('click', e => { const m = e.target.dataset.mode; if (!m) return; if (m === 'driller' && !cloud.require('driller')) return; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m)); store.set('layoutlab.mode', m); });
+$('compare').addEventListener('change', () => { if ($('compare').checked && !cloud.require('compare')) { $('compare').checked = false; return; } if ($('compare').checked && recCache) setLayoutInputs('B', stepLayout(recCache.s, 1).layout); schedule(); });
 $('btnRec').addEventListener('click', applyRec);
 $('readCard').addEventListener('click', e => {
   const v = e.target.dataset.usepap; if (!v) return;
@@ -2109,6 +2116,7 @@ $('viewGrip').addEventListener('click', () => { for (const X of ['A', 'B']) view
 $('viewPap').addEventListener('click', () => { for (const X of ['A', 'B']) if (views[X]?.papVec) views[X].face(views[X].papVec); });
 $('laneSeg').addEventListener('click', e => {
   const v = e.target.dataset.v; if (!v) return;
+  if (v === '3d' && !cloud.require('lane3d')) return;
   [...$('laneSeg').children].forEach(b => b.classList.toggle('on', b.dataset.v === v));
   if (v === '3d' && !laneView) { alert('The 3D view needs an internet connection to load three.js.'); return; }
   $('lane2d').classList.toggle('hidden', v === '3d'); $('lane3dHost').classList.toggle('hidden', v !== '3d'); $('cam').classList.toggle('hidden', v !== '3d');
@@ -2530,7 +2538,7 @@ $('arsTable').addEventListener('click', e => {
   const act = e.target.dataset.act, id = e.target.dataset.id; if (!act) return;
   const n = curBowler(), all = getAll(), ars = all[n]?.arsenal || [], r = ars.find(x => x.id === id); if (!r) return;
   if (act === 'load') loadRecord(r);
-  if (act === 'print') printBallSheet(n, r);
+  if (act === 'print' && cloud.require('print')) printBallSheet(n, r);
   if (act === 'dup') { const c = { ...JSON.parse(JSON.stringify(r)), id: Date.now().toString(36), date: new Date().toISOString().slice(0, 10), notes: (r.notes ? r.notes + ' · ' : '') + 'duplicate of ' + r.date }; all[n].arsenal.push(c); store.set(BKEY, all); renderArsenal(); loadRecord(c); }
   if (act === 'del' && confirm(`Remove ${r.ball.name} (${r.date}) from ${n}'s arsenal?`)) { all[n].arsenal = ars.filter(x => x.id !== id); store.set(BKEY, all); fillBowlers(n); renderArsenal(); }
 });
@@ -2554,6 +2562,13 @@ function drawCoverage(ars) {
   const cv = $('covChart'), dpr = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (!w || !last) return;
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  if (!cloud.can('coverage')) { // Pro: Free sees where the chart goes and a way to unlock it
+    $('covWhere').textContent = '';
+    g.fillStyle = getCss('--ink-2'); g.textAlign = 'center'; g.font = '600 14px system-ui';
+    g.fillText('Arsenal coverage is part of Pro', w / 2, h / 2 - 6); g.font = '12px system-ui';
+    g.fillText('See where every ball in the bag hooks and where the gaps are. Click to see plans.', w / 2, h / 2 + 16);
+    cv.style.cursor = 'pointer'; cv.dataset.upsell = 'coverage'; return;
+  }
   const state = last.state;
   $('covWhere').textContent = `— on ${state.lane.pat ? state.lane.pat.n : 'generic pattern'}, ${state.lane.auto ? 'each ball on its best strike line' : 'from board ' + state.lane.laydown}`;
   const pts = ars.map(r => ({ r, s: quickMotion(state, { ...r.ball, weight: +r.ball.weight || +r.weight || 15 }, r.layout) }));
@@ -2594,6 +2609,7 @@ function printBallSheet(name, r) {
   setTimeout(() => window.print(), 50);
 }
 $('arsSpec').addEventListener('click', () => {
+  if (!cloud.require('print')) return;
   const n = curBowler(); if (!n || !last) { alert('Load or save a bowler first.'); return; }
   const p = getAll()[n] || {}, ars = p.arsenal || [], s = last.state, rc = last.rec;
   drawCoverage(ars); const img = $('covChart').toDataURL('image/png');
@@ -2612,7 +2628,7 @@ $('arsSpec').addEventListener('click', () => {
 
 /* ---------- export / import ---------- */
 function download(name, text, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
-$('arsExport').addEventListener('click', () => download(`x-ing-bowlers-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ app: 'X-ING Pro Shop Lab', version: 1, bowlers: getAll(), myBalls: store.get('layoutlab.balls', []) }, null, 1), 'application/json'));
+$('arsExport').addEventListener('click', () => cloud.require('export') && download(`x-ing-bowlers-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ app: 'X-ING Pro Shop Lab', version: 1, bowlers: getAll(), myBalls: store.get('layoutlab.balls', []) }, null, 1), 'application/json'));
 $('arsCsv').addEventListener('click', () => {
   const n = curBowler(), ars = getAll()[n]?.arsenal || []; if (!ars.length) { alert('No arsenal to export for this bowler.'); return; }
   const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
@@ -2930,7 +2946,7 @@ function calibUI() {
 
 /* ---------- drill sheet ---------- */
 $('btnPrint').addEventListener('click', () => {
-  if (!last) return;
+  if (!last || !cloud.require('print')) return;
   const { state, rec, res } = last, sym = state.ball.core === 'sym';
   const ou = p => `${fmtIn(Math.abs(p.over))} ${p.over >= 0 ? 'over' : 'over (other side)'}, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}`;
   const imgs = [];
@@ -2976,7 +2992,7 @@ $('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
 fillBallSelect(startBall); loadBall(startBall); fillBowlers(); renderArsenal(); calibUI();
-const m = store.get('layoutlab.mode', 'simple'); document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+let m = store.get('layoutlab.mode', 'simple'); if (m === 'driller' && !cloud.can('driller')) m = 'simple'; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m));
 syncSysInputs('A'); syncSysInputs('B');
 applyRec();
 </script>
