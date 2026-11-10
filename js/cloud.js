@@ -162,6 +162,8 @@ dialog.xd::backdrop { background:rgba(0,0,0,.55); }
 .locked[data-badge] { opacity:.6; white-space:nowrap; }
 .locked[data-badge]:hover { opacity:.85; }
 .plan-lock { display:inline-flex; gap:6px; align-items:center; }
+.guest-dim { opacity:.45; filter:grayscale(.4); user-select:none; }
+.guest-banner { background:var(--panel-2); color:var(--ink); }
 `;
 const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); Object.assign(e, attrs); if (html) e.innerHTML = html; return e; };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -191,6 +193,20 @@ function mount() {
   cloud.markLocks();
 
   if (user && online && cloudEmpty && KEYS.some(k => ls.get(k) != null)) showImportBanner();
+  if (!user) lockForGuests(hg, box);
+}
+
+// Signed out: the app stays visible but nothing can be clicked or typed until the visitor signs in.
+// `inert` blocks mouse, keyboard and focus, so this can't be tabbed around.
+function lockForGuests(hg, box) {
+  document.body.classList.add('guest-locked');
+  const targets = [document.querySelector('main'), ...[...hg.children].filter(c => c !== box)].filter(Boolean);
+  targets.forEach(t => { t.inert = true; t.classList.add('guest-dim'); });
+  const b = el('div', { className: 'import-banner guest-banner', role: 'status' },
+    `<span><b>Sign in or create a free account to start.</b> Your bowlers, balls and layouts are saved to your account.</span>
+     <button class="btn sm primary" type="button" data-a="signup">Create free account</button><button class="btn sm" type="button" data-a="signin">Sign in</button>`);
+  b.addEventListener('click', e => { const a = e.target.dataset.a; if (a) openAuth(a); });
+  document.querySelector('header').after(b);
 }
 
 function dialog(html) {
