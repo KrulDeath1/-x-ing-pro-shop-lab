@@ -1,0 +1,33 @@
+# Deploys the site to Cloudflare Pages (project x-ing-pro-shop-lab) on every push to main.
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   — a Cloudflare API token with "Account · Cloudflare Pages · Edit"
+#   CLOUDFLARE_ACCOUNT_ID  — the Cloudflare account id
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build dist/
+        run: node build-site.js
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx -y wrangler@4 pages deploy dist --project-name x-ing-pro-shop-lab --branch main --commit-hash "$GITHUB_SHA" --commit-message "$(git log -1 --pretty=%s)"
