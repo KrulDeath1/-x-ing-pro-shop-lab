@@ -1,0 +1,4 @@
+# private / local-only
+*.local.json
+backups/
+x-ing-pro-shop-lab.before-update.html
