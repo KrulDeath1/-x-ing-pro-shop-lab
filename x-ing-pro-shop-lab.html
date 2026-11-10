@@ -157,6 +157,7 @@ body[data-mode="driller"] .simple-only { display: none !important; }
 .fc-box input { width: 54px; text-align: center; padding: 4px 2px; font-size: 13px; }
 .fc-a-mf { grid-area: mf; } .fc-a-rf { grid-area: rf; } .fc-a-th { grid-area: th; } .fc-a-br { grid-area: br; } .fc-a-smf { grid-area: smf; } .fc-a-srf { grid-area: srf; }
 .fc-hand { font-size: 12px; color: var(--ink-2); }
+.fc-off { opacity: .4; }
 .fc-span select { width: 92px; padding: 3px 2px; font-size: 11px; }
 .fc-pick { display: grid; gap: 3px; min-width: 0; }
 .fc-pick select, .fc-pick input { width: 100%; min-width: 0; }
@@ -755,12 +756,37 @@ function placeAll(b, ball, grip, L) {
     psa = side(c1) === side(g) ? c1 : c2;
   }
   const buffer = R * Math.asin(Math.sin(L.p2p / R) * Math.sin(L.val * D2R));
-  const holes = [];
-  const fl = grip.span / 2, fs = grip.fspace / 2;
-  holes.push({ name: 'middle finger', p: ll(-fs, fl), d: 0.82 });
-  holes.push({ name: 'ring finger', p: ll(fs, fl), d: 0.8 });
-  if (b.style !== '2H') holes.push({ name: 'thumb', p: ll(0, -fl), d: 1.0 });
-  return { pap, pin, psa, buffer, psa2pap: psa ? gcDist(psa, pap) : null, holes };
+  return { pap, pin, psa, buffer, psa2pap: psa ? gcDist(psa, pap) : null, holes: gripHoles(b, grip) };
+}
+/* The gripping holes as drilled. With fit specs (Fit specs card) the holes come from the fit: each finger's own
+   center-to-center span (cut to cut + half of each hole), the finger spacing (bridge + half of each finger hole), the
+   hole sizes, the thumb oval and every pitch. Without them, the Grip card's span / finger spacing and stock sizes.
+   Grip center (where the PAP is measured from): halfway between the thumb and the line of the finger holes; with no
+   thumb hole it's the center of the finger holes (USBC; Radical's no-thumb guide).
+   Pitch = how far the hole's line misses the ball's center (inches): forward leans toward the palm, lateral toward the
+   side named as you look at the ball. Depths are typical (fingers ~2 1/4", no-thumb fingers 3 1/2", thumb ~2 3/4"). */
+function gripHoles(b, grip) {
+  const F = grip.fit, noThumb = b.style === '2H' || !!F?.noThumb;
+  const sp = F && isFinite(F.space) ? F.space : grip.fspace;
+  const ccM = F && isFinite(F.ccM) ? F.ccM : F && isFinite(F.ccR) ? F.ccR : NaN, ccR = F && isFinite(F.ccR) ? F.ccR : ccM;
+  let yT, yM, yR; // up from the grip center, inches
+  if (isFinite(ccM)) { // thumb at 0, each finger where its own span reaches the finger line
+    const fy = c => Math.sqrt(Math.max(0.25, c * c - (sp / 2) ** 2)); yM = fy(ccM); yR = fy(ccR);
+    const mid = (yM + yR) / 4; yT = -mid; yM -= mid; yR -= mid;
+  } else { yT = -grip.span / 2; yM = yR = grip.span / 2; }
+  if (noThumb) { const c = (yM + yR) / 2; yM -= c; yR -= c; }
+  const sz = k => F && isFinite(F.size?.[k]) && F.size[k] > 0.3 ? F.size[k] : { mf: 0.82, rf: 0.8, th: 1.0 }[k];
+  const pit = k => F?.pitch?.[k] || { fwd: 0, lat: 0 };
+  const holes = [
+    { key: 'mf', name: 'middle finger', p: ll(-sp / 2, yM), d: sz('mf'), pitch: pit('mf'), depth: noThumb ? 3.5 : 2.25 },
+    { key: 'rf', name: 'ring finger', p: ll(sp / 2, yR), d: sz('rf'), pitch: pit('rf'), depth: noThumb ? 3.5 : 2.25 },
+  ];
+  if (!noThumb) {
+    const d = sz('th'), w = F && isFinite(F.ovalW) && F.ovalW > 0 ? (F.ovalW > d * 0.6 ? Math.max(d, F.ovalW) : d + F.ovalW) : d;
+    holes.push({ key: 'th', name: 'thumb', p: ll(0, yT), d, w, rot: F && isFinite(F.ovalDeg) ? F.ovalDeg : 0, pitch: pit('th'), depth: 2.75 });
+  }
+  holes.fromFit = !!(F && isFinite(ccM)); holes.sizesFromFit = !!(F && ["mf", "rf", "th"].some(k => isFinite(F.size?.[k]) && F.size[k] > 0.3));
+  return holes;
 }
 function flare(b, ball, geo, tiltDeg) {
   const a0 = llToV(geo.pap), N0 = llToV(geo.pin);
@@ -968,7 +994,7 @@ function rart(Rm, A) { // R A R^T
 }
 function qFromTo(a, b) { const c = V.cross(a, b), d = V.dot(a, b); if (d < -0.9999) return qAxis(Math.abs(a[0]) < 0.9 ? V.cross(a, [1, 0, 0]) : V.cross(a, [0, 1, 0]), Math.PI); return qNorm([c[0], c[1], c[2], 1 + d]); }
 
-function drilledSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" from PAP), interpolated on the angle to the VAL
+function modelSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" from PAP), interpolated on the angle to the VAL
   const t = (clamp(L.val, 20, 70) - 20) / 50, l3 = (a, b, c) => t < 0.5 ? a + (b - a) * t * 2 : b + (c - b) * (t - 0.5) * 2;
   const asym = ball.core === 'asym';
   // Blueprint's drilled-mass tables (Track Flare Explained, 2012, VAL 30): relative to a 5" pin, shorter pin-to-PAP
@@ -980,6 +1006,82 @@ function drilledSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" fro
     intdiff: asym ? ball.intdiff * l3(1.27, 1.17, 1.10) : l3(0.008, 0.004, 0.004),
   };
 }
+/* Manufacturer drilling charts: drilled int. diff, total diff and RG about the PAP for each suggested layout
+   (15 lb, PAP 5" over; Dual Angle drilling angle x pin-to-PAP x VAL). "Pin over / beside / under" in Radical's sheets
+   is the pin's place relative to the finger holes, and every row puts the pin above the PAP's horizontal line, so all
+   rows are pin up here. und = undrilled [low RG, total diff, int. diff].
+   Sources: Radical drilling instructions, 2026 — Evil Eye Pearl (#0302-26), Guru Oracle Pearl (#1209-25),
+   Outer Limits Black Hole (#0804-25), Intel Recon Hybrid (#0630-26), Vexed Variant (#0416-26).
+   Vexed Variant rows E and F are partly blacked out on the printed chart; the values come from the PDF's text layer. */
+const DRILL_CHARTS = {
+  'Radical Evil Eye Pearl': { src: 'Radical drilling chart #0302-26', core: 'sym', und: [2.493, 0.045, 0], rows: [
+    ['A', 'Maximum Performance', 70, 3.5, 20, 0.022, 0.057, 2.513], ['B', 'Strong Performance', 75, 4, 30, 0.023, 0.053, 2.518],
+    ['C', 'Strong Control', 80, 4.5, 40, 0.021, 0.046, 2.521], ['D', 'Maximum Control', 90, 2.25, 45, 0.014, 0.044, 2.502],
+    ['E', 'Strong Continuous', 20, 3.5, 20, 0.007, 0.047, 2.512], ['F', 'Versatile Continuous', 20, 5, 30, 0.009, 0.043, 2.527]] },
+  'Radical Guru Oracle Pearl': { src: 'Radical drilling chart #1209-25', core: 'asym', und: [2.503, 0.044, 0.018], rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.035, 0.059, 2.520], ['B', 'Most Versatile', 45, 4, 35, 0.023, 0.045, 2.530],
+    ['C', 'Smoother Motion', 20, 4.5, 40, 0.015, 0.038, 2.539], ['D', 'Midlane Hook', 40, 4.25, 75, 0.018, 0.029, 2.532],
+    ['E', 'Smaller Hook', 90, 2.25, 45, 0.014, 0.029, 2.511]] },
+  'Radical Outer Limits Black Hole': { src: 'Radical drilling chart #0804-25', core: 'asym', und: [2.499, 0.051, 0.014], rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.026, 0.059, 2.520], ['B', 'Most Versatile', 45, 4, 35, 0.018, 0.050, 2.528],
+    ['C', 'Smoother Motion', 20, 4.5, 40, 0.012, 0.045, 2.538], ['D', 'Midlane Hook', 40, 4.25, 75, 0.013, 0.040, 2.532],
+    ['E', 'Smaller Hook', 90, 2.25, 45, 0.009, 0.039, 2.509]] },
+  'Radical Intel Recon Hybrid': { src: 'Radical drilling chart #0630-26', core: 'sym', und: [2.481, 0.032, 0], rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.017, 0.041, 2.496], ['B', 'Most Versatile', 75, 4, 30, 0.018, 0.039, 2.499],
+    ['C', 'Smoother Motion', 80, 4.5, 40, 0.018, 0.035, 2.502], ['D', 'Smaller Hook', 90, 2.25, 45, 0.013, 0.026, 2.488]] },
+  'Radical Vexed Variant': { src: 'Radical drilling chart #0416-26', core: 'asym', und: [2.490, 0.045, 0.015], rows: [
+    ['A', 'Maximum Performance', 70, 3.5, 20, 0.032, 0.058, 2.502], ['B', 'Strong Performance', 75, 4, 30, 0.033, 0.054, 2.505],
+    ['C', 'Strong Control', 45, 4, 35, 0.020, 0.044, 2.508], ['D', 'Moderate Control', 90, 2.25, 45, 0.016, 0.042, 2.493],
+    ['E', 'Smooth Control', 20, 3.5, 20, 0.012, 0.044, 2.506], ['F', 'Most Control', 20, 4.5, 40, 0.011, 0.036, 2.516]] },
+};
+/* Two-handed / no-thumb starting layouts, after Radical's "A Radical Look Into No-Thumb Drill Patterns": the PAP is
+   measured from the center of the finger holes (USBC's grip center for no-thumb), pin-to-PAP is the #1 factor —
+   3 3/4"-5 1/4" for more flare and hook, 3/4"-2 1/2" for less flare and a controllable, direct line (most no-thumb
+   bowlers are high-rev, so the control range is the usual start) — and fingers go at least 3 1/2" deep.
+   Radical gives only the pin-to-PAP ranges; the drilling and VAL angles here are the app's mid-range picks. */
+const TWO_HAND_LAYOUTS = [
+  ['2H-1', 'Two-handed: more flare', { da: 45, p2p: 4.5, val: 45, pin: 'up' }, 'pin 3 3/4"–5 1/4" from the PAP: more flare, more hook'],
+  ['2H-2', 'Two-handed: less flare (control)', { da: 60, p2p: 2, val: 45, pin: 'up' }, 'pin 3/4"–2 1/2" from the PAP: less flare, a direct, controllable line'],
+];
+const chartFor = ball => DRILL_CHARTS[(ball.name || '').trim()] || null;
+const CHART_GRIP = { span: 4.75, fspace: 1.25 };
+const CHART_PAP = { papOver: 5, papUp: 0.5, style: '1H' };
+// the drilled ball's high-RG direction: the PSA for an asymmetric core; for a symmetric core the drilling makes one,
+// and Radical's sheets put it by the thumb hole (grip center without a thumb)
+function drilledPsa(ball, geo) { if (geo.psa) return geo.psa; const t = geo.holes.find(h => h.key === 'th'); return t ? t.p : { lat: 0, lon: 0 }; }
+const rgAbout = (spec, geo, axisPt) => { const a = llToV(axisPt), I = inertia(spec, geo).I; return Math.sqrt(Math.max(0, V.dot(a, mv(I, a)))) * 12; };
+/* For each chart row: correction factors from the generic model to the chart. The chart gives RG about the PAP, not the
+   low RG, so the low RG is solved from it: with the chart's diff and int. diff and the layout's pin / PSA positions,
+   find the low RG whose inertia tensor gives that RG along the PAP (bisection; RG about the PAP rises with low RG). */
+const chartCache = new Map();
+function chartCorrections(ch, ball) {
+  if (chartCache.has(ch)) return chartCache.get(ch);
+  const und = { ...ball, core: ch.core, rg: ch.und[0], diff: ch.und[1], intdiff: ch.und[2], pin2psa: 6.75 };
+  const out = ch.rows.map(([id, name, da, p2p, val, idf, df, rgPap]) => {
+    const L = { da, p2p, val, pin: 'up' }, m = modelSpecs(und, L), geo = placeAll(CHART_PAP, und, CHART_GRIP, L);
+    const psa = drilledPsa(und, geo);
+    let lo = 2.2, hi = 2.9;
+    for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2; if (rgAbout({ rg: mid, diff: df, intdiff: idf, psa }, geo, geo.pap) < rgPap) lo = mid; else hi = mid; }
+    return { id, name, L, rgLow: (lo + hi) / 2, kDiff: df / m.diff, kInt: idf / Math.max(1e-4, m.intdiff), dRg: (lo + hi) / 2 - m.rg, row: { idf, df, rgPap } };
+  });
+  chartCache.set(ch, out); return out;
+}
+// layout distance between two Dual Angle layouts (about one "step" per 30 deg drilling angle, 1" pin, 25 deg VAL)
+const layoutDist = (a, b) => Math.hypot((a.da - b.da) / 30, (a.p2p - b.p2p) / 1, (a.val - b.val) / 25);
+/* Drilled specs. With a manufacturer chart, the generic model is corrected toward the chart: each chart row's correction
+   (diff and int. diff as ratios, low RG as an offset) is blended by inverse distance in layout space, so a chart layout
+   reproduces the chart exactly (at the chart's weight) and other layouts follow the nearest rows. Other weights keep the
+   chart's corrections on top of that weight's own specs. */
+function drilledSpecs(ball, L, geo) {
+  const m = modelSpecs(ball, L), ch = chartFor(ball);
+  if (!ch) return m;
+  const rows = chartCorrections(ch, ball);
+  let sw = 0, kD = 0, kI = 0, dR = 0, near = null;
+  for (const r of rows) { const d = layoutDist(L, r.L), w = 1 / (d * d + 0.0025); sw += w; kD += w * r.kDiff; kI += w * r.kInt; dR += w * r.dRg; if (!near || d < near.d) near = { id: r.id, name: r.name, d }; }
+  kD /= sw; kI /= sw; dR /= sw;
+  return { rg: m.rg + dR, diff: m.diff * clamp(kD, 0.5, 2), intdiff: Math.max(0, m.intdiff * clamp(kI, 0.2, 8)),
+    psa: geo ? drilledPsa(ball, geo) : null, chart: { src: ch.src, near: near.d < 0.12 ? near : null, closest: near } };
+}
 /* Core imbalance scale. Was 0.6 (tuned to the "5-6 in max" folklore while flare was measured release -> roll point).
    Checked against 3DB Technology's "Bowling Ball Track Flare Explained" (Powerhouse Blueprint, 2012; its solver was
    validated on CATS lanes): given Blueprint's as-drilled RG / differentials / axis positions for all 49 tabulated
@@ -989,7 +1091,7 @@ function drilledSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" fro
 const FLARE_K = 1.0;
 function inertia(spec, geo) { // per unit mass, ft^2, in the ball's local (layout) frame
   const eLow = llToV(geo.pin);
-  let eHigh = geo.psa ? llToV(geo.psa) : llToV({ lat: 0, lon: 0 });
+  let eHigh = llToV(spec.psa || geo.psa || { lat: 0, lon: 0 });
   eHigh = V.sub(eHigh, V.sc(eLow, V.dot(eHigh, eLow)));
   if (V.len(eHigh) < 1e-6) eHigh = V.cross(eLow, [0, 1, 0]);
   eHigh = V.norm(eHigh); const eInt = V.cross(eLow, eHigh);
@@ -1084,6 +1186,30 @@ function simulate(cfg, alphaDeg, record = false) {
   }
   pts.push({ t, px, py, b: 20 - px / BW, vx, vy, slip: 0, q: q.slice(), c: mtv(qToM(q), [0, 0, -1]), oil: 0, wl: V.norm(mtv(qToM(q), mv(rart(qToM(q), cfg.inert.Inv), Lw))) });
   return { pts, gutter };
+}
+/* Oil rings as they really form. A flare ring is laid down over one whole revolution of the ball, so its axis is the
+   spin axis averaged over that revolution — not the instantaneous axis. Under strong friction (skid on dry boards) the
+   instantaneous axis traces a small loop every revolution (the friction torque is fixed to the lane while the ball spins
+   under it, ~0.15-0.25" here); drawn as snapshots that loop made early rings and the axis path jump toward the grip and
+   back before the real migration took over. Revolutions are counted from the simulated orientation itself.
+   Returns per-point axes smoothed over +-half a revolution, and one ring per revolution { axis, rho, py, oil }. */
+function flareRings(pts) {
+  const P = pts.filter(p => p.q && p.wl && p.c), n = P.length, ang = new Float64Array(n);
+  for (let i = 1; i < n; i++) { const a = P[i - 1].q, b = P[i].q, d = Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]); ang[i] = ang[i - 1] + 2 * Math.acos(Math.min(1, d)); }
+  const smooth = []; let lo = 0, hi = 0, s = [0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    while (hi < n && ang[hi] <= ang[i] + Math.PI) { s = V.add(s, P[hi].wl); hi++; }
+    while (ang[lo] < ang[i] - Math.PI) { s = V.sub(s, P[lo].wl); lo++; }
+    smooth.push(V.norm(s));
+  }
+  const rings = []; let cur = null;
+  for (let i = 0; i < n; i++) {
+    const k = Math.floor(ang[i] / (2 * Math.PI));
+    if (!cur || cur.k !== k) { if (cur) rings.push(cur); cur = { k, sum: [0, 0, 0], rho: 0, oil: 0, m: 0, py: P[i].py }; }
+    cur.sum = V.add(cur.sum, P[i].wl); cur.rho += Math.acos(clamp(V.dot(P[i].wl, P[i].c), -1, 1)); cur.oil += P[i].oil || 0; cur.m++;
+  }
+  if (cur && cur.m > 3) rings.push(cur); // a last part-revolution only if it's more than a few samples
+  return { P, smooth, revs: ang[n - 1] / (2 * Math.PI), rings: rings.map(r => ({ axis: V.norm(r.sum), rho: r.rho / r.m, oil: r.oil / r.m, py: r.py })) };
 }
 function interpAtY(pts, y) {
   for (let i = 1; i < pts.length; i++) if (pts[i].py >= y) {
@@ -1276,6 +1402,7 @@ function layoutCardHTML(X) {
       ${X === 'A' ? '<button class="btn sm" data-q="rec">Recommended</button>' : '<button class="btn sm" data-q="weaker">Weaker</button><button class="btn sm" data-q="stronger">Stronger</button><button class="btn sm" data-q="control">Control</button>'}
     </div></div>
   </div>${X === 'A' ? `
+  <label class="f hidden" id="A_makerBox" style="margin-top:8px"><span>Recommended layouts for this ball</span><select id="A_maker"></select></label>
   <div class="grid2" style="margin-top:8px">
     <label class="f"><span>Goal</span><select id="goal"><option value="bench">Benchmark</option><option value="hook">More hook</option><option value="length">More length / control</option></select></label>
     <div class="f"><span>&nbsp;</span><span class="hint">Nudges Recommended one step stronger (more hook) or weaker (more length). Saved with the bowler.</span></div>
@@ -1384,7 +1511,7 @@ function readState() {
     rg: num('rg') || 2.5, diff: isFinite(num('diff')) ? num('diff') : 0.045, intdiff: isFinite(num('intdiff')) ? num('intdiff') : 0,
     grit: $('grit').value, pin2psa: clamp(parseIn($('pin2psa').value) || 6.75, 1, 6.75), color: $('ballColor').value, weight: +$('ballWt').value || 15,
   };
-  const grip = { span: parseIn($('span').value) || 4.75, fspace: parseIn($('fspace').value) || 1.25 };
+  const grip = { span: parseIn($('span').value) || 4.75, fspace: parseIn($('fspace').value) || 1.25, fit: gripFit() };
   return { b, lane, ball, grip, compare: $('compare').checked && cloud.can('compare') };
 }
 
@@ -1446,10 +1573,12 @@ function textSprite(text, color = '#ffffff') {
 }
 function disposeTree(o) { o.traverse(n => { n.geometry?.dispose?.(); if (n.material) { (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => { m.map?.dispose?.(); m.dispose?.(); }); } }); }
 
+// the cover is not drawn where a hole opening marked the stencil (see BallView.drillHole)
+const holeCut = m => Object.assign(m, { stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc });
 class BallView {
   constructor(host) {
     this.host = host;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, stencil: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     host.appendChild(this.renderer.domElement);
@@ -1481,7 +1610,7 @@ class BallView {
     const col = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { const c = cmap((rg[i] - lo) / span); col.set(c, i * 3); }
     geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    this.group.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 })));
+    this.group.add(new THREE.Mesh(geo, holeCut(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 }))));
     // iso-lines by marching triangles over the sphere mesh
     const idx = geo.index.array, seg = [], P = k => new THREE.Vector3(pos.getX(k), pos.getY(k), pos.getZ(k));
     for (let L = 1; L < 8; L++) {
@@ -1496,6 +1625,37 @@ class BallView {
     this.group.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x10141a, transparent: true, opacity: 0.55 })));
     this.rgRange = [lo, hi];
   }
+  /* One drilled hole. Local frame at the hole (display coords): out = surface normal, up = toward the fingers along the
+     span line, right = as you look at the ball. The bore aims at the ball's center shifted by the pitches: forward
+     leans toward the palm (a finger leans down toward the thumb, the thumb leans up toward the fingers). */
+  drillHole(h, hs) {
+    const disp = a => new THREE.Vector3(hs * a[0], a[1], a[2]);
+    const v = llToV(h.p), out = disp(v).normalize();
+    const north = disp(V.norm(V.sub([0, 1, 0], V.sc(v, v[1]))));
+    const right = new THREE.Vector3().crossVectors(north, out).normalize(), up = new THREE.Vector3().crossVectors(out, right).normalize();
+    const P = out.clone().multiplyScalar(R), pi = h.pitch || { fwd: 0, lat: 0 }, palm = h.key === 'th' ? 1 : -1;
+    const aim = up.clone().multiplyScalar(palm * (pi.fwd || 0)).add(right.clone().multiplyScalar(pi.lat || 0));
+    const bore = aim.sub(P).normalize(); // inward
+    const a = h.d / 2, bw = (h.w || h.d) / 2, rot = (h.rot || 0) * D2R, depth = h.depth || 2.25;
+    // oval: long axis rotated from the span line ("degree of oval"); the bore keeps the same cross-section
+    const ax1 = up.clone().applyAxisAngle(out, -rot), ax2 = new THREE.Vector3().crossVectors(ax1, out);
+    const mask = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false,
+      stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp }));
+    mask.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(ax2, ax1, out));
+    mask.scale.set(a, bw, 1); mask.position.copy(out.clone().multiplyScalar(R + 0.004)); mask.renderOrder = -1; this.group.add(mask);
+    const inside = side => new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: 0.9, side, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.EqualStencilFunc });
+    const y = bore.clone().negate(), x = new THREE.Vector3().crossVectors(ax1, y).normalize(), z = new THREE.Vector3().crossVectors(x, y);
+    const basis = new THREE.Matrix4().makeBasis(x, y, z);
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, depth, 40, 1, true), inside(THREE.BackSide));
+    wall.quaternion.setFromRotationMatrix(basis); wall.scale.set(a, 1, bw); wall.position.copy(P.clone().add(bore.clone().multiplyScalar(depth / 2 - 0.3)));
+    wall.renderOrder = 1; this.group.add(wall);
+    const bottom = new THREE.Mesh(new THREE.CircleGeometry(1, 40), inside(THREE.FrontSide));
+    bottom.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, z.clone().negate(), y)); bottom.scale.set(a, bw, 1);
+    bottom.position.copy(P.clone().add(bore.clone().multiplyScalar(depth - 0.3))); bottom.renderOrder = 1; this.group.add(bottom);
+    // thin rim so the edge reads on any cover color
+    const rim = new THREE.Mesh(new THREE.RingGeometry(1, 1 + 0.06 / a, 48), new THREE.MeshBasicMaterial({ color: 0x9aa3ad, side: THREE.DoubleSide }));
+    rim.quaternion.copy(mask.quaternion); rim.scale.set(a, bw, 1); rim.position.copy(out.clone().multiplyScalar(R + 0.006)); this.group.add(rim);
+  }
   face(vec) { const d = this.camera.position.length(); const v = new THREE.Vector3(...vec).normalize().multiplyScalar(d); this.camera.position.copy(v); this.controls.update(); }
   update(d) {
     disposeTree(this.group); this.group.clear();
@@ -1504,16 +1664,12 @@ class BallView {
     const rough = GRIT_ROUGH[d.ball.grit] ?? .5;
     const mat = new THREE.MeshPhysicalMaterial({ color: d.ball.color, roughness: rough, clearcoat: rough < .3 ? 0.8 : 0.1, clearcoatRoughness: rough < .3 ? 0.1 : 0.6,
       iridescence: d.ball.cover === 'pearl' ? 0.6 : 0, iridescenceIOR: 1.5, sheen: d.ball.cover === 'pearl' ? 0.4 : 0 });
+    holeCut(mat);
     if (d.showContours && d.inertI) this.rgContours(d.inertI, hs);
     else this.group.add(new THREE.Mesh(new THREE.SphereGeometry(R, 96, 64), mat));
-    // gripping holes
-    for (const h of d.geo.holes) {
-      const v = llToV(h.p), pos = W(v, R + 0.035), out = W(v, R + 2);
-      const disc = new THREE.Mesh(new THREE.CircleGeometry(h.d / 2, 40), new THREE.MeshBasicMaterial({ color: 0x07080a }));
-      disc.position.copy(pos); disc.lookAt(out); this.group.add(disc);
-      const rim = new THREE.Mesh(new THREE.RingGeometry(h.d / 2, h.d / 2 + 0.07, 40), new THREE.MeshBasicMaterial({ color: 0x9aa3ad, side: THREE.DoubleSide }));
-      rim.position.copy(W(v, R + 0.04)); rim.lookAt(out); this.group.add(rim);
-    }
+    // gripping holes, drilled: each opening is cut out of the cover (stencil), and through it you see the bore —
+    // a cylinder down the hole's pitched line to its depth — so size, oval and pitch all show
+    for (const h of d.geo.holes) this.drillHole(h, hs);
     const marker = (p, color, label, size = 0.2) => {
       const v = llToV(p);
       const m = new THREE.Mesh(new THREE.SphereGeometry(size, 20, 14), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.35 }));
@@ -1567,27 +1723,22 @@ class BallView {
     }
     if (d.showRings && d.run) {
       // the actual contact path from the simulation: blue where the ball picked up oil, orange on the dry backend
-      const pts = d.run.pts.filter(p => p.c && p.wl);
+      const fr = flareRings(d.run.pts);
       const tube = (vs, rad, color, opacity = 1) => { if (vs.length < 2) return; this.group.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(vs), Math.max(8, vs.length * 2), rad, 6, false), new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity }))); };
-      // flare rings: one oil ring per ball revolution (every 27" of travel), each a circle around the spin axis at that
-      // moment through the contact point -- the bow-tie pattern you see on a real ball after a shot
-      let next = 0;
-      for (const p of pts) {
-        if (p.py * 12 < next) continue;
-        next = p.py * 12 + 27;
-        const rho = Math.acos(clamp(V.dot(p.wl, p.c), -1, 1));
-        const ring = circleAround(p.wl, rho, 96).map(v => W(v, R + 0.025));
+      // flare rings: one oil ring per revolution of the ball, around that revolution's average spin axis, through the
+      // contact point -- the bow-tie pattern you see on a real ball after a shot (blue = picked up oil, orange = dry)
+      for (const r of fr.rings) {
+        const ring = circleAround(r.axis, r.rho, 96).map(v => W(v, R + 0.025));
         ring.push(ring[0].clone());
-        tube(ring, 0.018, p.oil > 0.05 ? 0x6fc3ff : 0xffa94d, 0.9);
+        tube(ring, 0.018, r.oil > 0.05 ? 0x6fc3ff : 0xffa94d, 0.9);
       }
-      // spin-axis migration (the PAP moving as the ball flares), with start/end dots and the total distance
-      const ax = pts.filter((p, i) => i % 4 === 0).map(p => W(p.wl, R + 0.05));
-      ax.push(W(pts.at(-1).wl, R + 0.05));
+      // spin-axis migration (the PAP moving as the ball flares), from the PAP at release along the revolution-averaged axis
+      const ax = [W(fr.P[0].wl, R + 0.05), ...fr.smooth.filter((v, i) => i % 4 === 0).map(v => W(v, R + 0.05)), W(fr.smooth.at(-1), R + 0.05)];
       tube(ax, 0.055, 0x3ddc84);
       const dot = (v, c) => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 10), new THREE.MeshBasicMaterial({ color: c })); m.position.copy(W(v, R + 0.06)); this.group.add(m); };
-      dot(pts.at(-1).wl, 0xb8ffd6);
-      const mig = Math.acos(clamp(V.dot(pts[0].wl, pts.at(-1).wl), -1, 1)) * R;
-      const s = textSprite(`axis migrates ${mig.toFixed(1)}"`, '#3ddc84'); s.scale.set(1.6 * s.userData.aspect, 0.4, 1); s.position.copy(W(pts.at(-1).wl, R + 0.7)); this.group.add(s);
+      dot(fr.smooth.at(-1), 0xb8ffd6);
+      const mig = Math.acos(clamp(V.dot(fr.P[0].wl, fr.smooth.at(-1)), -1, 1)) * R;
+      const s = textSprite(`axis migrates ${mig.toFixed(1)}" · ${fr.rings.length} rings`, '#3ddc84'); s.scale.set(1.6 * s.userData.aspect, 0.4, 1); s.position.copy(W(fr.smooth.at(-1), R + 0.7)); this.group.add(s);
     }
     // release track = first oil line: the contact ring at release, (90 deg + tilt) from the PAP.
     // Marked where it crosses the grip midline and centerline, with the distance from grip center, to compare with a real ball.
@@ -1680,7 +1831,9 @@ class LaneView {
       g.add(new THREE.Mesh(new THREE.SphereGeometry(Rf, 48, 32), mat));
       for (const h of d.geos[idx].holes) {
         const v = llToV(h.p); const disc = new THREE.Mesh(new THREE.CircleGeometry(h.d / 24, 24), new THREE.MeshBasicMaterial({ color: 0x050505 }));
-        disc.position.set(hs * v[0] * Rf * 1.01, v[1] * Rf * 1.01, v[2] * Rf * 1.01); disc.lookAt(hs * v[0] * 2, v[1] * 2, v[2] * 2); g.add(disc);
+        disc.position.set(hs * v[0] * Rf * 1.01, v[1] * Rf * 1.01, v[2] * Rf * 1.01); disc.lookAt(hs * v[0] * 2, v[1] * 2, v[2] * 2);
+        if (h.w && h.w > h.d) { disc.rotateZ(-(h.rot || 0) * D2R * hs); disc.scale.set(1, h.w / h.d, 1); } // thumb oval, long axis along the span line
+        g.add(disc);
       }
       const pv = llToV(d.geos[idx].pin); const pm = new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffd23f }));
       pm.position.set(hs * pv[0] * Rf, pv[1] * Rf, pv[2] * Rf); g.add(pm);
@@ -1699,7 +1852,9 @@ class LaneView {
       const track = new THREE.Line(tg, new THREE.LineBasicMaterial({ vertexColors: true })); g.add(track);
       // same track as fat dots (WebGL lines are 1 px), and the spin axis's path over the cover (PAP migration), both revealed with time
       const trackDots = new THREE.Points(tg, new THREE.PointsMaterial({ vertexColors: true, size: 3, sizeAttenuation: false })); g.add(trackDots);
-      const mpos = []; run.pts.forEach(p => { const w = p.wl || run.pts[0].wl; mpos.push(hs * w[0] * Rf * 1.02, w[1] * Rf * 1.02, w[2] * Rf * 1.02); });
+      // the axis averaged over one revolution (flareRings), so the per-revolution friction loop doesn't show as jitter
+      const frl = flareRings(run.pts), sm = new Map(frl.P.map((q, i) => [q, frl.smooth[i]]));
+      const mpos = []; run.pts.forEach(p => { const w = sm.get(p) || p.wl || run.pts[0].wl; mpos.push(hs * w[0] * Rf * 1.02, w[1] * Rf * 1.02, w[2] * Rf * 1.02); });
       const mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(mpos, 3));
       const migDots = new THREE.Points(mg, new THREE.PointsMaterial({ color: 0x3ddc84, size: 4, sizeAttenuation: false })); g.add(migDots);
       // spin axis "skewer" through the ball (follows the simulated axis as it migrates) so tilt and rotation are visible
@@ -1891,7 +2046,7 @@ function analyze(state, X, rec) {
   const geo = placeAll(state.b, state.ball, state.grip, L);
   const tilt = estTilt(state.b), rot = estRot(state.b);
   const fl = flare(state.b, state.ball, geo, tilt.v);
-  const spec = drilledSpecs(state.ball, L);
+  const spec = drilledSpecs(state.ball, L, geo);
   const th = tilt.v * D2R, ph = rot.v * D2R, axis = [-Math.cos(th) * Math.cos(ph), -Math.cos(th) * Math.sin(ph), Math.sin(th)];
   const thr = throwFor(state.b, state.ball);
   const cfg = { mph: thr.mph, rpm: thr.rpm, tilt: tilt.v, rot: rot.v, laydown: state.lane.laydown,
@@ -1978,6 +2133,7 @@ function compute() {
   const cols = state.compare ? 2 : 1;
   for (const id of ['layCols', 'ballsHost', 'statsHost']) $(id).style.setProperty('--cols', cols);
 
+  fillMakerLayouts(state);
   const rec = recommend(state.b, state.lane, state.ball); recCache = rec;
   const ballB = readBallB(state.ball);
   const res = { A: analyze(state, 'A', rec) }; res.A.ball = state.ball;
@@ -2015,7 +2171,7 @@ function renderRead(state, rec, res) {
   $('rotation').placeholder = `${r.v}° ${r.est ? '· estimate' : ''}`;
   if (t.bad) warns.push(`The ${t.src} reading puts the track closer to the PAP than 6 3/4", which can't happen (6 3/4" is zero tilt). Re-check the measurement — the PAP→track distance is measured from the PAP across to the oil ring, not the PAP's distance from the grip.`);
   if (t.est || r.est) warns.push('Tilt/rotation are rough estimates. A PAP alone can’t give them (the same PAP can be released at different angles) — use "Measure tilt & rotation from a release photo" for real numbers.');
-  if (state.b.style === '2H') warns.push('Two-hander: the grip center is between the finger holes and where a thumb hole would be (or use Storm’s 2LS system). Measure the PAP carefully.');
+  if (state.b.style === '2H') warns.push('Two-hander: no thumb hole, so the grip center is the center of the finger holes (USBC; Radical’s no-thumb guide). Measure the PAP from there, and drill the fingers at least 3 1/2" deep.');
   if (state.ball.core === 'asym' && Math.abs(state.ball.pin2psa - 6.75) > 0.05) warns.push(`PSA set ${fmtIn(state.ball.pin2psa)} from the pin. Dual Angle assumes 6 3/4" — if your ball's mass-bias marker is closer, the PSA is still 6 3/4" out along the same pin–MB line.`);
   $('readCard').innerHTML = `
     <h2>Bowler read</h2>
@@ -2030,22 +2186,27 @@ function renderRead(state, rec, res) {
 function layoutBlock(state, X, r) {
   const sym = state.ball.core === 'sym', hand = state.b.hand === 'L' ? 'left' : 'right';
   const L = r.L, g = r.geo, surf = surfaceRec(r.s, state.ball);
+  // Radical's symmetric charts still use a drilling angle: it sets where the thumb (and the drilled PSA) lands vs the pin and CG
+  const chartSym = sym && !!r.stats.spec.chart;
   const ou = (p) => `${fmtIn(Math.abs(p.over))} ${p.over >= 0 ? 'over (PAP side)' : 'over (other side)'}, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}`;
   return `<div>
     <div class="row" style="margin-bottom:6px"><span class="tag tag${X}" style="color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px">${X}</span>
-      <span class="big">${sym ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</span><span class="chip">pin ${L.pin}</span></div>
+      <span class="big">${sym && !chartSym ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</span><span class="chip">pin ${L.pin}</span></div>
     <dl class="kv">
-      <dt>Dual Angle</dt><dd>${sym ? 'n/a (sym)' : Math.round(L.da) + '°'} drilling · ${fmtIn(L.p2p)} pin-to-PAP · ${Math.round(L.val)}° VAL</dd>
+      <dt>Dual Angle</dt><dd>${sym && !chartSym ? 'n/a (sym)' : Math.round(L.da) + '°'} drilling · ${fmtIn(L.p2p)} pin-to-PAP · ${Math.round(L.val)}° VAL</dd>
       <dt>VLS / Pin Buffer</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
       <dt>Pin lands</dt><dd>${ou(r.pinOU)}</dd>
       ${r.psaOU ? `<dt>PSA lands</dt><dd>${ou(r.psaOU)}</dd>` : ''}
       <dt>Track flare (simulated)</dt><dd>${r.stats.flareSim.toFixed(1)}" <span class="hint" style="margin:0">(${r.stats.flareOil.toFixed(1)}" in oil + ${r.stats.flareDry.toFixed(1)}" dry)</span></dd>
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
-      <dt>Drilled RG / diff / int.</dt><dd>${r.stats.spec.rg.toFixed(3)} / ${r.stats.spec.diff.toFixed(3)} / ${r.stats.spec.intdiff.toFixed(3)} <span class="hint">(${(r.stats.spec.rg - state.ball.rg >= 0 ? '+' : '') + (r.stats.spec.rg - state.ball.rg).toFixed(3)} RG from drilling; book: pin-up layouts add about 0.01–0.02, pin-down about −0.01, Rico about −0.05)</span></dd>
+      <dt>Drilled RG / diff / int.</dt><dd>${r.stats.spec.rg.toFixed(3)} / ${r.stats.spec.diff.toFixed(3)} / ${r.stats.spec.intdiff.toFixed(3)} <span class="hint">(${(r.stats.spec.rg - state.ball.rg >= 0 ? '+' : '') + (r.stats.spec.rg - state.ball.rg).toFixed(3)} RG from drilling; ${r.stats.spec.chart
+        ? `from ${r.stats.spec.chart.src}${r.stats.spec.chart.near ? `, layout ${r.stats.spec.chart.near.id} (${r.stats.spec.chart.near.name})` : `, blended from the nearest chart layouts (closest: ${r.stats.spec.chart.closest.id} ${r.stats.spec.chart.closest.name})`}${state.b.style === '2H' ? '; the chart assumes a thumb hole' : ''}`
+        : 'book: pin-up layouts add about 0.01–0.02, pin-down about −0.01, Rico about −0.05'})</span></dd>
+      <dt>Holes</dt><dd>${g.holes.map(h => `${h.name} ${fmt64(h.d)}"${h.w > h.d ? ` (oval ${fmt64(h.w)}")` : ''}`).join(', ')} <span class="hint">(${g.holes.fromFit ? 'drilled from the Fit specs card: spans, sizes, oval, pitches' : g.holes.sizesFromFit ? 'sizes from the Fit specs card; placed by the Grip card span until the fit has cut-to-cut spans, hole sizes and the bridge' : 'stock sizes placed by the Grip card span — fill in the Fit specs card to drill the real holes'})</span></dd>
       <dt>Surface</dt><dd>${surf.grit}</dd>
     </dl>
     <ul class="why simple-only">
-      <li>${explainDA(L.da, sym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(sym ? 45 : L.da, L.val)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
+      <li>${explainDA(L.da, sym && !chartSym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(sym && !chartSym ? 45 : L.da, L.val)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
     </ul>
     <p class="hint adv">${surf.note} Measurements are from the center of the grip, the same way the PAP is measured (${hand}-handed view).</p>
   </div>`;
@@ -2176,6 +2337,27 @@ $('readCard').addEventListener('click', e => {
   const [o, u] = v.split(',').map(Number);
   $('papOver').value = fmtIn(Math.abs(o)).replace('"', ''); $('papUp').value = fmtIn(Math.abs(u)).replace('"', ''); $('papDir').value = u >= 0 ? 'up' : 'down';
   applyRec();
+});
+/* The maker's suggested layouts for the ball (its drilling chart, with each row's drilled specs) plus the two
+   two-handed / no-thumb starts. Shown for a ball with a chart, and for any ball when the bowler is two-handed. */
+function makerLayouts(ball, style) {
+  const ch = chartFor(ball), out = [];
+  if (ch) for (const [id, name, da, p2p, val, idf, df, rgPap] of ch.rows) out.push({ key: id, label: `${id} – ${name}: ${da}° × ${fmtIn(p2p)} × ${val}° (int ${idf.toFixed(3)}, diff ${df.toFixed(3)}, RG at PAP ${rgPap.toFixed(3)})`, L: { da, p2p, val, pin: 'up' } });
+  if (ch || style === '2H') for (const [key, name, L, note] of TWO_HAND_LAYOUTS) out.push({ key, label: `${name}: ${L.da}° × ${fmtIn(L.p2p)} × ${L.val}° — ${note}`, L });
+  return { out, ch };
+}
+function fillMakerLayouts(state) {
+  const { out, ch } = makerLayouts(state.ball, state.b.style), s = $('A_maker'), keep = s.value;
+  $('A_makerBox').classList.toggle('hidden', !out.length);
+  if (!out.length) return;
+  const sig = state.ball.name + '|' + state.b.style; if (s.dataset.sig === sig) return; s.dataset.sig = sig;
+  s.innerHTML = `<option value="">${ch ? ch.src.replace('drilling chart', 'chart') + ' — pick a layout…' : 'Pick a layout…'}</option>`
+    + (state.b.style === '2H' ? [...out.filter(o => o.key.startsWith('2H')), ...out.filter(o => !o.key.startsWith('2H'))] : out).map(o => `<option value="${o.key}">${escH(o.label)}</option>`).join('');
+  s.value = [...s.options].some(o => o.value === keep) ? keep : '';
+}
+$('A_maker').addEventListener('change', e => {
+  const st = readState(), o = makerLayouts(st.ball, st.b.style).out.find(x => x.key === e.target.value); if (!o) return;
+  setLayoutInputs('A', o.L); compute();
 });
 function applyRec() { const st = readState(); const r = recommend(st.b, st.lane, st.ball); setLayoutInputs('A', r.layout); if (st.compare) setLayoutInputs('B', stepLayout(r.s, 1).layout); compute(); }
 for (const X of ['A', 'B']) $('card' + X).addEventListener('click', e => {
@@ -2561,6 +2743,16 @@ function fitPickInput(e) {
   const t = e.target.closest('.fc-stype');
   if (t) { const box = $('fitHost').querySelector(`.fc-sp[data-h="${t.id.split('_')[1]}"]`); box.value = $(spanId(box.dataset.h)).value; }
 }
+/* Two-handed (no thumb) grip: there's no thumb hole, so every thumb field is blocked — hole size, pitches, oval,
+   insert style / size — and so are the spans, which run from the thumb hole to each finger. The stored values stay
+   (switching the grip back brings them back); the ball view drills no thumb hole. */
+function fitThumbUI() {
+  const off = /^two-handed/i.test($('fit_grip').value), host = $('fitHost');
+  host.querySelectorAll('.fc-p[data-h="th"], #fit_th_size, .fc-sel[data-for^="fit_th_"], #fit_th_ins, #fit_th_insz, #fit_ovaldeg, #fit_ovalw, .fc-sp, .fc-stype')
+    .forEach(e => { e.disabled = off; e.title = off ? 'No thumb hole with a two-handed (no thumb) grip' : ''; });
+  host.querySelectorAll('.fc-a-th, .fc-span, .fc-oval').forEach(e => e.classList.toggle('fc-off', off));
+}
+$('fit_grip').addEventListener('change', fitThumbUI);
 $('hand').addEventListener('change', fitHandUI);
 fitHandUI();
 
@@ -2622,7 +2814,7 @@ $('fitHost').addEventListener('input', fitBoxInput); $('fitHost').addEventListen
 $('fitHost').addEventListener('input', fitPickInput); $('fitHost').addEventListener('change', fitPickInput);
 const readFit = () => Object.fromEntries(FIT_IDS.map(id => [id, $(id).value]));
 const SP_DEFAULTS = { sp_lay: '6', sp_drift: '0', ...Object.fromEntries(Object.entries(SP_DEFAULT_ARROW).map(([p, a]) => [`sp_arrow_${p}`, String(a)])) };
-const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); fitBoxesFromStore(); fitSpansFromStore(f); fitPicksFromStore(); fitHandUI(); renderSpares(); fitDerivedUI(); };
+const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); fitBoxesFromStore(); fitSpansFromStore(f); fitPicksFromStore(); fitThumbUI(); fitHandUI(); renderSpares(); fitDerivedUI(); };
 /* Spans from the fit sheet, as pro shops define them (bowlingball.com pro shop terms; ballreviews fitting threads):
    - cut to cut: thumb-hole edge to finger-hole edge nearest each other, measured to the drilled cut (inserts/grips excluded)
    - actual: the same edges with the inserts / grips in (what the hand feels)
@@ -2634,6 +2826,14 @@ function fitCC(f) {
   const ccM = g('fit_mf_sfull') + th / 2 + mf / 2, ccR = g('fit_rf_sfull') + th / 2 + rf / 2, space = br + mf / 2 + rf / 2;
   const span = isFinite(ccM) && isFinite(ccR) ? (ccM + ccR) / 2 : isFinite(ccM) ? ccM : ccR;  // to the middle of the finger pair
   return { ccM, ccR, span, space };
+}
+// the fit, as the hole geometry gripHoles() drills on the ball (null until the fit section has loaded)
+function gripFit() {
+  let f; try { f = readFit(); } catch { return null; }
+  const g = id => parseIn(f[id] || ''), c = fitCC(f), z = v => isFinite(v) ? v : 0;
+  const pitch = Object.fromEntries(HOLES.map(([h]) => [h, { fwd: z(g(`fit_${h}_fp`)) * (f[`fit_${h}_fpd`] === 'R' ? -1 : 1), lat: z(g(`fit_${h}_lp`)) * (f[`fit_${h}_lpd`] === 'L' ? -1 : 1) }]));
+  return { size: Object.fromEntries(HOLES.map(([h]) => [h, g(`fit_${h}_size`)])), ccM: c.ccM, ccR: c.ccR, space: c.space,
+    ovalW: g('fit_ovalw'), ovalDeg: parseFloat(f.fit_ovaldeg), pitch, noThumb: /^two-handed/i.test(f.fit_grip || '') };
 }
 function fitDerivedText(f) {
   const c = fitCC(f), parts = [];
@@ -2653,6 +2853,7 @@ function fitDerivedUI() {
 }
 $('fitHost').addEventListener('input', fitDerivedUI);
 $('fitHost').addEventListener('change', fitDerivedUI);
+$('fitHost').addEventListener('change', () => schedule()); // the drilled holes on the ball follow the fit
 $('fitHost').addEventListener('click', e => {
   if (e.target.id !== 'fitToGrip') return;
   const c = fitCC(readFit());
@@ -2918,7 +3119,7 @@ $('arsTable').addEventListener('click', e => {
 /* coverage: every ball simulated for the current bowler on the current pattern, same laydown */
 function quickMotion(state, ball, L0) {
   const L = resolveLayout({ ...L0, sys: 'dual' }, ball), geo = placeAll(state.b, ball, state.grip, L);
-  const tilt = estTilt(state.b), rot = estRot(state.b), spec = drilledSpecs(ball, L);
+  const tilt = estTilt(state.b), rot = estRot(state.b), spec = drilledSpecs(ball, L, geo);
   const th = tilt.v * D2R, ph = rot.v * D2R, axis = [-Math.cos(th) * Math.cos(ph), -Math.cos(th) * Math.sin(ph), Math.sin(th)];
   const cfg = { ...throwFor(state.b, ball), tilt: tilt.v, rot: rot.v, laydown: state.lane.laydown, inert: inertia(spec, geo), fr: makeFriction(state.lane, ball, L), q0: releaseOrientation(state.b, geo, axis) };
   const run = lay => { const c = { ...cfg, laydown: lay }, a = aim(c), rr = simulate(c, a.alpha), st = motionStats(rr, a.alpha); lineScore(st, rr, state.lane.eff); st.ok = a.status === 'ok' && (st.gutter == null || st.gutter >= 60) && st.bpBoard >= 3; st.laydown = lay; return st; };
@@ -3264,7 +3465,7 @@ renderDeck();
    Saved on this device per pattern; Auto line, Pocket from laydown and My line only simulate on it. */
 function calibShot(state, lay, arrows) {
   const ball = state.ball, L = last.res.A.L;
-  const geo = placeAll(state.b, ball, state.grip, L), tilt = estTilt(state.b), rot = estRot(state.b), spec = drilledSpecs(ball, L);
+  const geo = placeAll(state.b, ball, state.grip, L), tilt = estTilt(state.b), rot = estRot(state.b), spec = drilledSpecs(ball, L, geo);
   const th = tilt.v * D2R, ph = rot.v * D2R, axis = [-Math.cos(th) * Math.cos(ph), -Math.cos(th) * Math.sin(ph), Math.sin(th)];
   const cfg = { ...throwFor(state.b, ball), tilt: tilt.v, rot: rot.v, laydown: lay, inert: inertia(spec, geo), q0: releaseOrientation(state.b, geo, axis) };
   // one try at backend factor kb and oil factor ko: re-aim through the arrows each time (oil friction changes the heads)
