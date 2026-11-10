@@ -157,6 +157,10 @@ body[data-mode="driller"] .simple-only { display: none !important; }
 .fc-box input { width: 54px; text-align: center; padding: 4px 2px; font-size: 13px; }
 .fc-a-mf { grid-area: mf; } .fc-a-rf { grid-area: rf; } .fc-a-th { grid-area: th; } .fc-a-br { grid-area: br; } .fc-a-smf { grid-area: smf; } .fc-a-srf { grid-area: srf; }
 .fc-hand { font-size: 12px; color: var(--ink-2); }
+.fc-span select { width: 92px; padding: 3px 2px; font-size: 11px; }
+.fc-pick { display: grid; gap: 3px; min-width: 0; }
+.fc-pick select, .fc-pick input { width: 100%; min-width: 0; }
+.fit td:has(.fc-pick) { width: 33%; }
 .fc-oval { display: flex; gap: 8px 12px; flex-wrap: wrap; justify-content: flex-end; margin: 4px 0 10px; }
 .fc-oval label { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); }
 .fc-oval input { width: 70px; }
@@ -290,7 +294,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
     <div class="card" id="fitCard">
       <h2>Fit specs <span style="text-transform:none;letter-spacing:0;font-weight:400">— inches, 1/64ths</span></h2>
       <div id="fitHost"></div>
-      <p class="hint">Laid out like a pro shop grip card, looking at the ball with the finger holes up. Type each pitch in the box on the side it points to (one per pair), and the hole size inside each circle. Spans on the diagram are <b>cut to cut</b>: thumb-hole edge to finger-hole edge, measured to the drilled cut. <b>Actual</b> spans (with inserts in, what the hand feels) go in the table. Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
+      <p class="hint">Laid out like a pro shop grip card, looking at the ball with the finger holes up. Type each pitch in the box on the side it points to (one per pair), and the hole size inside each circle. Each span box has a dropdown: <b>Cut to cut</b> (thumb-hole edge to finger-hole edge, measured to the drilled cut — the layout math uses this one) or <b>Full span</b> (with the inserts in, what the hand feels). Both are kept; the dropdown picks which one you're editing and which one prints. Insert style and size: pick from the list, or choose <b>Other…</b> to type your own. Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
       <div class="row"><button class="btn sm" type="button" id="fitPrint" data-plan="print">Print fit card</button></div>
     </div>
 
@@ -2446,8 +2450,25 @@ const HOLES = [['th', 'Thumb'], ['mf', 'Middle'], ['rf', 'Ring']];
 /* Field keys are unchanged from the old table (fit_<hole>_<key>), so saved fits keep their values:
    size = hole size (drilled cut) · ins = insert style · insz = insert size (new) · sfit = span actual · sfull = span cut to cut
    fp + fpd = forward / reverse pitch (F|R) · lp + lpd = lateral pitch (L|R, as you look at the ball) · oval = cut / depth notes · bev = bevel.
-   Plus fit_grip, fit_bridge, fit_ovaldeg + fit_ovalw (thumb oval, new) and fit_notes. */
-const FIT_TABLE = [['ins', 'Insert style'], ['insz', 'Insert size'], ['sfit', 'Span — actual', 'fingers'], ['oval', 'Cut / depth'], ['bev', 'Bevel']];
+   Plus fit_grip, fit_bridge, fit_ovaldeg + fit_ovalw (thumb oval, new) and fit_notes.
+   The span box on each finger shows one of two stored spans, picked by fit_<h>_stype: cc = sfull (cut to cut), full = sfit (full span).
+   Bevel and cut / depth are no longer shown, but old values stay in hidden fields so a save doesn't wipe them. */
+const FIT_TABLE = [['ins', 'Insert style'], ['insz', 'Insert size']];
+const FIT_HIDDEN = ['oval', 'bev'];
+const FC_OTHER = '__other';
+const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const SPAN_TYPES = { cc: ['sfull', 'Cut to cut'], full: ['sfit', 'Full span'] };
+// which span a saved fit shows: its stored choice, else cut to cut unless only a full span was entered (older fits)
+const spanType = (f, h) => f?.[`fit_${h}_stype`] || (!(f?.[`fit_${h}_sfull`] || '').trim() && (f?.[`fit_${h}_sfit`] || '').trim() ? 'full' : 'cc');
+/* Insert lists: the common US products (Vise and Turbo catalogs / retailer listings, 2024-26). "Other…" takes free text.
+   Thumb sizes: Vise Ultimate Vinyl / Turbo Xcel run 51/64 to 1 7/64. Finger sizes: Vise P/O and Turbo Quad run
+   9/16 to 29/32, Vise Ladies P/O and Turbo Ms. Quad go down to 17/32. All in 1/64 steps. */
+const INS_STYLES = {
+  th: ['No insert (drilled)', 'Vise Pro V2 vinyl oval', 'Vise Ultimate Vinyl oval', 'Vise Ultimate Vinyl round', 'Turbo Xcel oval', 'Turbo Xcel round', 'Turbo Switch Grip', 'Urethane thumb slug', 'Tape only'],
+  f: ['No insert (drilled)', 'Vise Power Lift & Oval (P/O)', 'Vise Power Lift & Semi (P/S)', 'Vise Oval & Power Oval', 'Vise Ladies Power Lift & Oval', 'Turbo Quad', 'Turbo Quad2 (nubs)', 'Turbo Quad Soft Power Lift Oval mesh', 'Turbo Ms. Quad', 'Turbo Switch Grip finger']
+};
+const range64 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => fmt64((a + i) / 64));
+const INS_SIZES = { th: range64(51, 71), f: range64(34, 58) };
 function fmt64(x) {
   if (!isFinite(x)) return '';
   const neg = x < 0; x = Math.abs(x); let w = Math.floor(x), n = Math.round((x - w) * 64);
@@ -2467,6 +2488,11 @@ function fcHole(h, name) {
     <input type="hidden" id="fit_${h}_fp"><select id="fit_${h}_fpd" hidden><option>F</option><option>R</option></select>
     <input type="hidden" id="fit_${h}_lp"><select id="fit_${h}_lpd" hidden><option>L</option><option>R</option></select></div>`;
 }
+// a span box: the input edits whichever stored span the dropdown picks (both are kept)
+const fcSpan = (h, name) => `<div class="fc-box fc-span fc-a-s${h}"><span>Span · ${name.toLowerCase()}</span>
+  <input class="fc-sp" data-h="${h}" data-n placeholder="0" aria-label="${name} span">
+  <select id="fit_${h}_stype" class="fc-stype" aria-label="${name} span type">${Object.entries(SPAN_TYPES).map(([v, [, l]]) => `<option value="${v}">${l}</option>`).join('')}</select>
+  <input type="hidden" id="fit_${h}_sfull"><input type="hidden" id="fit_${h}_sfit"></div>`;
 function fitHTML() {
   let h = `<div class="grid2" style="margin-bottom:8px">
     <label class="f"><span>Grip</span><select id="fit_grip"><option>Fingertip</option><option>Semi-fingertip</option><option>Conventional</option><option>Two-handed (no thumb)</option></select></label>
@@ -2474,18 +2500,22 @@ function fitHTML() {
     <div class="fc-scroll"><div class="fc" id="fcGrid">
       ${fcHole('mf', 'Middle')}${fcHole('rf', 'Ring')}
       <label class="fc-box fc-a-br"><span>Bridge</span><input id="fit_bridge" data-n placeholder="1/4"><span>← →</span></label>
-      <label class="fc-box fc-a-smf"><span>Span · middle</span><input id="fit_mf_sfull" data-n placeholder="0"><span>cut to cut</span></label>
+      ${fcSpan('mf', 'Middle')}
       ${fcHole('th', 'Thumb')}
-      <label class="fc-box fc-a-srf"><span>Span · ring</span><input id="fit_rf_sfull" data-n placeholder="0"><span>cut to cut</span></label>
+      ${fcSpan('rf', 'Ring')}
     </div></div>
     <div class="fc-oval"><label>Thumb: degree of oval <input id="fit_ovaldeg" placeholder="e.g. 10°"></label><label>width <input id="fit_ovalw" data-n placeholder="0"></label></div>
     <table class="fit"><tr><th></th>${HOLES.map(([, l]) => `<th>${l}</th>`).join('')}</tr>`;
-  for (const [k, label, only] of FIT_TABLE) {
+  for (const [k, label] of FIT_TABLE) {
     h += `<tr><th>${label}</th>`;
-    for (const [hk] of HOLES) h += only === 'fingers' && hk === 'th' ? '<td></td>' : `<td><input id="fit_${hk}_${k}" ${k === 'sfit' ? 'data-n placeholder="0"' : ''}></td>`;
+    for (const [hk, hn] of HOLES) {
+      const list = (k === 'ins' ? INS_STYLES : INS_SIZES)[hk === 'th' ? 'th' : 'f'];
+      h += `<td><div class="fc-pick"><select class="fc-sel" data-for="fit_${hk}_${k}" aria-label="${hn} ${label.toLowerCase()}"><option value="">—</option>${list.map(o => `<option>${escH(o)}</option>`).join('')}<option value="${FC_OTHER}">Other…</option></select>`
+        + `<input id="fit_${hk}_${k}" class="fc-other" ${k === 'insz' ? 'data-n' : ''} placeholder="type it" aria-label="${hn} ${label.toLowerCase()} (other)" hidden></div></td>`;
+    }
     h += '</tr>';
   }
-  h += `</table><div id="fitDerived" class="hint" style="margin:8px 0 0"></div><label class="f" style="margin-top:8px"><span>Fit notes</span><input id="fit_notes" placeholder="e.g. tape 2 pieces in thumb, flat back in ring insert"></label>`;
+  h += `</table>${HOLES.map(([hk]) => FIT_HIDDEN.map(k => `<input type="hidden" id="fit_${hk}_${k}">`).join('')).join('')}<div id="fitDerived" class="hint" style="margin:8px 0 0"></div><label class="f" style="margin-top:8px"><span>Fit notes</span><input id="fit_notes" placeholder="e.g. tape 2 pieces in thumb, flat back in ring insert"></label>`;
   return h;
 }
 $('fitHost').innerHTML = fitHTML();
@@ -2503,6 +2533,33 @@ function fitBoxInput(e) {
   const id = `fit_${b.dataset.h}_${b.dataset.k}`;
   $(id).value = b.value.trim(); $(id + 'd').value = b.dataset.d;
   if (b.value.trim()) fcBoxes().forEach(o => { if (o !== b && o.dataset.h === b.dataset.h && o.dataset.k === b.dataset.k) o.value = ''; });
+}
+const spanId = h => `fit_${h}_${SPAN_TYPES[$(`fit_${h}_stype`).value][0]}`;
+function fitSpansFromStore(f) { // after a load: pick each box's span type, then show that span
+  $('fitHost').querySelectorAll('.fc-sp').forEach(b => { const h = b.dataset.h; $(`fit_${h}_stype`).value = spanType(f, h); b.value = $(spanId(h)).value; });
+}
+// insert dropdowns: the stored value lives in the text input; a value not on the list shows as Other… with the box open
+const sameIns = (a, b, size) => size ? fmt64(parseIn(a)) === fmt64(parseIn(b)) : a.trim().toLowerCase() === b.trim().toLowerCase();
+function fitPicksFromStore() {
+  $('fitHost').querySelectorAll('.fc-sel').forEach(s => {
+    const inp = $(s.dataset.for), v = inp.value.trim(), size = inp.dataset.n !== undefined;
+    const hit = v ? [...s.options].find(o => o.value && o.value !== FC_OTHER && sameIns(o.value, v, size)) : s.options[0];
+    s.value = hit ? hit.value : FC_OTHER; inp.hidden = !!hit;
+    if (hit) inp.value = hit.value;
+  });
+}
+function fitPickInput(e) {
+  const s = e.target.closest('.fc-sel');
+  if (s) {
+    const inp = $(s.dataset.for), other = s.value === FC_OTHER;
+    inp.hidden = !other;
+    if (other) { inp.value = ''; inp.focus(); } else inp.value = s.value;
+    return;
+  }
+  const b = e.target.closest('.fc-sp');
+  if (b) { $(spanId(b.dataset.h)).value = b.value.trim(); return; }
+  const t = e.target.closest('.fc-stype');
+  if (t) { const box = $('fitHost').querySelector(`.fc-sp[data-h="${t.id.split('_')[1]}"]`); box.value = $(spanId(box.dataset.h)).value; }
 }
 $('hand').addEventListener('change', fitHandUI);
 fitHandUI();
@@ -2562,9 +2619,10 @@ function sparePrintTable() {
 const FIT_IDS = [...$('fitHost').querySelectorAll('input,select'), ...$('spareCard').querySelectorAll('input,select')].map(e => e.id).filter(Boolean); // the pitch boxes have no id: they feed fit_<h>_fp / _lp
 $('fitHost').addEventListener('change', e => { if (e.target.dataset.n !== undefined && e.target.value.trim()) { const v = parseIn(e.target.value); if (isFinite(v)) e.target.value = fmt64(v); } });
 $('fitHost').addEventListener('input', fitBoxInput); $('fitHost').addEventListener('change', fitBoxInput); // after the 1/64 formatting above
+$('fitHost').addEventListener('input', fitPickInput); $('fitHost').addEventListener('change', fitPickInput);
 const readFit = () => Object.fromEntries(FIT_IDS.map(id => [id, $(id).value]));
 const SP_DEFAULTS = { sp_lay: '6', sp_drift: '0', ...Object.fromEntries(Object.entries(SP_DEFAULT_ARROW).map(([p, a]) => [`sp_arrow_${p}`, String(a)])) };
-const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); fitBoxesFromStore(); fitHandUI(); renderSpares(); fitDerivedUI(); };
+const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); fitBoxesFromStore(); fitSpansFromStore(f); fitPicksFromStore(); fitHandUI(); renderSpares(); fitDerivedUI(); };
 /* Spans from the fit sheet, as pro shops define them (bowlingball.com pro shop terms; ballreviews fitting threads):
    - cut to cut: thumb-hole edge to finger-hole edge nearest each other, measured to the drilled cut (inserts/grips excluded)
    - actual: the same edges with the inserts / grips in (what the hand feels)
@@ -2581,14 +2639,17 @@ function fitDerivedText(f) {
   const c = fitCC(f), parts = [];
   if (isFinite(c.ccM) || isFinite(c.ccR)) parts.push(`Center to center (cut to cut + ½ thumb hole + ½ finger hole): middle ${isFinite(c.ccM) ? fmt64(c.ccM) + '"' : '—'}, ring ${isFinite(c.ccR) ? fmt64(c.ccR) + '"' : '—'}`);
   if (isFinite(c.space)) parts.push(`finger spacing ${fmt64(c.space)}" (bridge + ½ of each finger hole)`);
+  // a full span includes the inserts, so it can't stand in for cut to cut: say what's missing
+  const fullOnly = ['mf', 'rf'].filter(h => !isFinite(c['cc' + (h === 'mf' ? 'M' : 'R')]) && (f[`fit_${h}_sfit`] || '').trim() && !(f[`fit_${h}_sfull`] || '').trim());
+  if (fullOnly.length) parts.push(`center to center for the ${fullOnly.map(h => h === 'mf' ? 'middle' : 'ring').join(' and ')} needs the cut-to-cut span (switch the span box to Cut to cut); the full span isn't used for the layout`);
   return parts.join(' · ');
 }
 function fitDerivedUI() {
   const el = $('fitDerived'); if (!el) return;
   const f = readFit(), c = fitCC(f), txt = fitDerivedText(f);
-  el.innerHTML = txt
-    ? `${txt}. <button class="btn sm" type="button" id="fitToGrip" title="Copy into the Grip card (span ${isFinite(c.span) ? fmt64(c.span) : '—'}, finger spacing ${isFinite(c.space) ? fmt64(c.space) : '—'})">Use for layout</button>`
-    : 'Enter hole sizes (the drilled cut) and the cut-to-cut spans to get the center-to-center span the layout uses.';
+  el.innerHTML = !txt ? 'Enter hole sizes (the drilled cut) and the cut-to-cut spans to get the center-to-center span the layout uses.'
+    : !isFinite(c.span) && !isFinite(c.space) ? `${txt[0].toUpperCase()}${txt.slice(1)}.`
+    : `${txt}. <button class="btn sm" type="button" id="fitToGrip" title="Copy into the Grip card (span ${isFinite(c.span) ? fmt64(c.span) : '—'}, finger spacing ${isFinite(c.space) ? fmt64(c.space) : '—'})">Use for layout</button>`;
 }
 $('fitHost').addEventListener('input', fitDerivedUI);
 $('fitHost').addEventListener('change', fitDerivedUI);
@@ -2603,7 +2664,6 @@ fitDerivedUI();
 /* Printed fit card, laid out like the standard pro shop grip card: customer header, hand, the hole diagram with
    reverse / lateral / forward pitch boxes, span and bridge, thumb oval, then grip, PAP, ball and inserts.
    o = { name, date, hand: 'R'|'L', pap: { over, up } (inches), ball, wgt, sn }. An empty fit prints a blank card to fill in by hand. */
-const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function fitPrintCard(f, o = {}) {
   f = f || {};
   const v = id => (f[id] || '').trim(), lh = o.hand === 'L';
@@ -2623,6 +2683,7 @@ function fitPrintCard(f, o = {}) {
     <text x="${x}" y="${y - 6}" text-anchor="middle" font-size="9" fill="#555">${name[h]}</text>
     <text x="${x}" y="${y + 13}" text-anchor="middle" font-size="13" font-weight="700">${escH(v(`fit_${h}_size`))}</text>`;
   const toward = ([x1, y1], [x2, y2], d) => { const a = Math.atan2(y2 - y1, x2 - x1); return [x1 + Math.cos(a) * d, y1 + Math.sin(a) * d]; };
+  const spanBox = (x, h) => { const [k, l] = SPAN_TYPES[spanType(f, h)]; return box(x, 222, v(`fit_${h}_${k}`), `SPAN · ${l.replace(/ span$/i, '').toUpperCase()}`, 'below'); };
   const span = (from, to) => { const [a, b] = toward(TH, to, R + 4), [c, d] = toward(to, TH, R + 4); return `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="#000" stroke-width="1.2" marker-start="url(#fcAh)" marker-end="url(#fcAh)"/>`; };
   const svg = `<svg viewBox="0 0 640 465" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
     <defs><marker id="fcAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#000"/></marker></defs>
@@ -2637,7 +2698,7 @@ function fitPrintCard(f, o = {}) {
     ${box(560, 162, p(Rr, 'fp', 'F'), 'FORWARD PITCH', 'below')}${arrow(522, 162, 522, 196)}
     ${box(320, 110, v('fit_bridge'), 'BRIDGE', 'below')}${arrow(287, 110, 253, 110)}${arrow(353, 110, 387, 110)}
     ${span(TH, LH)}${span(TH, RH)}
-    ${box(178, 222, v(`fit_${L}_sfull`), 'SPAN', 'below')}${box(462, 222, v(`fit_${Rr}_sfull`), 'SPAN', 'below')}
+    ${spanBox(178, L)}${spanBox(462, Rr)}
     ${box(320, 225, p('th', 'fp', 'F'), 'FORWARD PITCH', 'below')}${arrow(320, 209, 320, 190)}
     ${box(196, 322, p('th', 'lp', 'L'))}${arrow(163, 322, 146, 322)}
     ${box(444, 322, p('th', 'lp', 'R'))}${arrow(477, 322, 494, 322)}
