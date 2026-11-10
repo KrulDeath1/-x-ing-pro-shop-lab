@@ -615,9 +615,12 @@ function releaseSpeed(b) { return b.speedSrc === 'monitor' ? b.speed + 2.5 : b.s
 /* The same release with a different ball ("Bowling Beyond the Basics" ch. 2, 3, 6): the bowler's force and torque are
    fixed, so speed scales with 1/mass and rev rate with 1/(mass x RG^2). Only applied when the bowler's numbers were
    measured with a different ball (weight / RG); otherwise the entered numbers are used as-is. */
+const refOk = b => ({ wt: isFinite(b.refWt) && b.refWt >= 6 && b.refWt <= 16, rg: isFinite(b.refRg) && b.refRg >= 2.3 && b.refRg <= 2.9 });
 function throwFor(b, ball) {
   const m = +ball.weight || 15, rg = +ball.rg || 2.5;
-  const m0 = isFinite(b.refWt) && b.refWt > 0 ? b.refWt : m, rg0 = isFinite(b.refRg) && b.refRg > 2 ? b.refRg : rg;
+  // only real ball numbers count (6–16 lb, RG 2.3–2.9): an RG typed into the weight box would otherwise scale the
+  // throw down to ~3 mph / ~80 rpm, and the ball would barely react to speed or rev changes
+  const m0 = refOk(b).wt ? b.refWt : m, rg0 = refOk(b).rg ? b.refRg : rg;
   const mph = releaseSpeed(b) * m0 / m, rpm = (b.revsTrue ?? b.revs) * (m0 * rg0 * rg0) / (m * rg * rg);
   return { mph, rpm, adjusted: Math.abs(m0 - m) > 0.01 || Math.abs(rg0 - rg) > 0.0005 };
 }
@@ -2163,6 +2166,10 @@ function renderRead(state, rec, res) {
   const warns = [...new Set([...res.A.warns, ...(res.B ? res.B.warns : [])])];
   if (state.b.speedSrc === 'monitor') warns.unshift(`Using about ${c.mph.toFixed(1)} mph release speed (lane monitors read about 2–3 mph slower than release).`);
   if (c.mph < 11 || c.mph > 24 || c.rpm < 100 || c.rpm > 700) warns.push('Speed or rev numbers look unusual — double-check them.');
+  { const ok = refOk(state.b), bad = [];
+    if (Number.isFinite(state.b.refWt) && !ok.wt) bad.push(`weight ${state.b.refWt}${state.b.refWt >= 2.3 && state.b.refWt <= 2.9 ? ' (that looks like an RG — it goes in the RG box)' : ''}`);
+    if (Number.isFinite(state.b.refRg) && !ok.rg) bad.push(`RG ${state.b.refRg}`);
+    if (bad.length) warns.unshift(`“Measured with a ball of…” has ${bad.join(' and ')}, which isn't a real ball — ignored, so your speed and revs are used as entered. Use 6–16 lb and RG 2.3–2.9, or leave it blank.`); }
   $('tiltHow').textContent = t.both ? `tilt ${t.v}° from the ring size; the crossing puts the PAP at ${fmtIn(Math.abs(t.both.ou.over))} × ${fmtIn(Math.abs(t.both.ou.up))} ${t.both.ou.up >= 0 ? 'up' : 'down'}`
     : t.src ? `→ tilt ${t.v}° from ${t.src}` : '';
   if (t.both && Math.abs(t.both.papShift) > 0.2) warns.push(`<span>Your track says the PAP is at <b>${fmtIn(Math.abs(t.both.ou.over))} over, ${fmtIn(Math.abs(t.both.ou.up))} ${t.both.ou.up >= 0 ? 'up' : 'down'}</b> (you entered ${fmtIn(state.b.papOver)} × ${fmtIn(Math.abs(state.b.papUp))}) — that's where the ball actually rolled for a ${t.v}° ring to cross ${fmtIn(state.b.trackGap)} from grip. The white ring on the ball is drawn around it (green circle). <button class="btn sm" data-usepap="${t.both.ou.over.toFixed(3)},${t.both.ou.up.toFixed(3)}">Use this PAP</button></span>`);
