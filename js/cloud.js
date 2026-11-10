@@ -134,6 +134,35 @@ export const cloud = {
   }
 };
 
+/* ---------- Shop: customer contact cards ----------
+   Table public.customers, one row per bowler (bowler_key = the bowler's name in 'layoutlab.bowlers').
+   The database only lets a paid Shop account read or write it, so this needs the server (no offline copy). */
+const CUST_COLS = 'id,bowler_key,phone,email,notes,updated_at';
+const custErr = e => {
+  const missing = e && (e.code === '42P01' || e.code === 'PGRST205' || /customers/.test(e.message || '') && /not find|does not exist/.test(e.message || ''));
+  if (e?.code === '42501') return new Error('Your plan doesn’t include the customer list. It’s part of Shop.');
+  return new Error(missing ? 'The customer list isn’t set up on the server yet.' : e?.message === 'timeout' || !online ? 'Couldn’t reach the server. Check your connection and try again.' : (e?.message || 'Something went wrong.'));
+};
+export const customers = {
+  async list() {
+    if (!sb || !user) throw new Error('Sign in to see your customers.');
+    try { const { data, error } = await withTimeout(sb.from('customers').select(CUST_COLS).order('bowler_key'), 10000); if (error) throw error; return data; }
+    catch (e) { throw custErr(e); }
+  },
+  /** creates or updates the contact card for one bowler */
+  async save({ bowler_key, phone, email, notes }) {
+    if (!sb || !user) throw new Error('Sign in first.');
+    const row = { shop_id: user.id, bowler_key: bowler_key.trim(), phone: phone?.trim() || null, email: email?.trim() || null, notes: notes?.trim() || null };
+    try { const { data, error } = await withTimeout(sb.from('customers').upsert(row, { onConflict: 'shop_id,bowler_key' }).select(CUST_COLS).single(), 10000); if (error) throw error; return data; }
+    catch (e) { throw custErr(e); }
+  },
+  async remove(id) {
+    if (!sb || !user) throw new Error('Sign in first.');
+    try { const { error } = await withTimeout(sb.from('customers').delete().eq('id', id), 10000); if (error) throw error; }
+    catch (e) { throw custErr(e); }
+  }
+};
+
 /* ==================== UI ==================== */
 const css = `
 .acct { display:inline-flex; align-items:center; gap:8px; }
@@ -194,6 +223,11 @@ function mount() {
 
   if (user && online && cloudEmpty && KEYS.some(k => ls.get(k) != null)) showImportBanner();
   if (!user) lockForGuests(hg, box);
+  // the front page's "Create a free account" links land on app/#signup: open the sign-up window straight away
+  if (location.hash === '#signup') {
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!user) openAuth('signup');
+  }
 }
 
 // Signed out: the app stays visible but nothing can be clicked or typed until the visitor signs in.
@@ -307,7 +341,8 @@ const FEATURES = {
   print:    { label: 'Printing drill and spec sheets', tier: 'pro' },
   coverage: { label: 'The arsenal coverage chart', tier: 'pro' },
   export:   { label: 'Exporting your data', tier: 'pro' },
-  driller:  { label: 'Driller mode', tier: 'shop' }
+  driller:  { label: 'Driller mode', tier: 'shop' },
+  customers: { label: 'The customer list', tier: 'shop' }
 };
 function openUpsell(feature) {
   const f = FEATURES[feature], plan = f?.tier === 'shop' ? 'Shop' : 'Pro';
@@ -316,7 +351,7 @@ function openUpsell(feature) {
     <ul>
       <li><b>Free</b>: unlimited bowlers and balls, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
       <li><b>Pro</b> (bowlers): plus Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
-      <li><b>Shop</b> (pro shops): everything in Pro, plus Driller mode.</li>
+      <li><b>Shop</b> (pro shops): everything in Pro, plus Driller mode and the customer list.</li>
     </ul>
     <div class="hint">${user ? 'Online checkout is coming soon.' : 'Create a free account first, then upgrade.'}</div>
     <div class="row2">

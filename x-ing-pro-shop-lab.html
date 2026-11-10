@@ -66,6 +66,29 @@ main { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 16px
 .bs-opt small { color: var(--ink-2); font-size: 12px; }
 .bs-opt.on, .bs-opt:hover { background: var(--chip); }
 .bs-more, .bs-none { padding: 7px 8px; font-size: 12px; color: var(--ink-2); }
+/* Shop: customer list dialog (dialog.xd base styles come from js/cloud.js) */
+dialog.cust { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+.cust .body { padding: 18px 20px; display: grid; gap: 12px; }
+.cust .head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cust .head h2 { margin: 0; font-size: 18px; flex: 1; }
+.cust .count { font-size: 12px; color: var(--ink-2); font-weight: 400; }
+.cust-list { display: grid; gap: 2px; max-height: min(52vh, 460px); overflow-y: auto; overscroll-behavior: contain; margin: 0 -6px; padding: 0 6px; }
+.cust-row { display: flex; gap: 10px; align-items: center; padding: 9px 8px; border-radius: 8px; border-bottom: 1px solid var(--line); }
+.cust-row:hover { background: var(--panel-2); }
+.cust-row .who { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.cust-row .who b { font-weight: 600; overflow-wrap: anywhere; }
+.cust-row .who span, .cust-row .who small { font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+.cust-row .who small.none { font-style: italic; }
+.cust-row .acts { display: flex; gap: 6px; flex: none; }
+.cust-empty { padding: 18px 8px; color: var(--ink-2); font-size: 13px; text-align: center; }
+.cust-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.cust-form[hidden] { display: none; }
+.cust-form .full { grid-column: 1 / -1; }
+.cust-form textarea { width: 100%; min-height: 64px; resize: vertical; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
+.cust-form input { background: var(--panel); }
+.cust-form .row2 { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.cust-form .row2 .spacer { flex: 1; }
+@media (max-width: 520px) { .cust-form { grid-template-columns: 1fr; } .cust-row { flex-wrap: wrap; } .cust-row .acts { width: 100%; justify-content: flex-end; } }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
 input:focus, select:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 0; }
@@ -118,6 +141,25 @@ body[data-mode="driller"] .simple-only { display: none !important; }
 .fit td { padding: 2px 3px; }
 .fit td input, .fit td select { padding: 4px 5px; font-size: 12px; }
 .fit .pd { display: flex; gap: 3px; } .fit .pd input { min-width: 0; } .fit .pd select { width: 46px; flex: none; padding: 4px 2px; }
+/* fit card: the pro shop grip card, finger holes over the thumb, pitch boxes around each hole.
+   Right hand: middle finger on the left as you look at the ball; .lh swaps the finger holes for a left hand. */
+.fc-scroll { overflow-x: auto; padding: 2px 0 6px; }
+.fc { display: grid; grid-template-columns: auto auto auto; grid-template-areas: "mf br rf" "smf th srf"; gap: 6px 10px; justify-content: center; align-items: center; justify-items: center; width: max-content; margin: 0 auto; }
+.fc.lh { grid-template-areas: "rf br mf" "srf th smf"; }
+.fc-hole { display: grid; grid-template-columns: 54px 64px 54px; gap: 4px; align-items: center; justify-items: center; }
+.fc-hole .nm { grid-area: 1 / 1 / 2 / 4; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+.fc-hole .top { grid-area: 2 / 2; } .fc-hole .ll { grid-area: 3 / 1; } .fc-hole .fc-ring { grid-area: 3 / 2; } .fc-hole .lr { grid-area: 3 / 3; } .fc-hole .bot { grid-area: 4 / 2; }
+.fc-ring { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; align-content: center; gap: 0; }
+.fc-ring span { font-size: 9px; color: var(--ink-2); line-height: 1; }
+.fc-ring input { width: 50px; text-align: center; padding: 2px; font-size: 13px; }
+.fc-box { display: grid; gap: 1px; justify-items: center; }
+.fc-box > span { font-size: 10px; color: var(--ink-2); white-space: nowrap; }
+.fc-box input { width: 54px; text-align: center; padding: 4px 2px; font-size: 13px; }
+.fc-a-mf { grid-area: mf; } .fc-a-rf { grid-area: rf; } .fc-a-th { grid-area: th; } .fc-a-br { grid-area: br; } .fc-a-smf { grid-area: smf; } .fc-a-srf { grid-area: srf; }
+.fc-hand { font-size: 12px; color: var(--ink-2); }
+.fc-oval { display: flex; gap: 8px 12px; flex-wrap: wrap; justify-content: flex-end; margin: 4px 0 10px; }
+.fc-oval label { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); }
+.fc-oval input { width: 70px; }
 table.ars { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 table.ars th { text-align: left; color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--line); padding: 5px 6px; white-space: nowrap; }
 table.ars td { border-bottom: 1px solid var(--line); padding: 6px; vertical-align: top; }
@@ -143,6 +185,20 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
   #sheet h2 { font-size: 12pt; margin: 14px 0 6px; border-bottom: 1px solid #999; padding-bottom: 2px; }
   #sheet table { border-collapse: collapse; width: 100%; }
   #sheet td, #sheet th { border: 1px solid #bbb; padding: 4px 6px; text-align: left; vertical-align: top; }
+  #sheet .fcard { break-inside: avoid; display: grid; gap: 6px; }
+  #sheet .fcard .hd, #sheet .fcard .ft { border: 2.5px solid #000; padding: 6px 10px; }
+  #sheet .fcard .hd { display: grid; gap: 5px; }
+  #sheet .fcard .ln { display: flex; gap: 6px; align-items: baseline; }
+  #sheet .fcard .ln i { font-style: normal; flex: 1; border-bottom: 1px solid #000; min-height: 1.25em; padding: 0 4px; font-weight: 600; }
+  #sheet .fcard .ln i.s { flex: 0 0 22mm; }
+  #sheet .fcard svg { width: 100%; height: auto; max-height: 112mm; }
+  #sheet .fcard .ov { display: grid; justify-content: end; gap: 3px; font-weight: 700; font-size: 10pt; }
+  #sheet .fcard .ft { display: grid; grid-template-columns: 34% 1fr; gap: 0; padding: 0; }
+  #sheet .fcard .ft > div { padding: 6px 10px; display: grid; gap: 4px; align-content: start; }
+  #sheet .fcard .ft > div + div { border-left: 1.5px solid #000; }
+  #sheet .fcard .ft table td, #sheet .fcard .ft table th { border: 0; padding: 2px 4px; }
+  #sheet .fcard .ft table td i { font-style: normal; display: block; border-bottom: 1px solid #000; min-height: 1.2em; font-weight: 600; }
+  #sheet .fcard .shop { text-align: center; font: 700 12pt ui-monospace, Consolas, monospace; margin-top: 4px; }
   #sheet .imgs { display: flex; gap: 10px; }
   #sheet .imgs img { max-height: 70mm; border: 1px solid #ccc; }
 }
@@ -166,7 +222,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <div class="grid2">
         <label class="f full"><span>Name</span><input id="bName" placeholder="Bowler name"></label>
         <div class="f full"><span>Saved bowlers</span>
-          <div class="row"><select id="bSaved" style="flex:1"></select><button class="btn sm" id="bSave">Save</button><button class="btn sm" id="bDel">Delete</button></div>
+          <div class="row"><select id="bSaved" style="flex:1"></select><button class="btn sm" id="bSave">Save</button><button class="btn sm" id="bDel">Delete</button><button class="btn sm" id="bCust" data-plan="customers">Customers</button></div>
         </div>
         <label class="f"><span>Hand</span><select id="hand"><option value="R">Right</option><option value="L">Left</option></select></label>
         <label class="f"><span>Style</span><select id="style"><option value="1H">One-handed</option><option value="2H">Two-handed</option></select></label>
@@ -234,7 +290,8 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
     <div class="card" id="fitCard">
       <h2>Fit specs <span style="text-transform:none;letter-spacing:0;font-weight:400">— inches, 1/64ths</span></h2>
       <div id="fitHost"></div>
-      <p class="hint">Spans are measured edge to edge, from the thumb-hole edge to the finger-hole edge nearest each other. <b>Cut to cut</b> is measured to the drilled cut (inserts and grips not counted). <b>Actual</b> is the same with the inserts / grips in, which is what the hand feels. Hole size = the drilled cut (the bore for a slug or insert). Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
+      <p class="hint">Laid out like a pro shop grip card, looking at the ball with the finger holes up. Type each pitch in the box on the side it points to (one per pair), and the hole size inside each circle. Spans on the diagram are <b>cut to cut</b>: thumb-hole edge to finger-hole edge, measured to the drilled cut. <b>Actual</b> spans (with inserts in, what the hand feels) go in the table. Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
+      <div class="row"><button class="btn sm" type="button" id="fitPrint" data-plan="print">Print fit card</button></div>
     </div>
 
     <div class="card">
@@ -434,7 +491,7 @@ const $ = id => document.getElementById(id);
 const R = 27 / (2 * Math.PI);           // ball radius, inches
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-import { store, cloud } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
+import { store, cloud, customers } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
 function parseIn(s) {
   if (s === undefined || s === null) return NaN;
   s = String(s).trim().replace(/["”]/g, '');
@@ -2386,35 +2443,69 @@ pc.addEventListener('click', e => {
 $('papApply').addEventListener('click', () => { if (!pap.res) return; $('tilt').value = pap.res.tilt; $('rotation').value = pap.res.rot; $('papDlg').close(); applyRec(); });
 /* ---------- fit specs (pro shop drill sheet), 1/64" ---------- */
 const HOLES = [['th', 'Thumb'], ['mf', 'Middle'], ['rf', 'Ring']];
-const FIT_ROWS = [
-  ['size', 'Hole size', 'n'], ['ins', 'Insert / slug', 't'], ['sfit', 'Span — actual', 'n', 'fingers'], ['sfull', 'Span — cut to cut', 'n', 'fingers'], // keys kept ('sfit', 'sfull') so saved fits keep their values
-  ['fp', 'Fwd / rev pitch', 'p', ['F', 'R']], ['lp', 'Lateral pitch', 'p', ['L', 'R']], ['oval', 'Oval / cut / depth', 't'], ['bev', 'Bevel', 't'],
-];
+/* Field keys are unchanged from the old table (fit_<hole>_<key>), so saved fits keep their values:
+   size = hole size (drilled cut) · ins = insert style · insz = insert size (new) · sfit = span actual · sfull = span cut to cut
+   fp + fpd = forward / reverse pitch (F|R) · lp + lpd = lateral pitch (L|R, as you look at the ball) · oval = cut / depth notes · bev = bevel.
+   Plus fit_grip, fit_bridge, fit_ovaldeg + fit_ovalw (thumb oval, new) and fit_notes. */
+const FIT_TABLE = [['ins', 'Insert style'], ['insz', 'Insert size'], ['sfit', 'Span — actual', 'fingers'], ['oval', 'Cut / depth'], ['bev', 'Bevel']];
 function fmt64(x) {
   if (!isFinite(x)) return '';
   const neg = x < 0; x = Math.abs(x); let w = Math.floor(x), n = Math.round((x - w) * 64);
   if (n === 64) { w++; n = 0; } let d = 64; while (n && n % 2 === 0) { n /= 2; d /= 2; }
   return (neg ? '-' : '') + (w || !n ? w : '') + (w && n ? ' ' : '') + (n ? `${n}/${d}` : '');
 }
+// one pitch box: typing in it stores the value in fit_<h>_<k> with direction d (the boxes on the other side clear)
+const fcBox = (h, k, d, label) => `<label class="fc-box"><span>${label}</span><input class="fc-p" data-h="${h}" data-k="${k}" data-d="${d}" data-n placeholder="0" aria-label="${HOLES.find(x => x[0] === h)[1]} ${label.replace(/[↑↓←→]/g, '').trim()}"></label>`;
+function fcHole(h, name) {
+  const thumb = h === 'th'; // the thumb's forward pitch points up toward the fingers; a finger's points down toward the palm
+  return `<div class="fc-hole fc-a-${h}"><div class="nm">${name}</div>
+    <div class="top">${thumb ? fcBox(h, 'fp', 'F', 'Forward ↑') : fcBox(h, 'fp', 'R', 'Reverse ↑')}</div>
+    <div class="ll">${fcBox(h, 'lp', 'L', '← Lateral')}</div>
+    <div class="fc-ring"><span>size</span><input id="fit_${h}_size" data-n placeholder="0" aria-label="${name} hole size"></div>
+    <div class="lr">${fcBox(h, 'lp', 'R', 'Lateral →')}</div>
+    <div class="bot">${thumb ? fcBox(h, 'fp', 'R', 'Reverse ↓') : fcBox(h, 'fp', 'F', 'Forward ↓')}</div>
+    <input type="hidden" id="fit_${h}_fp"><select id="fit_${h}_fpd" hidden><option>F</option><option>R</option></select>
+    <input type="hidden" id="fit_${h}_lp"><select id="fit_${h}_lpd" hidden><option>L</option><option>R</option></select></div>`;
+}
 function fitHTML() {
   let h = `<div class="grid2" style="margin-bottom:8px">
     <label class="f"><span>Grip</span><select id="fit_grip"><option>Fingertip</option><option>Semi-fingertip</option><option>Conventional</option><option>Two-handed (no thumb)</option></select></label>
-    <label class="f"><span>Bridge (in)</span><input id="fit_bridge" data-n placeholder="1/4"></label></div>
+    <div class="f"><span>Hand</span><div class="fc-hand" id="fcHand"></div></div></div>
+    <div class="fc-scroll"><div class="fc" id="fcGrid">
+      ${fcHole('mf', 'Middle')}${fcHole('rf', 'Ring')}
+      <label class="fc-box fc-a-br"><span>Bridge</span><input id="fit_bridge" data-n placeholder="1/4"><span>← →</span></label>
+      <label class="fc-box fc-a-smf"><span>Span · middle</span><input id="fit_mf_sfull" data-n placeholder="0"><span>cut to cut</span></label>
+      ${fcHole('th', 'Thumb')}
+      <label class="fc-box fc-a-srf"><span>Span · ring</span><input id="fit_rf_sfull" data-n placeholder="0"><span>cut to cut</span></label>
+    </div></div>
+    <div class="fc-oval"><label>Thumb: degree of oval <input id="fit_ovaldeg" placeholder="e.g. 10°"></label><label>width <input id="fit_ovalw" data-n placeholder="0"></label></div>
     <table class="fit"><tr><th></th>${HOLES.map(([, l]) => `<th>${l}</th>`).join('')}</tr>`;
-  for (const [k, label, type, extra] of FIT_ROWS) {
+  for (const [k, label, only] of FIT_TABLE) {
     h += `<tr><th>${label}</th>`;
-    for (const [hk] of HOLES) {
-      const id = `fit_${hk}_${k}`;
-      if (extra === 'fingers' && hk === 'th') { h += '<td></td>'; continue; }
-      if (type === 'p') h += `<td><div class="pd"><input id="${id}" data-n placeholder="0"><select id="${id}d">${extra.map(o => `<option>${o}</option>`).join('')}</select></div></td>`;
-      else h += `<td><input id="${id}" ${type === 'n' ? 'data-n' : ''} placeholder="${type === 'n' ? '0' : ''}"></td>`;
-    }
+    for (const [hk] of HOLES) h += only === 'fingers' && hk === 'th' ? '<td></td>' : `<td><input id="fit_${hk}_${k}" ${k === 'sfit' ? 'data-n placeholder="0"' : ''}></td>`;
     h += '</tr>';
   }
   h += `</table><div id="fitDerived" class="hint" style="margin:8px 0 0"></div><label class="f" style="margin-top:8px"><span>Fit notes</span><input id="fit_notes" placeholder="e.g. tape 2 pieces in thumb, flat back in ring insert"></label>`;
   return h;
 }
 $('fitHost').innerHTML = fitHTML();
+const fcBoxes = () => $('fitHost').querySelectorAll('.fc-p');
+function fitBoxesFromStore() { // show each stored pitch in the box for its direction
+  fcBoxes().forEach(b => { const id = `fit_${b.dataset.h}_${b.dataset.k}`; b.value = $(id + 'd').value === b.dataset.d ? $(id).value : ''; });
+}
+function fitHandUI() {
+  const lh = $('hand').value === 'L';
+  $('fcGrid').classList.toggle('lh', lh);
+  $('fcHand').textContent = `${lh ? 'Left' : 'Right'} hand (from the Bowler card): ${lh ? 'ring' : 'middle'} finger on the left`;
+}
+function fitBoxInput(e) {
+  const b = e.target.closest('.fc-p'); if (!b) return;
+  const id = `fit_${b.dataset.h}_${b.dataset.k}`;
+  $(id).value = b.value.trim(); $(id + 'd').value = b.dataset.d;
+  if (b.value.trim()) fcBoxes().forEach(o => { if (o !== b && o.dataset.h === b.dataset.h && o.dataset.k === b.dataset.k) o.value = ''; });
+}
+$('hand').addEventListener('change', fitHandUI);
+fitHandUI();
 
 /* ---------- spare system (straight-line geometry over the arrows; "Bowling Beyond the Basics" App. B/C) ----------
    Lane 41.5" / 39 boards. Headpin 720" from the foul line, rows 10.375" apart, pins 12" apart side to side.
@@ -2468,11 +2559,12 @@ function sparePrintTable() {
     ${spareData().map(r => `<tr><td><b>${r.pins}</b></td>${r.boards.map(b => `<td>${b}</td>`).join('')}<td>${r.arrow}</td><td>${r.foul}</td><td><b>${r.stand}</b></td></tr>`).join('')}</table>`;
 }
 
-const FIT_IDS = [...$('fitHost').querySelectorAll('input,select'), ...$('spareCard').querySelectorAll('input,select')].map(e => e.id);
+const FIT_IDS = [...$('fitHost').querySelectorAll('input,select'), ...$('spareCard').querySelectorAll('input,select')].map(e => e.id).filter(Boolean); // the pitch boxes have no id: they feed fit_<h>_fp / _lp
 $('fitHost').addEventListener('change', e => { if (e.target.dataset.n !== undefined && e.target.value.trim()) { const v = parseIn(e.target.value); if (isFinite(v)) e.target.value = fmt64(v); } });
+$('fitHost').addEventListener('input', fitBoxInput); $('fitHost').addEventListener('change', fitBoxInput); // after the 1/64 formatting above
 const readFit = () => Object.fromEntries(FIT_IDS.map(id => [id, $(id).value]));
 const SP_DEFAULTS = { sp_lay: '6', sp_drift: '0', ...Object.fromEntries(Object.entries(SP_DEFAULT_ARROW).map(([p, a]) => [`sp_arrow_${p}`, String(a)])) };
-const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); renderSpares(); fitDerivedUI(); };
+const setFit = f => { FIT_IDS.forEach(id => { $(id).value = f && f[id] != null ? f[id] : SP_DEFAULTS[id] ?? ($(id).tagName === 'SELECT' ? $(id).options[0].value : ''); }); fitBoxesFromStore(); fitHandUI(); renderSpares(); fitDerivedUI(); };
 /* Spans from the fit sheet, as pro shops define them (bowlingball.com pro shop terms; ballreviews fitting threads):
    - cut to cut: thumb-hole edge to finger-hole edge nearest each other, measured to the drilled cut (inserts/grips excluded)
    - actual: the same edges with the inserts / grips in (what the hand feels)
@@ -2508,22 +2600,80 @@ $('fitHost').addEventListener('click', e => {
   schedule();
 });
 fitDerivedUI();
-function fitPrintTable(f) {
-  if (!f) return '<p>No fit specs saved.</p>';
-  const v = (id) => (f[id] || '').trim();
-  let h = `<p><b>Grip:</b> ${v('fit_grip') || '—'} &nbsp; <b>Bridge:</b> ${v('fit_bridge') ? v('fit_bridge') + '"' : '—'}</p><table><tr><th></th>${HOLES.map(([, l]) => `<th>${l}</th>`).join('')}</tr>`;
-  for (const [k, label, type, extra] of FIT_ROWS) {
-    h += `<tr><td><b>${label}</b></td>`;
-    for (const [hk] of HOLES) {
-      const id = `fit_${hk}_${k}`;
-      if (extra === 'fingers' && hk === 'th') { h += '<td>—</td>'; continue; }
-      const val = v(id); h += `<td>${val ? (type === 'p' ? `${val}" ${v(id + 'd')}` : type === 'n' ? val + '"' : val) : ''}</td>`;
-    }
-    h += '</tr>';
-  }
+/* Printed fit card, laid out like the standard pro shop grip card: customer header, hand, the hole diagram with
+   reverse / lateral / forward pitch boxes, span and bridge, thumb oval, then grip, PAP, ball and inserts.
+   o = { name, date, hand: 'R'|'L', pap: { over, up } (inches), ball, wgt, sn }. An empty fit prints a blank card to fill in by hand. */
+const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function fitPrintCard(f, o = {}) {
+  f = f || {};
+  const v = id => (f[id] || '').trim(), lh = o.hand === 'L';
+  const cust = (typeof custCache !== 'undefined' && custCache.find(c => c.bowler_key === o.name)) || {};
+  const shop = cloud.profile?.account_type === 'shop' && cloud.profile.display_name ? cloud.profile.display_name : 'X-ING Pro Shop Lab';
+  // pitch in the box for its direction; a lateral pitch on a finger hole only has the outer box, so an inward one gets an arrow
+  const p = (h, k, d) => v(`fit_${h}_${k}d`) === d ? v(`fit_${h}_${k}`) : '';
+  const latOuter = (h, side) => { const val = v(`fit_${h}_lp`); if (!val) return ''; const d = v(`fit_${h}_lpd`) || 'L'; return d === side ? val : `${val} ${d === 'L' ? '←' : '→'}`; };
+  const W = 66, H = 32, R = 44;
+  const box = (x, y, val, label, labelPos) => `<rect x="${x - W / 2}" y="${y - H / 2}" width="${W}" height="${H}" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="700">${escH(val)}</text>
+    ${label ? `<text x="${x}" y="${labelPos === 'below' ? y + H / 2 + 11 : y - H / 2 - 4}" text-anchor="middle" font-size="8.5">${label}</text>` : ''}`;
+  const arrow = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-width="1.5" marker-end="url(#fcAh)"/>`;
+  const L = lh ? 'rf' : 'mf', Rr = lh ? 'mf' : 'rf', name = { mf: 'MIDDLE', rf: 'RING', th: 'THUMB' };
+  const LH = [205, 110], RH = [435, 110], TH = [320, 322];
+  const hole = (h, [x, y]) => `<circle cx="${x}" cy="${y}" r="${R}" fill="none" stroke="#c62828" stroke-width="2"/>
+    <text x="${x}" y="${y - 6}" text-anchor="middle" font-size="9" fill="#555">${name[h]}</text>
+    <text x="${x}" y="${y + 13}" text-anchor="middle" font-size="13" font-weight="700">${escH(v(`fit_${h}_size`))}</text>`;
+  const toward = ([x1, y1], [x2, y2], d) => { const a = Math.atan2(y2 - y1, x2 - x1); return [x1 + Math.cos(a) * d, y1 + Math.sin(a) * d]; };
+  const span = (from, to) => { const [a, b] = toward(TH, to, R + 4), [c, d] = toward(to, TH, R + 4); return `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="#000" stroke-width="1.2" marker-start="url(#fcAh)" marker-end="url(#fcAh)"/>`; };
+  const svg = `<svg viewBox="0 0 640 465" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+    <defs><marker id="fcAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#000"/></marker></defs>
+    <text x="205" y="22" text-anchor="middle" font-size="12">( ${lh ? 'X' : '&#160;&#160;'} ) LEFT HAND</text>
+    <text x="435" y="22" text-anchor="middle" font-size="12">( ${lh ? '&#160;&#160;' : 'X'} ) RIGHT HAND</text>
+    ${hole(L, LH)}${hole(Rr, RH)}${hole('th', TH)}
+    ${box(80, 54, p(L, 'fp', 'R'), 'REVERSE PITCH', 'below')}${arrow(118, 54, 118, 30)}
+    ${box(80, 110, latOuter(L, 'L'))}${arrow(47, 110, 30, 110)}
+    ${box(80, 162, p(L, 'fp', 'F'), 'FORWARD PITCH', 'below')}${arrow(118, 162, 118, 196)}
+    ${box(560, 54, p(Rr, 'fp', 'R'), 'REVERSE PITCH', 'below')}${arrow(522, 54, 522, 30)}
+    ${box(560, 110, latOuter(Rr, 'R'))}${arrow(593, 110, 610, 110)}
+    ${box(560, 162, p(Rr, 'fp', 'F'), 'FORWARD PITCH', 'below')}${arrow(522, 162, 522, 196)}
+    ${box(320, 110, v('fit_bridge'), 'BRIDGE', 'below')}${arrow(287, 110, 253, 110)}${arrow(353, 110, 387, 110)}
+    ${span(TH, LH)}${span(TH, RH)}
+    ${box(178, 222, v(`fit_${L}_sfull`), 'SPAN', 'below')}${box(462, 222, v(`fit_${Rr}_sfull`), 'SPAN', 'below')}
+    ${box(320, 225, p('th', 'fp', 'F'), 'FORWARD PITCH', 'below')}${arrow(320, 209, 320, 190)}
+    ${box(196, 322, p('th', 'lp', 'L'))}${arrow(163, 322, 146, 322)}
+    ${box(444, 322, p('th', 'lp', 'R'))}${arrow(477, 322, 494, 322)}
+    ${box(320, 418, p('th', 'fp', 'R'), 'REVERSE PITCH')}${arrow(320, 434, 320, 456)}
+  </svg>`;
+  const grip = v('fit_grip'), chk = on => on ? '&#9746;' : '&#9744;';
+  const pap = o.pap && isFinite(o.pap.over) ? [`${fmtIn(o.pap.over)} over`, `${fmtIn(Math.abs(o.pap.up))} ${o.pap.up >= 0 ? 'up' : 'down'}`] : ['', ''];
+  const ln = (label, val, cls = '') => `<b>${label}</b><i class="${cls}">${escH(val)}</i>`;
   const cc = fitDerivedText(f);
-  return h + `</table>${cc ? `<p>${cc}</p>` : ''}${v('fit_notes') ? `<p><b>Fit notes:</b> ${v('fit_notes')}</p>` : ''}`;
+  return `<div class="fcard">
+    <div class="hd">
+      <div class="ln">${ln('Name:', o.name)}${ln('Date:', o.date, 's')}</div>
+      <div class="ln">${ln('Address:', '')}</div>
+      <div class="ln">${ln('City', '')}${ln('State:', '', 's')}${ln('Zip:', '', 's')}</div>
+      <div class="ln">${ln('Phone (H):', cust.phone || '')}${ln('Phone (W):', '')}</div>
+    </div>
+    ${svg}
+    <div class="ov"><div>DEGREE OF OVAL: ${escH(v('fit_ovaldeg')) || '__________'}</div><div>WIDTH: ${escH(v('fit_ovalw')) || '__________'}</div></div>
+    <div class="ft">
+      <div><b>GRIP:</b><div>${chk(grip === 'Fingertip')} Finger Tip</div><div>${chk(grip === 'Conventional')} Conventional</div>
+        ${grip && grip !== 'Fingertip' && grip !== 'Conventional' ? `<div>${chk(true)} ${escH(grip)}</div>` : ''}
+        <div class="ln"><b>P.A.P.</b><i>${escH(pap[0])}</i></div><div class="ln"><b style="visibility:hidden">P.A.P.</b><i>${escH(pap[1])}</i></div></div>
+      <div><div class="ln">${ln('BALL:', o.ball)}${ln('WGT:', o.wgt, 's')}${ln('SN:', o.sn)}</div>
+        <table><tr><th>INSERT</th><th>STYLE</th><th>SIZE</th></tr>
+        ${HOLES.map(([h, l]) => `<tr><td>${h === 'th' ? 'Thumb' : l + ' Finger'}</td><td><i>${escH(v(`fit_${h}_ins`))}</i></td><td><i>${escH(v(`fit_${h}_insz`))}</i></td></tr>`).join('')}</table></div>
+    </div>
+    ${cc || v('fit_notes') ? `<p style="font-size:9pt;margin:0">${cc ? escH(cc) + '. ' : ''}${v('fit_notes') ? '<b>Fit notes:</b> ' + escH(v('fit_notes')) : ''}</p>` : ''}
+    <div class="shop">${escH(shop)}</div>
+  </div>`;
 }
+$('fitPrint').addEventListener('click', () => {
+  if (!cloud.require('print')) return;
+  $('sheet').innerHTML = fitPrintCard(readFit(), { name: curBowler(), date: new Date().toLocaleDateString(), hand: $('hand').value,
+    pap: last ? { over: last.state.b.papOver, up: last.state.b.papUp } : null, ball: $('ballName').value, wgt: $('ballWt')?.value || $('arsWeight').value, sn: $('arsSerial').value.trim() });
+  setTimeout(() => window.print(), 50);
+});
 
 /* ---------- bowlers + arsenal (this device; export/import JSON) ---------- */
 const BKEY = 'layoutlab.bowlers';
@@ -2538,6 +2688,109 @@ function saveBowler(n) {
 $('bSave').addEventListener('click', () => { const n = $('bName').value.trim(); if (!n) { $('bName').focus(); return; } saveBowler(n); });
 $('bSaved').addEventListener('change', e => { const p = getAll()[e.target.value]; if (!p) { renderArsenal(); return; } BOWLER_FIELDS.forEach(f => { if (p[f] != null) $(f).value = p[f]; }); for (const [f, d] of Object.entries(LINE_DEFAULTS)) $(f).value = p[f] != null ? p[f] : d; setFit(p.fit); applyRec(); renderArsenal(); });
 $('bDel').addEventListener('click', () => { const n = $('bSaved').value; if (!n) return; if (!confirm(`Delete ${n} and their whole arsenal from this device?`)) return; const all = getAll(); delete all[n]; store.set(BKEY, all); fillBowlers(); renderArsenal(); });
+
+/* ---------- Shop: customer list ----------
+   Contact cards (phone, email, notes) live in Supabase table `customers`, one per bowler name; the bowler's
+   specs and arsenal stay in the bowlers list above. The list shows every saved bowler plus every contact card. */
+var custCache = []; // last contact cards loaded (fills the phone on the printed fit card)
+$('bCust').addEventListener('click', () => { if (cloud.require('customers')) openCustomers(); });
+if (cloud.can('customers')) customers.list().then(r => { custCache = r; }).catch(() => {});
+function openCustomers() {
+  const d = document.createElement('dialog'); d.className = 'xd cust';
+  d.innerHTML = `<div class="body">
+    <div class="head"><h2>Customers <span class="count" id="custCount"></span></h2>
+      <button class="btn sm primary" type="button" data-a="new">Add customer</button><button class="btn sm" type="button" data-a="close">Close</button></div>
+    <input id="custSearch" type="search" autocomplete="off" placeholder="Search name, phone, email or notes" aria-label="Search customers">
+    <form class="cust-form" id="custForm" hidden>
+      <label class="f full"><span>Bowler name</span><input id="custName" required maxlength="200" autocomplete="off"></label>
+      <label class="f"><span>Phone</span><input id="custPhone" type="tel" maxlength="40" autocomplete="off"></label>
+      <label class="f"><span>Email</span><input id="custEmail" type="email" maxlength="200" autocomplete="off"></label>
+      <label class="f full"><span>Notes</span><textarea id="custNotes" maxlength="2000" placeholder="e.g. league Tue nights, likes 3000 Abralon, sensitive thumb"></textarea></label>
+      <div class="row2"><button class="btn sm" type="button" data-a="remove" hidden>Remove contact details</button><span class="spacer"></span>
+        <button class="btn sm" type="button" data-a="cancel">Cancel</button><button class="btn sm primary" type="submit">Save</button></div>
+    </form>
+    <div class="msg" id="custMsg" role="status"></div>
+    <div class="cust-list" id="custList"><div class="cust-empty">Loading customers…</div></div>
+  </div>`;
+  document.body.append(d);
+  const q = s => d.querySelector(s), form = q('#custForm'), msg = (t, cls = '') => { const m = q('#custMsg'); m.textContent = t; m.className = 'msg ' + cls; };
+  let rows = [], shown = [], editing = null, loaded = false;
+
+  const merged = () => {
+    const all = getAll(), byKey = new Map(rows.map(r => [r.bowler_key, r]));
+    return [...new Set([...Object.keys(all), ...byKey.keys()])].sort((a, b) => a.localeCompare(b)).map(name => {
+      const ars = all[name] ? (all[name].arsenal || []) : [];
+      return { name, c: byKey.get(name) || null, bowler: !!all[name], balls: ars.length, last: ars.reduce((m, r) => (r.date || '') > m ? r.date : m, '') };
+    });
+  };
+  const draw = () => {
+    const list = merged(), words = q('#custSearch').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    shown = list.filter(it => { const t = `${it.name} ${it.c ? `${it.c.phone || ''} ${it.c.email || ''} ${it.c.notes || ''}` : ''}`.toLowerCase(); return words.every(w => t.includes(w)); });
+    q('#custCount').textContent = list.length ? `· ${list.length}` : '';
+    const box = q('#custList'); box.innerHTML = '';
+    if (!shown.length) { box.innerHTML = `<div class="cust-empty">${list.length ? 'No customer matches that.' : loaded ? 'No customers yet. Add one here, or save a bowler in the Bowler card.' : 'Loading customers…'}</div>`; return; }
+    shown.forEach((it, i) => {
+      const r = document.createElement('div'); r.className = 'cust-row';
+      const who = document.createElement('div'); who.className = 'who';
+      const b = document.createElement('b'); b.textContent = it.name; who.append(b);
+      const contact = it.c ? [it.c.phone, it.c.email].filter(Boolean).join(' · ') : '';
+      if (contact) { const s = document.createElement('span'); s.textContent = contact; who.append(s); }
+      const sm = document.createElement('small');
+      if (it.bowler) sm.textContent = `${it.balls} ball${it.balls === 1 ? '' : 's'}${it.last ? ` · last drilled ${it.last}` : ''}${it.c ? '' : ' · no contact details'}`;
+      else { sm.textContent = 'No bowler saved yet: open to enter their specs'; sm.className = 'none'; }
+      who.append(sm);
+      const acts = document.createElement('div'); acts.className = 'acts';
+      acts.innerHTML = `<button class="btn sm" type="button" data-a="edit" data-i="${i}">${it.c ? 'Edit' : 'Add contact'}</button><button class="btn sm primary" type="button" data-a="open" data-i="${i}">Open</button>`;
+      r.append(who, acts); box.append(r);
+    });
+  };
+  const showForm = it => {
+    editing = it; form.hidden = false; msg('');
+    q('#custName').value = it ? it.name : ''; q('#custName').readOnly = !!it;
+    q('#custPhone').value = it?.c?.phone || ''; q('#custEmail').value = it?.c?.email || ''; q('#custNotes').value = it?.c?.notes || '';
+    form.querySelector('[data-a=remove]').hidden = !it?.c;
+    (it ? q('#custPhone') : q('#custName')).focus();
+  };
+  const hideForm = () => { form.hidden = true; editing = null; };
+  const openBowler = name => {
+    d.close();
+    if (getAll()[name]) { $('bSaved').value = name; $('bName').value = name; $('bSaved').dispatchEvent(new Event('change')); }
+    else { $('bSaved').value = ''; $('bName').value = name; renderArsenal(); $('bName').focus(); }
+    $('bName').scrollIntoView({ block: 'center' });
+  };
+
+  d.addEventListener('click', async e => {
+    if (e.target === d) { d.close(); return; }
+    const btn = e.target.closest('[data-a]'); if (!btn) return;
+    const a = btn.dataset.a, it = shown[+btn.dataset.i];
+    if (a === 'close') d.close();
+    else if (a === 'new') showForm(null);
+    else if (a === 'cancel') hideForm();
+    else if (a === 'edit') showForm(it);
+    else if (a === 'open') openBowler(it.name);
+    else if (a === 'remove' && editing?.c) {
+      if (!confirm(`Remove ${editing.name}'s phone, email and notes? Their bowler record and arsenal stay.`)) return;
+      btn.disabled = true;
+      try { await customers.remove(editing.c.id); rows = rows.filter(r => r.id !== editing.c.id); custCache = rows; msg(`Removed ${editing.name}'s contact details.`, 'ok'); hideForm(); draw(); }
+      catch (err) { msg(err.message, 'err'); } finally { btn.disabled = false; }
+    }
+  });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = q('#custName').value.trim(); if (!name) { q('#custName').focus(); return; }
+    const sub = form.querySelector('[type=submit]'); sub.disabled = true; msg('Saving…');
+    try {
+      const row = await customers.save({ bowler_key: name, phone: q('#custPhone').value, email: q('#custEmail').value, notes: q('#custNotes').value });
+      rows = [...rows.filter(r => r.bowler_key !== row.bowler_key), row]; custCache = rows;
+      msg(`Saved ${name}.`, 'ok'); hideForm(); draw();
+    } catch (err) { msg(err.message, 'err'); } finally { sub.disabled = false; }
+  });
+  q('#custSearch').addEventListener('input', draw);
+  d.addEventListener('close', () => d.remove());
+  d.showModal(); q('#custSearch').focus();
+  draw();
+  customers.list().then(r => { rows = r; custCache = r; }).catch(err => msg(err.message, 'err')).finally(() => { loaded = true; draw(); });
+}
 
 function makeRecord() {
   const { state, rec, res } = last, r = res.A;
@@ -2657,7 +2910,7 @@ function bowlerHead(name, b) {
 function printBallSheet(name, r) {
   $('sheet').innerHTML = `<h1>Drill sheet — ${name}</h1><div>${r.date}${r.driller ? ' · drilled by ' + r.driller : ''}${r.serial ? ' · serial ' + r.serial : ''}</div>
     <h2>Bowler (at time of drilling)</h2>${bowlerHead(name, r.bowler)}
-    <h2>Fit</h2>${fitPrintTable(r.fit)}
+    <h2>Fit card</h2>${fitPrintCard(r.fit, { name, date: r.date, hand: r.bowler.hand, pap: { over: r.bowler.papOver, up: r.bowler.papUp }, ball: r.ball.name, wgt: r.weight, sn: r.serial })}
     <h2>Ball</h2><p><b>${r.ball.name}</b> — ${r.weight || '?'} lb, ${r.ball.core === 'asym' ? 'asymmetric' : 'symmetric'}, ${r.ball.cover}, RG ${r.ball.rg}, diff ${r.ball.diff}${r.ball.core === 'asym' ? ', int. diff ' + r.ball.intdiff : ''}. Surface: ${GRIT_LABEL[r.ball.grit] || r.ball.grit} (recommended ${r.surface}).</p>
     <h2>Layout</h2><table><tr><th>Dual Angle</th><th>VLS (P2P × PSA-PAP × buffer)</th><th>Pin position</th><th>PSA position</th></tr>
     <tr><td>${layTxt(r)}</td><td>${vlsTxt(r)}</td><td>${ouTxt(r.pinOU)}</td><td>${ouTxt(r.psaOU)}</td></tr></table>
@@ -2674,7 +2927,7 @@ $('arsSpec').addEventListener('click', () => {
   $('sheet').innerHTML = `<h1>Bowler spec sheet — ${n}</h1><div>${new Date().toLocaleDateString()}</div>
     <h2>Bowler</h2>${bowlerHead(n, { hand: s.b.hand, style: s.b.style, papOver: s.b.papOver, papUp: s.b.papUp, mph: rc.c.mph, revs: s.b.revs, tilt: rc.tilt.v, rot: rc.rot.v })}
     <p>${rc.c.cls}. ${clsMeaning(rc.c)}</p>
-    <h2>Fit</h2>${fitPrintTable(readFit())}
+    <h2>Fit card</h2>${fitPrintCard(readFit(), { name: n, date: new Date().toLocaleDateString(), hand: s.b.hand, pap: { over: s.b.papOver, up: s.b.papUp } })}
     <h2>Spare system</h2>${sparePrintTable()}
     <h2>Arsenal (${ars.length})</h2>
     <table><tr><th>Date</th><th>Ball</th><th>Wt</th><th>Surface</th><th>Dual Angle</th><th>VLS</th><th>Pin</th><th>PSA</th><th>Driller</th><th>Notes</th></tr>
@@ -3024,7 +3277,7 @@ $('btnPrint').addEventListener('click', () => {
     <td>${rec.c.mph.toFixed(1)} mph (release)</td><td>${state.b.revs} rpm</td><td>${rec.tilt.v}°${rec.tilt.est ? ' est.' : ''} / ${rec.rot.v}°${rec.rot.est ? ' est.' : ''}</td>
     <td>${state.lane.len} ft, ${state.lane.vol}, ${state.lane.shape}, ${state.lane.cond === 'trans' ? 'transitioned' : 'fresh'}</td></tr></table>
     <p><b>${rec.c.cls}.</b> ${clsMeaning(rec.c)}<br><b>Target motion:</b> ${targetText(rec.s)}</p>
-    <h2>Fit</h2>${fitPrintTable(readFit())}
+    <h2>Fit card</h2>${fitPrintCard(readFit(), { name: state.b.name, date: new Date().toLocaleDateString(), hand: state.b.hand, pap: { over: state.b.papOver, up: state.b.papUp }, ball: state.ball.name, wgt: state.ball.weight, sn: $('arsSerial').value.trim() })}
     <h2>Ball</h2>
     <p>${state.ball.name} — ${state.ball.weight} lb, ${state.ball.core === 'asym' ? 'asymmetric' : 'symmetric'}, ${state.ball.cover}, RG ${state.ball.rg}, diff ${state.ball.diff}${state.ball.core === 'asym' ? ', int. diff ' + state.ball.intdiff + ', pin-to-PSA ' + fmtIn(state.ball.pin2psa) : ''}. Grip span ${fmtIn(state.grip.span)} c-c.</p>
     <h2>Layout</h2>

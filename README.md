@@ -29,9 +29,9 @@ Sign up as a **bowler** or as a **pro shop**. Your bowlers, balls, shot log and 
 |------|-----|----------|
 | **Free** | Everyone | Unlimited bowlers and balls, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, arsenal list, import |
 | **Pro** | Bowlers | Everything in Free, plus Auto line (best strike line) and strike chance, the 3D lane, Compare A/B, arsenal coverage chart, printing drill and spec sheets, export, the shot log and lane calibration |
-| **Shop** | Pro shops | Everything in Pro, plus Driller mode (shop branding on prints and a customer list are planned) |
+| **Shop** | Pro shops | Everything in Pro, plus Driller mode and the customer list (shop branding on prints is planned) |
 
-You need an account to use the app, even on Free. Signed-out visitors see the app greyed out with a "Sign in or create a free account" banner, and new accounts must confirm their email before they can sign in. Locked features stay visible, greyed out with a Pro or Shop badge, and clicking one shows the plans. The gates run in the browser only, so they aren't a security boundary.
+You need an account to use the app, even on Free. Signed-out visitors see the app greyed out with a "Sign in or create a free account" banner, and new accounts must confirm their email before they can sign in. Locked features stay visible, greyed out with a Pro or Shop badge, and clicking one shows the plans. Most gates run in the browser only, so they aren't a security boundary. The customer list is the exception: its contact details live in the Supabase table `customers`, and the database lets only a paid Shop account read or write them.
 
 ## Tech
 
