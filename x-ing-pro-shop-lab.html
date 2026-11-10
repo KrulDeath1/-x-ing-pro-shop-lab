@@ -57,6 +57,15 @@ main { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 16px
 .f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .f > span { font-size: 12px; color: var(--ink-2); }
 .f.full { grid-column: 1 / -1; }
+.bs-wrap { position: relative; display: block; }
+.bs-list { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 4px); max-height: min(320px, 50vh); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 4px; }
+.bs-list[hidden] { display: none; }
+.bs-opt { display: flex; flex-direction: column; gap: 1px; padding: 7px 8px; border-radius: 6px; cursor: pointer; }
+.bs-opt b { font-weight: 600; color: var(--ink); font-size: 14px; }
+.bs-opt small { color: var(--ink-2); font-size: 12px; }
+.bs-opt.on, .bs-opt:hover { background: var(--chip); }
+.bs-more, .bs-none { padding: 7px 8px; font-size: 12px; color: var(--ink-2); }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
 input:focus, select:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 0; }
@@ -231,7 +240,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
     <div class="card">
       <h2>Ball</h2>
       <div class="grid2">
-        <label class="f full"><span>Search all balls</span><input id="ballSearch" list="ballSearchList" type="search" autocomplete="off" placeholder="Type a ball, brand, core, cover or year — e.g. phaze, hammer pearl, 2024"><datalist id="ballSearchList"></datalist></label>
+        <label class="f full"><span>Search all balls</span><span class="bs-wrap"><input id="ballSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ballSearchList" placeholder="Type a ball, brand, core, cover or year — e.g. phaze, hammer pearl, 2024"><div id="ballSearchList" class="bs-list" role="listbox" hidden></div></span></label>
         <label class="f"><span>Manufacturer</span><select id="brandSel"></select></label>
         <label class="f"><span>Ball</span><select id="ballPreset"></select></label>
         <label class="f"><span>Weight (lb)</span><select id="ballWt"></select></label>
@@ -2184,29 +2193,73 @@ function fillBallsForBrand(brand, sel) {
   if (sel && [...s.options].some(o => o.value === sel)) s.value = sel;
 }
 $('brandSel').addEventListener('change', e => { fillBallsForBrand(e.target.value); loadBall($('ballPreset').value); schedule(); });
-/* search across every brand: the browser filters the suggestion list as you type (matches the name, brand, core,
-   cover or release year); picking a suggestion selects that ball. Several words narrow it down (all must match). */
-var searchMap; // var (hoisted): fillBallSelect can run before this line on startup
+/* search across every brand: the app draws its own result list as you type (the native <datalist> filtered
+   unpredictably). Every typed word must appear in the brand, name, core, cover or release year; balls whose name
+   starts a word with what you typed come first. Up to SEARCH_MAX rows; arrows + Enter or click pick, Esc closes. */
+var searchMap, searchIdx = [], searchShown = [], searchSel = -1, SEARCH_MAX = 50; // var (hoisted): fillBallSelect can run before this line on startup
 function fillBallSearch() {
-  const dl = $('ballSearchList'); dl.innerHTML = ''; searchMap = new Map();
+  searchMap = new Map(); searchIdx = [];
   for (const b of allBalls()) {
     const x = b.info, key = b.brand === MINE || b.brand === TYPES ? `${b.label} — ${b.brand}` : `${b.brand} ${b.label}`;
     searchMap.set(key.toLowerCase(), b);
-    const o = document.createElement('option'); o.value = key;
-    o.label = x ? `${x.k} · ${x.ct || b.cover} · ${x.d}` : (b.brand === MINE ? 'my ball' : 'generic type'); dl.append(o);
+    searchIdx.push({ b, key, name: ' ' + b.label.toLowerCase(),
+      sub: x ? `${x.k} · ${x.ct || b.cover} · ${x.d}` : (b.brand === MINE ? 'my ball' : 'generic type'),
+      t: `${b.brand} ${b.label} ${x ? `${x.k} ${x.cv} ${x.ct} ${x.d}` : b.cover}`.toLowerCase() });
   }
 }
-function pickSearch(q) {
+function searchHits(q) {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean); if (!words.length) return [];
+  const rank = e => words.reduce((s, w) => s + (e.name.includes(' ' + w) ? 0 : e.name.includes(w) ? 1 : 2), 0);
+  return searchIdx.filter(e => words.every(w => e.t.includes(w))).map(e => [rank(e), e])
+    .sort((a, b) => a[0] - b[0] || a[1].key.localeCompare(b[1].key)).map(r => r[1]);
+}
+function drawSearch() {
+  const inp = $('ballSearch'), list = $('ballSearchList');
+  if (!inp.value.trim()) return closeSearch();
+  const hits = searchHits(inp.value); searchShown = hits.slice(0, SEARCH_MAX); searchSel = -1;
+  list.innerHTML = '';
+  if (!hits.length) list.innerHTML = '<div class="bs-none">No ball matches that.</div>';
+  searchShown.forEach((e, i) => {
+    const d = document.createElement('div'); d.className = 'bs-opt'; d.id = 'bsOpt' + i; d.dataset.i = i;
+    d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false');
+    const n = document.createElement('b'), s = document.createElement('small'); n.textContent = e.key; s.textContent = e.sub;
+    d.append(n, s); list.append(d);
+  });
+  if (hits.length > SEARCH_MAX) { const m = document.createElement('div'); m.className = 'bs-more'; m.textContent = `${hits.length - SEARCH_MAX} more — keep typing to narrow it down`; list.append(m); }
+  list.hidden = false; list.scrollTop = 0; inp.setAttribute('aria-expanded', 'true'); inp.removeAttribute('aria-activedescendant');
+}
+function markSearch() {
+  const inp = $('ballSearch');
+  $('ballSearchList').querySelectorAll('.bs-opt').forEach((d, i) => { const on = i === searchSel; d.classList.toggle('on', on); d.setAttribute('aria-selected', on); if (on) d.scrollIntoView({ block: 'nearest' }); });
+  if (searchSel >= 0) inp.setAttribute('aria-activedescendant', 'bsOpt' + searchSel); else inp.removeAttribute('aria-activedescendant');
+}
+function closeSearch() {
+  const inp = $('ballSearch'); $('ballSearchList').hidden = true; searchSel = -1;
+  inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant');
+}
+function chooseBall(e) { $('ballSearch').value = e.key; $('ballSearch').title = ''; closeSearch(); fillBallSelect(e.b.id); loadBall(e.b.id); schedule(); }
+function pickSearch(q) { // Enter with nothing highlighted: an exact name, or the only match
   q = q.trim().toLowerCase(); if (!q) return false;
-  let b = searchMap.get(q);
-  if (!b) { // typed words without picking: take the single match if there is exactly one
-    const words = q.split(/\s+/), hits = allBalls().filter(x => { const t = `${x.brand} ${x.label} ${x.info ? `${x.info.k} ${x.info.cv} ${x.info.ct} ${x.info.d}` : x.cover}`.toLowerCase(); return words.every(w => t.includes(w)); });
-    if (hits.length !== 1) return false; b = hits[0];
-  }
-  fillBallSelect(b.id); loadBall(b.id); schedule(); return true;
+  const b = searchMap.get(q), hits = b ? null : searchHits(q);
+  if (!b && hits.length !== 1) return false;
+  chooseBall(b ? searchIdx.find(e => e.b === b) : hits[0]); return true;
 }
-$('ballSearch').addEventListener('input', e => { if (searchMap.has(e.target.value.trim().toLowerCase())) pickSearch(e.target.value); });
-$('ballSearch').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (!pickSearch(e.target.value)) e.target.title = 'More than one ball matches — pick one from the list'; } });
+$('ballSearch').addEventListener('input', drawSearch);
+$('ballSearch').addEventListener('focus', () => { if ($('ballSearchList').hidden) drawSearch(); });
+$('ballSearch').addEventListener('blur', closeSearch);
+$('ballSearch').addEventListener('keydown', e => {
+  const open = !$('ballSearchList').hidden, n = searchShown.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); if (!open) { drawSearch(); return; } if (!n) return;
+    searchSel = e.key === 'ArrowDown' ? (searchSel + 1) % n : (searchSel <= 0 ? n - 1 : searchSel - 1); markSearch();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (open && searchSel >= 0) chooseBall(searchShown[searchSel]);
+    else if (!pickSearch(e.target.value)) e.target.title = 'More than one ball matches — pick one from the list';
+  } else if (e.key === 'Escape' && open) { e.preventDefault(); closeSearch(); }
+});
+$('ballSearchList').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the box so blur doesn't close it first
+$('ballSearchList').addEventListener('click', e => { e.preventDefault(); /* no label activation */ const d = e.target.closest('.bs-opt'); if (d) chooseBall(searchShown[+d.dataset.i]); });
 function loadBall(id) {
   const b = allBalls().find(x => x.id === id); if (!b) { $('ballNote').textContent = 'Enter the ball specs in Driller mode.'; $('ballSpecs').innerHTML = ''; fillWeights(null); return; }
   $('ballName').value = b.brand && b.brand !== TYPES && b.brand !== MINE ? `${b.brand} ${b.name}` : b.name; $('core').value = b.core; $('rg').value = b.rg; $('diff').value = b.diff; $('intdiff').value = b.intdiff;
