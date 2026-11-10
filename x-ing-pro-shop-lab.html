@@ -73,7 +73,11 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .target { font-weight: 600; }
 .warns { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .warns li { background: var(--warn-bg); color: var(--warn-ink); padding: 6px 10px; border-radius: 8px; font-size: 13px; }
-.lay { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 16px; }.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.lay { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 16px; }
+.layCol { min-width: 0; }
+.layRead { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
+#layCols[style*="--cols: 2"] > #colB { border-left: 1px solid var(--line); padding-left: 16px; }
+@media (max-width: 760px) { #layCols { grid-template-columns: 1fr !important; } #layCols > #colB { border-left: 0 !important; padding-left: 0 !important; border-top: 1px solid var(--line); padding-top: 12px; } }.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
 .kv dt { color: var(--ink-2); }
 .kv dd { margin: 0; font-variant-numeric: tabular-nums; }
 .big { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
@@ -179,7 +183,6 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
           </div>
           <p class="hint" style="margin:2px 0 0">Quick estimate: rings × (monitor mph + 1) × 88 ÷ pattern length (the +1 mph allows for the ball slowing before the sensor). <span id="rc_oOut"></span> <button class="btn sm" id="rc_oUse" type="button">Use</button></p>
         </details>
-        <label class="f"><span>Goal</span><select id="goal"><option value="bench">Benchmark</option><option value="hook">More hook</option><option value="length">More length / control</option></select></label>
         <label class="f"><span>Axis tilt (°)</span><input id="tilt" type="number" step="1" placeholder="auto"></label>
         <label class="f"><span>Axis rotation (°)</span><input id="rotation" type="number" step="1" placeholder="auto"></label>
         <div class="f full" style="border-top:1px solid var(--line);padding-top:8px;margin-top:2px"><span><b>Tilt from the oil track (no photo)</b> — read the first oil ring on a fresh shot. Enter the <b>track crossing and ring diameter together</b> for the most accurate tilt; the app combines them and checks your PAP.</span></div>
@@ -207,59 +210,6 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <p class="hint simple-only">PAP = the spot on the ball that doesn't spin, measured from the center of the grip. A pro shop can measure it in a few shots.</p>
     </div>
 
-    <div class="card">
-      <h2>Lane</h2>
-      <div class="grid2">
-        <label class="f full"><span>Pattern</span><select id="patPreset"></select></label>
-        <p class="hint f full" id="patInfo" style="margin:0"></p>
-        <label class="f adv"><span>Length (ft)</span><input id="patLen" type="number" value="40"></label>
-        <label class="f adv"><span>Volume</span><select id="patVol"><option value="light">Light</option><option value="medium" selected>Medium</option><option value="heavy">Heavy</option></select></label>
-        <label class="f adv"><span>Shape</span><select id="patShape"><option value="house">House (crowned)</option><option value="sport">Sport (flat)</option></select></label>
-        <label class="f"><span>Condition</span><select id="patCond"><option value="fresh">Fresh</option><option value="trans">Transitioned</option></select></label>
-        <div class="f full" id="logBox" style="border-top:1px solid var(--line);padding-top:8px">
-          <span><b>Log a shot</b> — calibrates the lane. Every shot with a breakpoint retunes the lane to where this bowler’s ball (the ball and Layout A on screen) really went. This is the only thing that changes the lane; every other view just simulates on it.</span>
-          <div class="shotwrap" style="margin-top:6px">
-            <div><div id="pinDeck" class="pindeck" aria-label="Tap the pins left standing"></div><p class="hint" style="text-align:center;margin:4px 0 0">Tap the pins left standing</p>
-              <label class="f hidden" id="pinTypeBox" style="margin-top:6px"><span id="pinTypeLbl">That pin was</span><select id="pinType"></select></label></div>
-            <div style="flex:1;min-width:200px">
-              <div class="row" style="flex-wrap:nowrap">
-                <label class="f" style="flex:1"><span>Laydown</span><input id="calLay" type="number" step="1"></label>
-                <label class="f" style="flex:1"><span>Target arrows</span><input id="calArrows" type="number" step="0.5"></label>
-              </div>
-              <div class="row" style="margin-top:4px;flex-wrap:nowrap">
-                <label class="f" style="flex:1"><span>Missed by</span><input id="calMiss" type="number" step="0.5" min="0" placeholder="0" title="Boards you missed your target at the arrows"></label>
-                <label class="f" style="flex:1"><span>which way</span><select id="calMissDir"><option value="left">left</option><option value="right">right</option></select></label>
-              </div>
-              <div class="row" style="margin-top:4px;flex-wrap:nowrap">
-                <label class="f" style="flex:1"><span>Breakpoint</span><input id="calBoard" type="number" step="0.5" placeholder="board"></label>
-                <label class="f" style="flex:1"><span>at (ft)</span><input id="calFt" type="number" step="1" placeholder="ft"></label>
-                <label class="f" style="flex:1"><span>Hit at pins</span><input id="calHit" type="number" step="0.5" placeholder="optional" title="Board where the ball hit the headpin (pocket = 17.5)"></label>
-              </div>
-              <label class="tog" style="margin-top:6px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="calBad" style="width:auto"> Bad release <span class="hint" style="margin:0">(way off speed or hand position: logged, lane not changed)</span></label>
-              <div class="ctl" style="margin-top:6px">
-                <button class="btn primary sm" id="shotStrike" type="button">Strike ✕</button>
-                <button class="btn sm" id="shotLog" type="button">Log leave</button>
-                <button class="btn sm" id="shotClear" type="button">Clear pins</button>
-                <button class="btn sm" id="calReset" type="button" title="Back to the physics defaults for this pattern">Reset lane</button>
-              </div>
-              <p class="hint" id="calInfo" style="margin:6px 0 0"></p>
-            </div>
-          </div>
-        </div>
-        <label class="f"><span>Line</span><select id="lineMode"><option value="auto" selected>Auto line</option><option value="pocket">Pocket from laydown</option><option value="mine">My line (laydown → arrows)</option></select></label>
-        <label class="f"><span>Laydown board</span><input id="laydown" type="number" step="1" value="22"></label>
-        <div class="f full hidden" id="myLineBox" style="border-top:1px solid var(--line);padding-top:8px">
-          <span><b>My line</b> — where you lay it down, the board you hit at the arrows, and (optional) where you saw it break</span>
-          <div class="row" style="margin-top:4px;flex-wrap:nowrap">
-            <label class="f" style="flex:1"><span>Arrows board</span><input id="myArrows" type="number" step="0.5" value="12"></label>
-            <label class="f" style="flex:1"><span>Breakpoint board</span><input id="myBpBoard" type="number" step="0.5" placeholder="optional"></label>
-            <label class="f" style="flex:1"><span>at (ft)</span><input id="myBpFt" type="number" step="1" placeholder="optional"></label>
-          </div>
-        </div>
-      </div>
-      <p class="hint" id="lineHint">The app aims each ball for the pocket (board 17.5) from your laydown board.</p>
-    </div>
-
     <div class="card adv">
       <h2>Grip</h2>
       <div class="grid2">
@@ -276,11 +226,6 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <h2>Fit specs <span style="text-transform:none;letter-spacing:0;font-weight:400">— inches, 1/64ths</span></h2>
       <div id="fitHost"></div>
       <p class="hint">Spans are measured edge to edge, from the thumb-hole edge to the finger-hole edge nearest each other. <b>Cut to cut</b> is measured to the drilled cut (inserts and grips not counted). <b>Actual</b> is the same with the inserts / grips in, which is what the hand feels. Hole size = the drilled cut (the bore for a slug or insert). Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
-    </div>
-
-    <div class="card">
-      <h2>Layout</h2>
-      <div class="lay" id="layOut"></div>
     </div>
 
     <div class="card">
@@ -310,8 +255,13 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <p class="hint" id="dbInfo"></p>
     </div>
 
-    <div class="card" id="cardA"></div>
-    <div class="card hidden" id="cardB"></div>
+    <!-- Layout: one box. Each column = that layout's inputs (cardA / cardB) with its readout underneath. B shows with Compare. -->
+    <div class="card" id="layCard">
+      <div class="lay" id="layCols">
+        <div class="layCol" id="colA"><div id="cardA"></div><div class="layRead" id="layOutA"></div></div>
+        <div class="layCol hidden" id="colB"><div id="cardB"></div><div class="layRead" id="layOutB"></div></div>
+      </div>
+    </div>
 
     <div class="card">
       <h2>Ball view <span style="text-transform:none;letter-spacing:0;font-weight:400">— drag to rotate, scroll to zoom</span></h2>
@@ -357,15 +307,66 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
           <p class="hint">Rigid-body physics: Coulomb friction at the contact point (oil ≈ 0.04, dry ≈ 0.20), Euler rigid-body rotation using the drilled ball's RG / differential / intermediate differential oriented by your layout, so track flare and axis migration come out of the simulation. Also modeled: oil picked up and absorbed by the cover, oil thinning down the pattern, Pinel's drilled-spec changes and his drilling-angle timing rule. Not modeled: lane topography, CG offset, pin action. Use it to compare layouts; confirm on the lanes.</p>
         </div>
       </div>
-    </div>
-
-    <div class="card" id="shotCard">
-      <h2>Shot log <span id="shotWho" style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)"></span></h2>
+      <div id="laneSet" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
+      <h2>Lane</h2>
+      <div class="grid2">
+        <label class="f full"><span>Pattern</span><select id="patPreset"></select></label>
+        <p class="hint f full" id="patInfo" style="margin:0"></p>
+        <label class="f adv"><span>Length (ft)</span><input id="patLen" type="number" value="40"></label>
+        <label class="f adv"><span>Volume</span><select id="patVol"><option value="light">Light</option><option value="medium" selected>Medium</option><option value="heavy">Heavy</option></select></label>
+        <label class="f adv"><span>Shape</span><select id="patShape"><option value="house">House (crowned)</option><option value="sport">Sport (flat)</option></select></label>
+        <label class="f"><span>Condition</span><select id="patCond"><option value="fresh">Fresh</option><option value="trans">Transitioned</option></select></label>
+        <label class="f"><span>Line</span><select id="lineMode"><option value="auto" selected>Auto line</option><option value="pocket">Pocket from laydown</option><option value="mine">My line (laydown → arrows)</option></select></label>
+        <label class="f"><span>Laydown board</span><input id="laydown" type="number" step="1" value="22"></label>
+        <div class="f full hidden" id="myLineBox" style="border-top:1px solid var(--line);padding-top:8px">
+          <span><b>My line</b> — where you lay it down, the board you hit at the arrows, and (optional) where you saw it break</span>
+          <div class="row" style="margin-top:4px;flex-wrap:nowrap">
+            <label class="f" style="flex:1"><span>Arrows board</span><input id="myArrows" type="number" step="0.5" value="12"></label>
+            <label class="f" style="flex:1"><span>Breakpoint board</span><input id="myBpBoard" type="number" step="0.5" placeholder="optional"></label>
+            <label class="f" style="flex:1"><span>at (ft)</span><input id="myBpFt" type="number" step="1" placeholder="optional"></label>
+          </div>
+        </div>
+      </div>
+      <p class="hint" id="lineHint">The app aims each ball for the pocket (board 17.5) from your laydown board.</p>
+        <div id="logBox" style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
+          <span><b>Log a shot</b> — calibrates the lane. Every shot with a breakpoint retunes the lane to where this bowler’s ball (the ball and Layout A on screen) really went. This is the only thing that changes the lane; every other view just simulates on it.</span>
+          <div class="shotwrap" style="margin-top:6px">
+            <div><div id="pinDeck" class="pindeck" aria-label="Tap the pins left standing"></div><p class="hint" style="text-align:center;margin:4px 0 0">Tap the pins left standing</p>
+              <label class="f hidden" id="pinTypeBox" style="margin-top:6px"><span id="pinTypeLbl">That pin was</span><select id="pinType"></select></label></div>
+            <div style="flex:1;min-width:200px">
+              <div class="row" style="flex-wrap:nowrap">
+                <label class="f" style="flex:1"><span>Laydown</span><input id="calLay" type="number" step="1"></label>
+                <label class="f" style="flex:1"><span>Target arrows</span><input id="calArrows" type="number" step="0.5"></label>
+              </div>
+              <div class="row" style="margin-top:4px;flex-wrap:nowrap">
+                <label class="f" style="flex:1"><span>Missed by</span><input id="calMiss" type="number" step="0.5" min="0" placeholder="0" title="Boards you missed your target at the arrows"></label>
+                <label class="f" style="flex:1"><span>which way</span><select id="calMissDir"><option value="left">left</option><option value="right">right</option></select></label>
+              </div>
+              <div class="row" style="margin-top:4px;flex-wrap:nowrap">
+                <label class="f" style="flex:1"><span>Breakpoint</span><input id="calBoard" type="number" step="0.5" placeholder="board"></label>
+                <label class="f" style="flex:1"><span>at (ft)</span><input id="calFt" type="number" step="1" placeholder="ft"></label>
+                <label class="f" style="flex:1"><span>Hit at pins</span><input id="calHit" type="number" step="0.5" placeholder="optional" title="Board where the ball hit the headpin (pocket = 17.5)"></label>
+              </div>
+              <label class="tog" style="margin-top:6px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="calBad" style="width:auto"> Bad release <span class="hint" style="margin:0">(way off speed or hand position: logged, lane not changed)</span></label>
+              <div class="ctl" style="margin-top:6px">
+                <button class="btn primary sm" id="shotStrike" type="button">Strike ✕</button>
+                <button class="btn sm" id="shotLog" type="button">Log leave</button>
+                <button class="btn sm" id="shotClear" type="button">Clear pins</button>
+                <button class="btn sm" id="calReset" type="button" title="Back to the physics defaults for this pattern">Reset lane</button>
+              </div>
+              <p class="hint" id="calInfo" style="margin:6px 0 0"></p>
+            </div>
+          </div>
+            <div id="shotCard" style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+      <h2 style="margin-top:0">Shot log <span id="shotWho" style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)"></span></h2>
       <p id="shotLast" style="margin:0 0 8px"></p>
       <div class="ctl" style="margin-bottom:6px"><button class="btn sm" id="shotClearLog" type="button">Clear log</button></div>
       <div class="adv" id="shotSummary" style="margin-top:10px"></div>
       <div class="adv" style="overflow-x:auto"><table class="ars" id="shotTable"></table></div>
-      <p class="hint">Shots are logged in the Lane panel (Log a shot) and saved with the bowler, ball, Layout A and pattern. “App expected” is what the app predicted for that line <i>before</i> the shot retuned the lane, so it shows how good the prediction really was.</p>
+      <p class="hint">Each shot is saved with the bowler, ball, Layout A and pattern. “App expected” is what the app predicted for that line <i>before</i> the shot retuned the lane, so it shows how good the prediction really was.</p>
+            </div>
+        </div>
+      </div>
     </div>
 
     <div class="card" id="arsCard">
@@ -1204,7 +1205,11 @@ function layoutCardHTML(X) {
     <div class="f"><span>Quick picks</span><div class="row">
       ${X === 'A' ? '<button class="btn sm" data-q="rec">Recommended</button>' : '<button class="btn sm" data-q="weaker">Weaker</button><button class="btn sm" data-q="stronger">Stronger</button><button class="btn sm" data-q="control">Control</button>'}
     </div></div>
-  </div>`;
+  </div>${X === 'A' ? `
+  <div class="grid2" style="margin-top:8px">
+    <label class="f"><span>Goal</span><select id="goal"><option value="bench">Benchmark</option><option value="hook">More hook</option><option value="length">More length / control</option></select></label>
+    <div class="f"><span>&nbsp;</span><span class="hint">Nudges Recommended one step stronger (more hook) or weaker (more length). Saved with the bowler.</span></div>
+  </div>` : ''}`;
 }
 $('cardA').innerHTML = layoutCardHTML('A');
 $('cardB').innerHTML = layoutCardHTML('B') + `
@@ -1898,10 +1903,10 @@ let recCache = null;
 function compute() {
   const state = readState();
   document.body.dataset.compare = state.compare;
-  $('cardB').classList.toggle('hidden', !state.compare);
+  $('colB').classList.toggle('hidden', !state.compare);
   $('ballB').classList.toggle('hidden', !state.compare);
   const cols = state.compare ? 2 : 1;
-  for (const id of ['layOut', 'ballsHost', 'statsHost']) $(id).style.setProperty('--cols', cols);
+  for (const id of ['layCols', 'ballsHost', 'statsHost']) $(id).style.setProperty('--cols', cols);
 
   const rec = recommend(state.b, state.lane, state.ball); recCache = rec;
   const ballB = readBallB(state.ball);
@@ -1975,7 +1980,7 @@ function layoutBlock(state, X, r) {
     <p class="hint adv">${surf.note} Measurements are from the center of the grip, the same way the PAP is measured (${hand}-handed view).</p>
   </div>`;
 }
-function renderLayout(state, res) { $('layOut').innerHTML = layoutBlock(state, 'A', res.A) + (res.B ? layoutBlock({ ...state, ball: res.B.ball }, 'B', res.B) : ''); }
+function renderLayout(state, res) { $('layOutA').innerHTML = layoutBlock(state, 'A', res.A); $('layOutB').innerHTML = res.B ? layoutBlock({ ...state, ball: res.B.ball }, 'B', res.B) : ''; }
 function myLineRows(state, s, f) {
   const m = s.mine, R_ = state.b.hand !== 'L';
   // board numbers rise toward the left for a righty and toward the right for a lefty
@@ -2834,7 +2839,7 @@ function renderShots() {
   shotLineUI();
   const key = last ? last.state.lane.calibKey : null, here = shots.filter(s => s.calibKey === key);
   const strikes = here.filter(s => !s.leave.length).length;
-  $('shotLast').innerHTML = here.length ? `Last shots: ${here.slice(-8).map(s => leaveChip(s.leave)).join('')}<br><span class="hint">This pattern: ${strikes} strikes in ${here.length} shots (${pct(strikes, here.length)}).</span>` : '<span class="hint">No shots logged on this pattern yet — log them in the Lane panel.</span>';
+  $('shotLast').innerHTML = here.length ? `Last shots: ${here.slice(-8).map(s => leaveChip(s.leave)).join('')}<br><span class="hint">This pattern: ${strikes} strikes in ${here.length} shots (${pct(strikes, here.length)}).</span>` : '<span class="hint">No shots logged on this pattern yet.</span>';
   // carry by ball + intended line on this pattern: actual strike rate vs the app's expected strike chance
   const groups = new Map();
   for (const s of here) { const k = `${s.ball}|${s.lay}|${s.target ?? s.arr}`; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
