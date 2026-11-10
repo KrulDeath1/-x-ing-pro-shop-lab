@@ -1,5 +1,5 @@
 // Pulls current balls plus balls discontinued in the last 5 years (every weight) from bowwwl.com's database and injects
-// them into the app HTML. Discontinued balls carry x: 1.
+// them into the app HTML. US releases only: balls bowwwl marks as international are skipped. Discontinued balls carry x: 1.
 // usage: node update-balls.js [path-to-app.html]   (default: x-ing-pro-shop-lab.html next to this script)
 // Safe to re-run: it backs up the app first, refuses to write if the download looks broken, and lists what changed.
 const fs = require('fs'), path = require('path');
@@ -69,6 +69,7 @@ async function pages(weight, onRow, disc = 0) {
       const rg = parseFloat(strip(cell(tr, 'field-rg'))), diff = parseFloat(strip(cell(tr, 'field-differential'))), mb = parseFloat(strip(cell(tr, 'field-mass-bias-differential')));
       const coreType = /Asymmetric/.test(coreHtml) ? 'asym' : 'sym';
       if (!name || !isFinite(rg)) return;
+      if (/globe|International/.test(cell(tr, 'field-international'))) return; // US releases only
       const rec = {
         b: BRAND[brandSlug] || brandSlug, n: name, d: strip(cell(tr, 'field-release-date')),
         cv: span(cov, 'coverstock-name'), ct: span(cov, 'coverstock-type'), c: coverKey(span(cov, 'coverstock-type')),
