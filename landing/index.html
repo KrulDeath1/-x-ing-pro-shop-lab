@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>X-ING Pro Shop Lab: drilling layout app for bowlers and pro shops</title>
-<meta name="description" content="Enter a bowler's PAP, speed and rev rate, get a drilling layout with the reasons, and watch the drilled ball roll down your lane pattern.">
+<meta name="description" content="Enter a bowler's PAP, speed and rev rate, get a drilling layout with the reasons behind it, and watch the drilled ball roll down your lane pattern.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="X-ING Pro Shop Lab: drilling layout app for bowlers and pro shops">
 <meta property="og:description" content="A layout from your PAP, speed and revs, with the ball's motion on your pattern.">
@@ -73,8 +73,14 @@
   .close__word { line-height: 1; padding-top: .04em; }
   @media (max-width: 639px) { #features .panel { --p-h: 150px; } #more .panel { --p-h: 200px; } }
   /* plans: every feature side by side, ticks per plan (the Pro column carries the featured card's accent) */
-  /* the chart is taller than one screen on short laptops: its section grows with it (as the system does on tablets) */
-  main > #compare { height: auto; min-height: 100vh; min-height: 100svh; }
+  /* on a short laptop screen (1366x768) a section's content can be taller than one screen, and the system's fixed
+     one-screen height then lays it over the next section: every section (not the hero) is at least one screen and grows
+     with its content, as the system already does on tablets */
+  @media (min-width: 1280px) {
+    main > :is(section, .section):not(.hero, .section--hero) { height: auto; min-height: calc(var(--h, 1) * 100vh); min-height: calc(var(--h, 1) * 100svh); }
+    :where(main > :is(section, .section):not(.hero, .section--hero)) { display: flex; flex-direction: column; }
+    main > :is(section, .section):not(.hero, .section--hero) > :is(.wrap, .container) { flex: 1 0 auto; height: auto; min-height: 0; }
+  }
   .pc { display: grid; gap: var(--s-4); }
   .pc__box { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
   .pc table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -158,9 +164,9 @@
   <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text">
       <div class="hero__c">
-        <a class="pill" href="#questions"><span>567 US balls built in</span><span class="muted">Current and from the last five years</span></a>
+        <a class="pill" href="#questions"><span>567 US balls built in</span><span class="muted">Current releases plus the last five years</span></a>
         <h1 id="hero-h" aria-label="Drilling layout app for bowlers"><span class="ly-mark" aria-hidden="true"></span> Drilling layout app for bowlers</h1>
-        <p class="hero__lead">Enter a bowler’s PAP, speed, rev rate and axis tilt. X-ING picks a Dual Angle or VLS layout, says why, and rolls the drilled ball down your oil pattern.</p>
+        <p class="hero__lead">Enter your PAP, speed, rev rate and axis tilt. X-ING picks a Dual Angle or VLS layout, explains why, and rolls the drilled ball down your oil pattern.</p>
         <div class="btn-row"><a class="btn btn--primary" href="app/#signup">Create a free account</a><a class="btn btn--secondary" href="#app">See the workbench</a></div>
       </div>
       <div class="hero__window" data-fx="painterly-landscape" data-fx-seed="11" role="img" aria-label="X-ING's ball view: a drilled ball with its pin, PAP, PSA and the track of its axis migration">
@@ -177,7 +183,7 @@
       <div class="grid">
         <h2 id="app-h" class="span-5">Bowler, ball and fit on one screen</h2>
         <div class="span-6 start-7">
-          <p>Type the bowler’s numbers on the left. The bowler read, fit specs, layout and ball motion update on the right as you type, and everything saves to the bowler’s profile.</p>
+          <p>Enter the bowler’s numbers on the left, and the read, fit specs, layout and ball motion update on the right as you type. Everything saves to the bowler’s profile.</p>
           <a class="link" href="app/">Open the app</a>
         </div>
       </div>
@@ -190,17 +196,17 @@
   <section class="section" id="features" aria-labelledby="features-h">
     <div class="wrap">
       <div class="section-head">
-        <h2 id="features-h">Layouts with the reasons. <span class="muted">Ball motion on your pattern.</span></h2>
+        <h2 id="features-h">Layouts that explain themselves. <span class="muted">Ball motion on your pattern.</span></h2>
       </div>
       <div class="grid">
         <article class="card card--row card--open span-6">
-          <h3>Layout recommendation in both systems</h3>
-          <p>Drilling angle, pin-to-PAP and VAL from the bowler’s speed, revs, tilt and the pattern, with where the pin and PSA land.</p>
+          <h3>Layout recommendations in both systems</h3>
+          <p>Get the drilling angle, pin-to-PAP and VAL angle from the bowler’s speed, revs, tilt and pattern, plus where the pin and PSA land.</p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/layout.png" alt="Layout A: 55 degrees, 5 inches, 45 degrees, pin up, with the reasons listed" loading="lazy" data-source="client" data-subject="X-ING layout screen"></div>
         </article>
         <article class="card card--row card--open span-6">
           <h3>3D lane with the drilled ball</h3>
-          <p>The ball rolls down a real house or PBA pattern, from behind or chasing it. <span class="badge">Pro</span></p>
+          <p>Watch the ball roll down a real house or PBA pattern, from behind the bowler or following the ball. <span class="badge">Pro</span></p>
           <div class="panel"><img class="frame__img" src="assets/app/lane-3d.png" alt="A ball rolling down a 3D lane over the oil pattern" loading="lazy" data-source="client" data-subject="X-ING 3D lane"></div>
         </article>
       </div>
@@ -210,22 +216,22 @@
   <section class="section" id="more" style="--hm: 2" aria-labelledby="more-h">
     <div class="wrap">
       <div class="section-head">
-        <h2 id="more-h">Arsenal planning in X-ING Pro</h2>
+        <h2 id="more-h">Plan your whole arsenal with Pro</h2>
       </div>
       <div class="grid">
         <article class="card card--row card--open span-4">
           <h3>Layout A and B side by side</h3>
-          <p>A stronger or weaker B on the same ball or another. <span class="badge">Pro</span></p>
+          <p>Try a stronger or weaker layout B on the same ball or a different one. <span class="badge">Pro</span></p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/compare-balls.png" alt="Two drilled balls side by side, 55 and 65 degree drilling angles" loading="lazy" data-source="client" data-subject="X-ING compare A and B"></div>
         </article>
         <article class="card card--row card--open span-4">
           <h3>Ball coverage across the arsenal</h3>
-          <p>Each ball’s length and hook on this pattern, so the gap shows the next ball. <span class="badge">Pro</span></p>
+          <p>See each ball’s length and hook on this pattern, and let the gap point to your next ball. <span class="badge">Pro</span></p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/coverage.png" alt="A chart of three balls by breakpoint distance and boards of hook" loading="lazy" data-source="client" data-subject="X-ING arsenal coverage"></div>
         </article>
         <article class="card card--row card--open span-4">
           <h3>Drill sheet with the layout and bowler read</h3>
-          <p>The bowler’s type, speed and revs, printed with the layout and fit. <span class="badge">Pro</span></p>
+          <p>Print the bowler’s type, speed and revs alongside the layout and fit. <span class="badge">Pro</span></p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/read.png" alt="The bowler read: rev-dominant, medium speed, high revs, tilt and rotation" loading="lazy" data-source="client" data-subject="X-ING bowler read"></div>
         </article>
       </div>
@@ -245,7 +251,7 @@
         <div class="span-5 stack-4">
           <h2 id="shops-h">Pro shop tools. <span class="muted">Every customer’s specs in one place.</span></h2>
           <p class="t-lead">Advanced mode shows each layout in Dual Angle and VLS with the drilled RG and differential, beside the bowler’s fit table.</p>
-          <p>Hole sizes, spans and pitches in 1/64ths<br>Every ball you drilled, saved with the bowler<br>Drill sheets and spec sheets with your shop’s name and logo<br>A customer list with phone, email and notes</p>
+          <p>Hole sizes, spans and pitches in 1/64ths<br>Every ball you’ve drilled, saved with the bowler<br>Drill sheets and spec sheets with your shop’s name and logo<br>A customer list with phone, email and notes</p>
           <a class="link" href="#plans">See the Shop plan</a>
         </div>
         <div class="frame frame--split frame--lit span-6 start-7" style="--ratio: 100%">
@@ -261,14 +267,14 @@
     <div class="wrap">
       <div class="section-head">
         <h2 id="plans-h">Plans</h2>
-        <p>Free has no time limit: one bowler with up to 9 balls in the arsenal, and every ball in the database. Pro and Shop prices are coming with online checkout.</p>
+        <p>Free never expires: one bowler, up to 9 balls in the arsenal, and every ball in the database to try. Pro and Shop prices arrive with online checkout.</p>
       </div>
       <div class="grid">
         <article class="card card--plan span-4">
           <h3>Free</h3>
           <p class="muted">For any bowler</p>
           <div class="price"><span class="t-stat">$0</span></div>
-          <a class="btn btn--secondary" href="app/?plan=free#signup">Sign up for Free</a>
+          <a class="btn btn--secondary" href="app/?plan=free#signup">Start for free</a>
           <p>One bowler, up to 9 balls in the arsenal<br>Every ball in the database<br>Layout recommendations<br>The 3D drilled ball<br>Top-down lane and ball motion<br>Import your saved data</p>
         </article>
         <article class="card card--plan is-featured span-4">
@@ -276,7 +282,7 @@
           <p class="muted">For bowlers. Everything in Free, plus</p>
           <div class="price"><span class="t-stat">Price coming soon</span></div>
           <a class="btn btn--primary" href="mailto:Proshoplab@gmail.com?subject=Pro">Ask about Pro</a>
-          <p>Up to 5 bowlers, unlimited arsenals<br>Advanced mode: ball specs, track and rev measuring, your own line<br>Auto line and strike chance<br>The 3D lane<br>Compare A and B<br>Arsenal coverage chart<br>Drill and spec sheets, export<br>Shot log and lane calibration</p>
+          <p>Up to 5 bowlers, unlimited arsenals<br>Advanced mode: ball specs, track and rev measuring, your own line<br>Auto line and strike chance<br>The 3D lane<br>Compare A and B<br>Arsenal coverage chart<br>Printed drill and spec sheets, data export<br>Shot log and lane calibration</p>
         </article>
         <article class="card card--plan span-4">
           <h3>Shop</h3>
@@ -335,10 +341,10 @@
     <div class="wrap">
       <div class="grid">
         <div class="span-5 stack-4">
-          <h2 id="lane-h">Shot log that tunes the lane to each ball</h2>
-          <p class="t-lead">On Pro, tap the pins left standing and where the ball broke. Each shot retunes the lane so the next prediction matches what this bowler’s ball really did.</p>
+          <h2 id="lane-h">A shot log that tunes the lane to each ball</h2>
+          <p class="t-lead">With Pro, tap the pins left standing and enter where the ball broke. Each shot retunes the lane, so the next prediction matches what this bowler’s ball actually did.</p>
           <p>Tracks strikes and leaves by pattern<br>Compares each shot with the app’s prediction<br>Flags a bad release so it never skews the lane</p>
-          <a class="link" href="#questions">Read the questions</a>
+          <a class="link" href="#questions">Read common questions</a>
         </div>
         <div class="frame frame--split frame--lit span-6 start-7" style="--ratio: 100%">
           <div class="stage stage--fade-br"><div class="at-corner to-edge" style="--ax:56px;--ay:56px">
@@ -354,17 +360,17 @@
       <div class="grid">
         <div class="span-5 stack-4">
           <h2 id="questions-h">Questions</h2>
-          <p>What bowlers and shops ask before they sign up.</p>
+          <p>What bowlers and pro shops ask before signing up.</p>
           <a class="link" href="#contact">Email us another question</a>
           <div class="frame frame--lit lane-top" role="img" aria-label="X-ING's top-down lane: the ball's path over the oil pattern to the pocket"><img src="assets/app/lane-2d.png" alt="" loading="lazy" data-source="client" data-subject="X-ING top-down lane"></div>
         </div>
         <div class="faq span-6 start-7">
           <div class="faq__item"><h3>Is the Free plan really free?</h3><p>Yes, with no time limit and no card. Free covers one bowler with up to 9 balls in the arsenal, and you can try every ball in the database. You need an account so your bowler and balls are saved.</p></div>
           <div class="faq__item"><h3>Which balls are in the list?</h3><p>567 US releases: current balls and those discontinued in the last five years, with specs for each weight.</p></div>
-          <div class="faq__item"><h3>Do I need to install software?</h3><p>No. It runs in the browser on a computer, tablet or phone, and keeps a copy on the device for when you’re offline.</p></div>
-          <div class="faq__item"><h3>How exact is the ball motion?</h3><p>It’s a physics simulation for comparing layouts, not a promise. Log real shots and it tunes the lane to what the ball did. Confirm on the lanes.</p></div>
-          <div class="faq__item"><h3>Do layouts work for lefties and two-handers?</h3><p>Yes. Set the hand and the style for each bowler, and the layout and the lane follow.</p></div>
-          <div class="faq__item"><h3>When will Pro have a price?</h3><p>When online checkout opens. Until then, ask us and we switch your account by hand.</p></div>
+          <div class="faq__item"><h3>Do I need to install software?</h3><p>No. It runs in the browser on a computer, tablet or phone, and keeps a copy on your device so it works offline.</p></div>
+          <div class="faq__item"><h3>How accurate is the ball motion?</h3><p>It’s a physics simulation built for comparing layouts, not a guarantee. Log real shots and it tunes the lane to what your ball actually did. Always confirm on the lanes.</p></div>
+          <div class="faq__item"><h3>Do layouts work for lefties and two-handers?</h3><p>Yes. Set each bowler’s hand and style, and the layout and lane follow.</p></div>
+          <div class="faq__item"><h3>When will Pro have a price?</h3><p>Once online checkout opens. Until then, email us and we’ll upgrade your account by hand.</p></div>
         </div>
       </div>
     </div>
@@ -375,7 +381,7 @@
   <div class="wrap">
     <div class="closing__cta close--word">
       <div class="section-head--split">
-        <div><h2 id="close-h">Create a free account</h2><p class="t-lead">Your bowler and up to 9 balls, no time limit, no card.</p></div>
+        <div><h2 id="close-h">Create a free account</h2><p class="t-lead">Your bowler and up to 9 balls. No time limit, no card needed.</p></div>
         <a class="btn btn--primary" href="app/#signup">Create a free account<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
       </div>
       <p class="close__word" aria-hidden="true">X-ING</p>
@@ -384,7 +390,7 @@
       <div class="grid">
         <div class="span-4 stack-4">
           <a class="nav__logo" href="#top"><span class="mark mark--initial" aria-hidden="true">X</span>X-ING</a>
-          <p class="footer__lede">Layouts and ball motion for bowlers.</p>
+          <p class="footer__lede">Drilling layouts and ball motion for bowlers and pro shops.</p>
         </div>
         <div class="span-2 footer__col"><h3>Features</h3><ul><li><a href="#app">Workbench</a></li><li><a href="#features">Layouts</a></li><li><a href="#more">Arsenal</a></li><li><a href="#lane">Shot log</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Pro shops</h3><ul><li><a href="#shops">Advanced mode</a></li><li><a href="#shops">Fit specs</a></li></ul></div>
