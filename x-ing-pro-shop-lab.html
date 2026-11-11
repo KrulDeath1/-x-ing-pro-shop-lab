@@ -869,7 +869,7 @@ function resolveLayout(raw, ball) {
   if (!(L.p2p > 0 && L.p2p < 6.75)) L.warn.push('Pin-to-PAP must be between 0 and 6 3/4".');
   else if (L.p2p < 1.5) L.warn.push('Dual Angle only works accurately with the pin at least 1 1/2" from the PAP.');
   if (ball.core === 'asym' && isFinite(L.da) && (L.da < 10 || L.da > 90)) L.warn.push('Drilling angle outside the effective 10°–90° range.');
-  if (isFinite(L.val) && (L.val < 20 || L.val > 90)) L.warn.push('VAL angle outside the effective range (20°–70°, up to 90° for a Rico-type layout).');
+  if (isFinite(L.val) && (L.val < 20 || L.val > 90)) L.warn.push('VAL angle outside the effective range (20°–70°, up to 90° for a pin-below-the-ring-finger layout).');
   const sum = (ball.core === 'asym' ? L.da : 45) + L.val;
   if (isFinite(sum) && (sum < 30 || sum > 160)) L.warn.push(`Drilling angle + VAL angle = ${Math.round(sum)}°. Keep the sum between 30° and 160° so the ball still hits.`);
   L.p2p = clamp(L.p2p || 4.5, 0.25, 6.7);
@@ -2422,7 +2422,7 @@ function layoutBlock(state, X, r) {
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
       <dt>Drilled RG / diff / int.</dt><dd>${r.stats.spec.rg.toFixed(3)} / ${r.stats.spec.diff.toFixed(3)} / ${r.stats.spec.intdiff.toFixed(3)} <span class="hint">(${(r.stats.spec.rg - state.ball.rg >= 0 ? '+' : '') + (r.stats.spec.rg - state.ball.rg).toFixed(3)} RG from drilling; ${r.stats.spec.chart
         ? `from the maker’s drilling chart${r.stats.spec.chart.near ? `, layout ${r.stats.spec.chart.near.id} (${r.stats.spec.chart.near.name})` : `, blended from the nearest chart layouts (closest: ${r.stats.spec.chart.closest.id} ${r.stats.spec.chart.closest.name})`}${state.b.style === '2H' ? '; the chart assumes a thumb hole' : ''}`
-        : 'pin-up layouts add about 0.01–0.02, pin-down about −0.01, Rico about −0.05'})</span></dd>
+        : 'pin-up layouts add about 0.01–0.02, pin-down about −0.01, pin below the ring finger about −0.05'})</span></dd>
       <dt>Holes</dt><dd>${g.holes.map(h => `${h.name} ${fmt64(h.d)}"${h.w > h.d ? ` (oval ${fmt64(h.w)}")` : ''}`).join(', ')} <span class="hint">(${g.holes.fromFit ? 'drilled from the Fit specs card: spans, sizes, oval, pitches' : g.holes.sizesFromFit ? 'sizes from the Fit specs card; placed by the Grip card span until the fit has cut-to-cut spans, hole sizes and the bridge' : 'stock sizes placed by the Grip card span — fill in the Fit specs card to drill the real holes'})</span></dd>
       <dt>Surface</dt><dd>${surf.grit}</dd>
     </dl>
