@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>X-ING Pro Shop Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -15,27 +18,36 @@
   --bg: #f4f2ee; --panel: #ffffff; --panel-2: #f8f7f4; --ink: #1d1b19; --ink-2: #5f5a53; --line: #e2ded6;
   --accent: #b4441b; --accent-ink: #ffffff; --a: #2f6fdb; --b: #c2378f; --warn-bg: #fff4dc; --warn-ink: #7a4b00;
   --good: #1f8a4c; --chip: #efe9df; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.05);
-  --stage: #20262e;
+  --stage: #20262e; --tag-ink: #ffffff;
+  /* Type roles. One reading face (the platform UI font) and one condensed face for the shop's numbers and card titles,
+     the way a drill sheet or a spec card is lettered. */
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-shop: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", var(--font-ui);
+  --fs-meta: 12px;   /* field labels, hints, legends, chips */
+  --fs-body: 14px;   /* reading text, inputs, data lists */
+  --fs-title: 17px;  /* card titles (condensed caps) */
+  --fs-mark: 22px;   /* second-tier figures: pin and PSA position */
+  --fs-figure: 40px; /* the layout itself */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #15171a; --panel: #1d2024; --panel-2: #23272c; --ink: #ece8e1; --ink-2: #a39e96; --line: #33373d;
     --accent: #e0703f; --accent-ink: #1a1a1a; --a: #6b9cf0; --b: #e070b6; --warn-bg: #3a2f17; --warn-ink: #f2c879;
-    --good: #5cc98a; --chip: #2b3036; --shadow: none; --stage: #101317;
+    --good: #5cc98a; --chip: #2b3036; --shadow: none; --stage: #101317; --tag-ink: #0f1216;
   }
 }
 :root[data-theme="dark"] {
   --bg: #15171a; --panel: #1d2024; --panel-2: #23272c; --ink: #ece8e1; --ink-2: #a39e96; --line: #33373d;
   --accent: #e0703f; --accent-ink: #1a1a1a; --a: #6b9cf0; --b: #e070b6; --warn-bg: #3a2f17; --warn-ink: #f2c879;
-  --good: #5cc98a; --chip: #2b3036; --shadow: none; --stage: #101317;
+  --good: #5cc98a; --chip: #2b3036; --shadow: none; --stage: #101317; --tag-ink: #0f1216;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { background: var(--bg); color: var(--ink); font: var(--fs-body)/1.5 var(--font-ui); }
 header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
   padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
-.brand { font-weight: 750; font-size: 18px; letter-spacing: -.01em; }
-.brand small { font-weight: 500; color: var(--ink-2); font-size: 12px; margin-left: 6px; }
+.brand { margin: 0; font: 700 24px/1 var(--font-shop); letter-spacing: .01em; }
+.brand small { font: 500 var(--fs-meta)/1.3 var(--font-ui); letter-spacing: 0; color: var(--ink-2); margin-left: 8px; }
 .hgroup { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .seg button { border: 0; background: transparent; color: var(--ink-2); padding: 6px 12px; font: inherit; cursor: pointer; }
@@ -43,19 +55,61 @@ header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; g
 .btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 8px; font: inherit; cursor: pointer; }
 .btn:hover { border-color: var(--ink-2); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
-.btn.sm { padding: 3px 8px; font-size: 12px; }
+.btn.sm { padding: 3px 10px; font-size: var(--fs-meta); min-height: 28px; }
+.btn, .seg button { min-height: 32px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+/* touch screens (the counter tablet, a phone at the lanes): bigger targets */
+@media (pointer: coarse) { .btn, .seg button { min-height: 40px; } .btn.sm { min-height: 36px; } }
 label.tog { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; user-select: none; }
+header label.tog { white-space: nowrap; }
+/* jump chips: one tap to each part of the page when it's a single column */
+.jump { display: none; flex: 1 0 100%; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px 0; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border-radius: 99px; background: var(--chip); color: var(--ink); font-size: var(--fs-meta); font-weight: 600; text-decoration: none; }
+.jump a:hover { background: var(--line); }
+:is(#bowlerCard, #layCard, #motionCard, #logBox, #arsCard) { scroll-margin-top: calc(var(--hdr, 58px) + 10px); }
+@media (max-width: 900px) { .jump { display: flex; } }
+/* single column (tablets, phones): one row of the name and the header tools, which scroll sideways (Recommend first), then
+   the jump chips. Phones also shorten the name to X-ING. */
+@media (max-width: 600px) {
+  header { padding: 8px 12px; }
+  .jump { margin: 0 -12px; padding: 0 12px; }
+  .brand { font-size: 22px; }
+  .brand-rest { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (max-width: 900px) {
+  header { flex-wrap: wrap; gap: 8px 10px; }
+  .brand { flex: none; }
+  .brand small { display: none; }
+  .hgroup { flex: 1 1 0; min-width: 0; margin-left: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); }
+  .hgroup::-webkit-scrollbar { display: none; }
+  .hgroup > * { flex: none; }
+  .hgroup > #btnRec { order: -3; } .hgroup > #btnPrint { order: -2; } .hgroup > .acct { order: -1; }
+  .hgroup .acct { display: inline-flex; flex-wrap: nowrap; }
+}
 main { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 16px; padding: 16px; max-width: 1500px; margin: 0 auto; }
 @media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 12px 16px; } }
 .form { display: flex; flex-direction: column; gap: 12px; }
+/* The inputs (Bowler, Ball, Grip) stay beside the results they drive: on two-column screens the column sticks under the
+   header and scrolls on its own when it's taller than the window. --hdr is the header's measured height. */
+@media (min-width: 901px) {
+  .form { position: sticky; top: calc(var(--hdr, 58px) + 16px); align-self: start; max-height: calc(100vh - var(--hdr, 58px) - 32px);
+    overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; margin-right: -4px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  .form::-webkit-scrollbar { width: 8px; }
+  .form::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+  .form::-webkit-scrollbar-track { background: transparent; }
+}
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 14px; min-width: 0; }
-.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
-.card h2 .tag { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 11px; padding: 1px 7px; border-radius: 99px; color: #fff; }
+.card h2 { font: 700 var(--fs-title)/1.15 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; color: var(--ink); margin: 0 0 12px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; text-wrap: balance; }
+/* the plain-text asides in a card title ("— inches, 1/64ths", the bowler's name) read as ordinary text */
+.card h2 > span:not(.tag) { font-family: var(--font-ui); font-size: var(--fs-meta); text-transform: none; letter-spacing: 0; color: var(--ink-2); }
+.tag { display: inline-block; font: 700 var(--fs-meta)/1.5 var(--font-ui); text-transform: none; letter-spacing: 0; padding: 0 7px; border-radius: 99px; color: var(--tag-ink); align-self: center; }
 .tagA { background: var(--a); } .tagB { background: var(--b); }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px 10px; }
 .f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.f > span { font-size: 12px; color: var(--ink-2); }
+.f > span { font-size: var(--fs-meta); line-height: 1.35; color: var(--ink-2); }
 .f.full { grid-column: 1 / -1; }
 .bs-wrap { position: relative; display: block; }
 .bs-list { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 4px); max-height: min(320px, 50vh); overflow-y: auto; overscroll-behavior: contain;
@@ -96,40 +150,58 @@ dialog.cust { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48
 .balladm .wts input { width: 100%; min-width: 0; }
 .balladm .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .balladm .tabs .on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-.balladm .tag { font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-left: 6px; }
+.balladm .tag { font-size: var(--fs-meta); padding: 1px 7px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-left: 6px; }
 @media (max-width: 520px) { .cust-form { grid-template-columns: 1fr; } .cust-row { flex-wrap: wrap; } .cust-row .acts { width: 100%; justify-content: flex-end; } }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
-input:focus, select:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 0; }
+/* One focus ring for every control, shown for keyboard focus (and on every text field, where the browser shows it on click too). */
+:where(a, button, input, select, textarea, summary, [tabindex], canvas):focus { outline: none; }
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.btn:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+::placeholder { color: var(--ink-2); opacity: 1; }
+::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); color: var(--ink); }
+.vh { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
 .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.hint { font-size: 12px; color: var(--ink-2); margin: 6px 0 0; }
-.sys { display: flex; gap: 12px; margin-bottom: 8px; font-size: 13px; }
+.hint { font-size: var(--fs-meta); line-height: 1.5; color: var(--ink-2); margin: 6px 0 0; max-width: 68ch; text-wrap: pretty; }
+.sys { display: flex; gap: 12px; margin-bottom: 8px; }
 .sys label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
 .sys input { width: auto; }
 fieldset { border: 0; padding: 0; margin: 0; }
 .out { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.chip { background: var(--chip); border-radius: 99px; padding: 2px 10px; font-size: 12px; font-weight: 600; }
-.read p { margin: 4px 0; }
+.chip { background: var(--chip); border-radius: 99px; padding: 2px 10px; font-size: var(--fs-meta); font-weight: 600; }
+.read p { margin: 4px 0; max-width: 68ch; text-wrap: pretty; }
 .target { font-weight: 600; }
 .warns { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.warns li { background: var(--warn-bg); color: var(--warn-ink); padding: 6px 10px; border-radius: 8px; font-size: 13px; }
+.warns li { background: var(--warn-bg); color: var(--warn-ink); padding: 6px 10px; border-radius: 8px; }
 .lay { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 16px; }
 .layCol { min-width: 0; }
 .layRead { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
 #layCols[style*="--cols: 2"] > #colB { border-left: 1px solid var(--line); padding-left: 16px; }
-@media (max-width: 760px) { #layCols { grid-template-columns: 1fr !important; } #layCols > #colB { border-left: 0 !important; padding-left: 0 !important; border-top: 1px solid var(--line); padding-top: 12px; } }.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+@media (max-width: 760px) { #layCols { grid-template-columns: 1fr !important; } #layCols > #colB { border-left: 0 !important; padding-left: 0 !important; border-top: 1px solid var(--line); padding-top: 12px; } }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .kv dt { color: var(--ink-2); }
 .kv dd { margin: 0; font-variant-numeric: tabular-nums; }
-.big { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
-.why { margin: 10px 0 0; padding-left: 18px; font-size: 13px; }
+/* the layout result, lettered like the drill sheet: the three Dual Angle numbers, then where the pin and PSA land */
+.ds-figs { display: grid; grid-template-columns: repeat(3, minmax(0, auto)); justify-content: start; gap: 4px 28px; margin: 0 0 14px; }
+.ds-figs div, .ds-marks div { display: grid; gap: 2px; min-width: 0; align-content: start; }
+.ds-figs b { font: 700 var(--fs-figure)/1 var(--font-shop); font-variant-numeric: tabular-nums; }
+.ds-figs span, .ds-marks span { font-size: var(--fs-meta); color: var(--ink-2); }
+.ds-marks { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 20px; padding: 10px 0 12px; margin-bottom: 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.ds-marks b { font: 600 var(--fs-mark)/1.1 var(--font-shop); font-variant-numeric: tabular-nums; }
+.ds-marks small { display: block; margin-top: 3px; font: 500 var(--fs-meta)/1.35 var(--font-ui); color: var(--ink-2); }
+@media (max-width: 420px) { .ds-figs { gap: 4px 16px; } .ds-figs b { font-size: 34px; } }
+.why { margin: 10px 0 0; padding-left: 18px; max-width: 68ch; }
 .why li { margin: 3px 0; }
 .balls { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 12px; }
 .stage { position: relative; background: radial-gradient(circle at 50% 40%, #39424e, var(--stage)); border-radius: 10px; overflow: hidden; height: 360px; }
 .stage canvas { display: block; width: 100% !important; height: 100% !important; }
-.stage .lbl { position: absolute; left: 10px; top: 8px; color: #fff; font-size: 12px; font-weight: 600; background: rgba(0,0,0,.35); padding: 2px 8px; border-radius: 99px; }
+.stage .lbl { position: absolute; left: 10px; top: 8px; color: #fff; font-size: var(--fs-meta); font-weight: 600; background: rgba(0,0,0,.35); padding: 2px 8px; border-radius: 99px; }
 .stage .note { position: absolute; inset: 0; display: grid; place-items: center; color: #cfd6df; padding: 20px; text-align: center; font-size: 13px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--fs-meta); color: var(--ink-2); margin-top: 8px; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
 .lanewrap { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 16px; align-items: start; }
 .lanewrap.wide { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
@@ -137,7 +209,7 @@ fieldset { border: 0; padding: 0; margin: 0; }
 #lane2d { width: 100%; height: 640px; display: block; border-radius: 10px; background: var(--stage); }
 #lane3dHost { height: 520px; }
 .stats { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0,1fr)); gap: 12px; }
-.stat h3 { margin: 0 0 6px; font-size: 13px; display: flex; gap: 6px; align-items: center; }
+.stat h3 { margin: 0 0 6px; font: 700 var(--fs-mark)/1.1 var(--font-shop); font-variant-numeric: tabular-nums; display: flex; gap: 8px; align-items: center; }
 .ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
 .ctl select { width: auto; }
 .adv { }
@@ -145,10 +217,10 @@ body[data-mode="simple"] .adv { display: none !important; }
 body[data-mode="advanced"] .simple-only { display: none !important; }
 .hidden { display: none !important; }
 #sheet { display: none; }
-.fit { width: 100%; border-collapse: collapse; font-size: 12px; }
+.fit { width: 100%; border-collapse: collapse; font-size: var(--fs-meta); }
 .fit th { text-align: left; color: var(--ink-2); font-weight: 600; padding: 2px 4px; white-space: nowrap; }
 .fit td { padding: 2px 3px; }
-.fit td input, .fit td select { padding: 4px 5px; font-size: 12px; }
+.fit td input, .fit td select { padding: 4px 5px; font-size: 13px; }
 .fit .pd { display: flex; gap: 3px; } .fit .pd input { min-width: 0; } .fit .pd select { width: 46px; flex: none; padding: 4px 2px; }
 /* fit card: the pro shop grip card, finger holes over the thumb, pitch boxes around each hole.
    Right hand: middle finger on the left as you look at the ball; .lh swaps the finger holes for a left hand. */
@@ -159,37 +231,48 @@ body[data-mode="advanced"] .simple-only { display: none !important; }
 .fc-hole .nm { grid-area: 1 / 1 / 2 / 4; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
 .fc-hole .top { grid-area: 2 / 2; } .fc-hole .ll { grid-area: 3 / 1; } .fc-hole .fc-ring { grid-area: 3 / 2; } .fc-hole .lr { grid-area: 3 / 3; } .fc-hole .bot { grid-area: 4 / 2; }
 .fc-ring { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; align-content: center; gap: 0; }
-.fc-ring span { font-size: 9px; color: var(--ink-2); line-height: 1; }
-.fc-ring input { width: 50px; text-align: center; padding: 2px; font-size: 13px; }
+.fc-ring span { font-size: var(--fs-meta); color: var(--ink-2); line-height: 1.1; }
+.fc-ring input { width: 50px; text-align: center; padding: 2px; font-size: var(--fs-body); }
 .fc-box { display: grid; gap: 1px; justify-items: center; }
-.fc-box > span { font-size: 10px; color: var(--ink-2); white-space: nowrap; }
-.fc-box input { width: 54px; text-align: center; padding: 4px 2px; font-size: 13px; }
+.fc-box > span { font-size: var(--fs-meta); color: var(--ink-2); white-space: nowrap; }
+.fc-box input { width: 54px; text-align: center; padding: 4px 2px; font-size: var(--fs-body); }
 .fc-a-mf { grid-area: mf; } .fc-a-rf { grid-area: rf; } .fc-a-th { grid-area: th; } .fc-a-br { grid-area: br; } .fc-a-smf { grid-area: smf; } .fc-a-srf { grid-area: srf; }
 .fc-hand { font-size: 12px; color: var(--ink-2); }
 .fc-off { opacity: .4; }
-.fc-span select { width: 92px; padding: 3px 2px; font-size: 11px; }
+.fc-span select { width: 96px; padding: 3px 2px; font-size: var(--fs-meta); }
 .fc-pick { display: grid; gap: 3px; min-width: 0; }
 .fc-pick select, .fc-pick input { width: 100%; min-width: 0; }
 .fit td:has(.fc-pick) { width: 33%; }
 .fc-oval { display: flex; gap: 8px 12px; flex-wrap: wrap; justify-content: flex-end; margin: 4px 0 10px; }
 .fc-oval label { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); }
 .fc-oval input { width: 70px; }
-table.ars { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.ars { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
 table.ars th { text-align: left; color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--line); padding: 5px 6px; white-space: nowrap; }
 table.ars td { border-bottom: 1px solid var(--line); padding: 6px; vertical-align: top; }
 table.ars td .row { flex-wrap: nowrap; }
 .shotwrap { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 .pindeck { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 10px 12px; background: var(--panel-2); border-radius: 12px; }
 .pindeck .prow { display: flex; gap: 8px; }
-.pindeck button { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--line); background: transparent; color: var(--ink-2); font: 600 13px system-ui; cursor: pointer; }
+.pindeck button { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--line); background: transparent; color: var(--ink-2); font: 600 13px var(--font-ui); cursor: pointer; }
 .pindeck button.up { background: #f4f1ea; border-color: #c43c2c; color: #222; box-shadow: inset 0 -4px 0 rgba(196,60,44,.35); }
-.leave { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--panel-2); margin: 2px 3px 2px 0; }
+.leave { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: var(--fs-meta); font-weight: 600; background: var(--panel-2); margin: 2px 3px 2px 0; }
 .leave.x { background: #2f7d4a; color: #fff; }
 .leave.split { background: #a33a2a; color: #fff; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 dialog#papDlg { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); padding: 0; width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
 dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
 .dlg { padding: 16px; }
+/* check before printing: grip, layout and weight in the drill sheet's lettering */
+dialog.pchk { width: min(560px, calc(100vw - 32px)); }
+.pchk h2 { font: 700 22px/1.1 var(--font-shop); text-transform: uppercase; letter-spacing: .04em; }
+.pchk-sec { display: grid; grid-template-columns: 92px 1fr; gap: 6px 14px; padding: 10px 0; border-top: 1px solid var(--line); }
+.pchk-sec > h3 { margin: 0; font: 700 var(--fs-title)/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+.pchk-sec dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+.pchk-sec dt { color: var(--ink-2); font-size: var(--fs-meta); align-self: baseline; }
+.pchk-sec dd { margin: 0; font: 600 18px/1.25 var(--font-shop); font-variant-numeric: tabular-nums; }
+.pchk-sec dd.miss { font: italic 500 var(--fs-meta)/1.5 var(--font-ui); color: var(--warn-ink); }
+.pchk-fig { font: 700 30px/1 var(--font-shop); font-variant-numeric: tabular-nums; }
+@media (max-width: 480px) { .pchk-sec { grid-template-columns: 1fr; } }
 @media print {
   @page { margin: 12mm; }
   body { background: #fff; color: #000; }
@@ -224,34 +307,35 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
 </head>
 <body data-mode="simple">
 <header>
-  <div class="brand">X-ING Pro Shop Lab <small>drilling layouts · PAP · ball motion</small></div>
+  <h1 class="brand">X-ING<span class="brand-rest"> Pro Shop Lab</span> <small>drilling layouts · PAP · ball motion</small></h1>
   <div class="hgroup">
     <div class="seg" id="modeSeg"><button data-mode="simple" class="on">Simple</button><button data-mode="advanced" data-plan="advanced">Advanced</button></div>
     <label class="tog" data-plan="compare"><input type="checkbox" id="compare"> Compare A / B</label>
     <button class="btn primary" id="btnRec">Recommend layout</button>
     <button class="btn" id="btnPrint" data-plan="print">Print drill sheet</button>
   </div>
+  <nav class="jump" aria-label="Jump to"><a href="#bowlerCard">Bowler</a><a href="#layCard">Layout</a><a href="#motionCard">Motion</a><a href="#logBox">Log</a><a href="#arsCard">Arsenal</a></nav>
 </header>
 
 <main>
   <section class="form" aria-label="Inputs">
-    <div class="card">
+    <div class="card" id="bowlerCard">
       <h2>Bowler</h2>
       <div class="grid2">
         <label class="f full"><span>Name</span><input id="bName" placeholder="Bowler name"></label>
         <div class="f full"><span>Saved bowlers</span>
-          <div class="row"><select id="bSaved" style="flex:1"></select><button class="btn sm" id="bSave">Save</button><button class="btn sm" id="bDel">Delete</button><button class="btn sm" id="bCust" data-plan="customers">Customers</button></div>
+          <div class="row"><select id="bSaved" style="flex:1" aria-label="Saved bowlers"></select><button class="btn sm" id="bSave">Save</button><button class="btn sm" id="bDel">Delete</button><button class="btn sm" id="bCust" data-plan="customers">Customers</button></div>
         </div>
         <label class="f"><span>Hand</span><select id="hand"><option value="R">Right</option><option value="L">Left</option></select></label>
         <label class="f"><span>Style</span><select id="style"><option value="1H">One-handed</option><option value="2H">Two-handed</option></select></label>
         <label class="f"><span>PAP over (in)</span><input id="papOver" value="5 1/4"></label>
-        <div class="f"><span>PAP vertical (in)</span><div class="row" style="flex-wrap:nowrap"><input id="papUp" value="1/2"><select id="papDir" style="width:auto;min-width:72px;flex:none"><option value="up">up</option><option value="down">down</option></select></div></div>
+        <div class="f"><span id="papUpLbl">PAP vertical (in)</span><div class="row" style="flex-wrap:nowrap"><input id="papUp" value="1/2" aria-labelledby="papUpLbl"><select id="papDir" style="width:auto;min-width:72px;flex:none" aria-label="PAP up or down"><option value="up">up</option><option value="down">down</option></select></div></div>
         <label class="f"><span>Ball speed (mph)</span><input id="speed" type="number" step="0.1" value="16.5"></label>
         <label class="f"><span>Speed measured at</span><select id="speedSrc"><option value="release">Release (tracking)</option><option value="monitor">Lane monitor</option></select></label>
         <label class="f"><span>Rev rate (rpm)</span><input id="revs" type="number" step="10" value="330"></label>
         <label class="f"><span>Rev rate came from</span><select id="revSrc"><option value="measured">Measured (video, oil rings, sensor ball)</option><option value="tracking">Tracking system / TV / guess (reads ~50% high)</option></select></label>
         <div class="f full adv"><span>Speed &amp; revs were measured with a ball of… <span class="hint">(leave blank = this ball; the same release gives other balls different speed and revs)</span></span>
-          <div class="row" style="flex-wrap:nowrap"><input id="refWt" type="number" step="1" placeholder="weight lb" style="flex:1"><input id="refRg" type="number" step="0.001" placeholder="RG" style="flex:1"><button class="btn sm" id="refThis" type="button">This ball</button></div></div>
+          <div class="row" style="flex-wrap:nowrap"><input id="refWt" type="number" step="1" placeholder="weight lb" style="flex:1" aria-label="Weight of the ball speed and revs were measured with (lb)"><input id="refRg" type="number" step="0.001" placeholder="RG" style="flex:1" aria-label="RG of the ball speed and revs were measured with"><button class="btn sm" id="refThis" type="button">This ball</button></div></div>
         <details class="f full adv" id="revCalc"><summary>Rev-rate calculator</summary>
           <div class="grid3" style="margin-top:6px">
             <label class="f"><span>Revolutions counted</span><input id="rc_rev" type="number" step="1" value="2"></label>
@@ -293,25 +377,6 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <p class="hint simple-only">PAP = the spot on the ball that doesn't spin, measured from the center of the grip. A pro shop can measure it in a few shots.</p>
     </div>
 
-    <div class="card adv">
-      <h2>Grip</h2>
-      <div class="grid2">
-        <label class="f"><span>Span, thumb↔fingers (center to center, in)</span><input id="span" value="4 3/4"></label>
-        <label class="f"><span>Finger spacing (center to center, in)</span><input id="fspace" value="1 1/4"></label>
-      </div>
-    </div>
-  </section>
-
-  <section class="out" aria-label="Results">
-    <div class="card read" id="readCard"></div>
-
-    <div class="card" id="fitCard">
-      <h2>Fit specs <span style="text-transform:none;letter-spacing:0;font-weight:400">— inches, 1/64ths</span></h2>
-      <div id="fitHost"></div>
-      <p class="hint">Laid out like a pro shop grip card, looking at the ball with the finger holes up. Type each pitch in the box on the side it points to (one per pair), and the hole size inside each circle. Each span box has a dropdown: <b>Cut to cut</b> (thumb-hole edge to finger-hole edge, measured to the drilled cut — the layout math uses this one) or <b>Full span</b> (with the inserts in, what the hand feels). Both are kept; the dropdown picks which one you're editing and which one prints. Insert style and size: pick from the list, or choose <b>Other…</b> to type your own. Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
-      <div class="row"><button class="btn sm" type="button" id="fitPrint" data-plan="print">Print fit card</button></div>
-    </div>
-
     <div class="card">
       <h2>Ball</h2>
       <div class="grid2">
@@ -338,6 +403,18 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <p class="hint" id="ballNote"></p>
       <p class="hint" id="dbInfo"></p>
     </div>
+
+    <div class="card adv">
+      <h2>Grip</h2>
+      <div class="grid2">
+        <label class="f"><span>Span, thumb↔fingers (center to center, in)</span><input id="span" value="4 3/4"></label>
+        <label class="f"><span>Finger spacing (center to center, in)</span><input id="fspace" value="1 1/4"></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="out" aria-label="Results">
+    <div class="card read" id="readCard"></div>
 
     <!-- Layout: one box. Each column = that layout's inputs (cardA / cardB) with its readout underneath. B shows with Compare. -->
     <div class="card" id="layCard">
@@ -372,18 +449,18 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="motionCard">
       <h2>Ball motion</h2>
       <div class="ctl">
         <div class="seg" id="laneSeg"><button data-v="2d" class="on">Top-down</button><button data-v="3d" data-plan="lane3d">3D</button></div>
         <button class="btn primary sm" id="play">▶ Play</button>
         <button class="btn sm" id="runMachine" title="Watch a lane machine lay this pattern (top-down view)">🛢 Run lane machine</button>
-        <select id="slowmo"><option value="1">1×</option><option value="0.5" selected>½×</option><option value="0.25">¼×</option></select>
-        <select id="cam" class="hidden"><option value="chase">Chase cam</option><option value="behind">Behind ball (see tilt)</option><option value="pins">Pin cam</option><option value="high">High cam</option></select>
+        <select id="slowmo" aria-label="Playback speed"><option value="1">1×</option><option value="0.5" selected>½×</option><option value="0.25">¼×</option></select>
+        <select id="cam" class="hidden" aria-label="3D camera"><option value="chase">Chase cam</option><option value="behind">Behind ball (see tilt)</option><option value="pins">Pin cam</option><option value="high">High cam</option></select>
       </div>
       <div class="lanewrap">
         <div>
-          <canvas id="lane2d"></canvas>
+          <canvas id="lane2d" role="img" aria-label="Top-down lane: the oil pattern and the simulated path of each layout" aria-describedby="statsHost"></canvas>
           <div class="stage hidden" id="lane3dHost"><span class="lbl" id="axisLbl"></span></div>
         </div>
         <div>
@@ -454,6 +531,13 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       </div>
     </div>
 
+    <div class="card" id="fitCard">
+      <h2>Fit specs <span style="text-transform:none;letter-spacing:0;font-weight:400">— inches, 1/64ths</span></h2>
+      <div id="fitHost"></div>
+      <p class="hint">Laid out like a pro shop grip card, looking at the ball with the finger holes up. Type each pitch in the box on the side it points to (one per pair), and the hole size inside each circle. Each span box has a dropdown: <b>Cut to cut</b> (thumb-hole edge to finger-hole edge, measured to the drilled cut — the layout math uses this one) or <b>Full span</b> (with the inserts in, what the hand feels). Both are kept; the dropdown picks which one you're editing and which one prints. Insert style and size: pick from the list, or choose <b>Other…</b> to type your own. Saved with the bowler (press Save in the Bowler card). Fractions are rounded to the nearest 1/64".</p>
+      <div class="row"><button class="btn sm" type="button" id="fitPrint" data-plan="print">Print fit card</button></div>
+    </div>
+
     <div class="card" id="arsCard">
       <h2>Arsenal &amp; drill history <span id="arsWho" style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)"></span></h2>
       <p class="hidden" id="limitNote" style="margin:0 0 10px;background:var(--warn-bg);color:var(--warn-ink);padding:6px 10px;border-radius:8px;font-size:13px"></p>
@@ -468,11 +552,11 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
         <button class="btn sm" id="arsSpec" data-plan="print">Print bowler spec sheet</button>
         <button class="btn sm" id="arsExport" data-plan="export">Export (JSON)</button>
         <button class="btn sm" id="arsCsv">Export arsenal (CSV)</button>
-        <label class="btn sm" style="cursor:pointer">Import<input type="file" id="arsImport" accept=".json,application/json" hidden></label>
+        <label class="btn sm" style="cursor:pointer">Import<input type="file" id="arsImport" accept=".json,application/json" class="vh"></label>
       </div>
       <div style="overflow-x:auto"><table class="ars" id="arsTable"></table></div>
       <h2 style="margin-top:14px" data-plan="coverage">Arsenal coverage <span id="covWhere" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
-      <canvas id="covChart" style="width:100%;height:320px;display:block;border-radius:10px;background:var(--panel-2)"></canvas>
+      <canvas id="covChart" role="img" aria-label="Arsenal coverage chart" style="width:100%;height:320px;display:block;border-radius:10px;background:var(--panel-2)"></canvas>
       <p class="hint">Each ball is simulated for this bowler on the selected pattern (on its own best line when Auto line is on, otherwise from the laydown board). Right = more length (later breakpoint), up = more hook. Gaps on the chart are where the next ball should go. The hollow ring is the ball and layout currently on screen.</p>
     </div>
 
@@ -480,7 +564,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <h2>Spare system <span style="text-transform:none;letter-spacing:0;font-weight:400">— straight shots over the arrows</span></h2>
       <div class="grid2">
         <label class="f"><span>Laydown distance (boards)</span><input id="sp_lay" type="number" step="1" value="6" title="How many boards the ball lands outside your slide foot"></label>
-        <label class="f"><span>Drift (boards)</span><div class="row" style="flex-wrap:nowrap;gap:6px"><input id="sp_drift" type="number" step="1" value="0" style="flex:1"><select id="sp_driftDir"><option value="none">none</option><option value="R">right</option><option value="L">left</option></select></div></label>
+        <label class="f"><span>Drift (boards)</span><div class="row" style="flex-wrap:nowrap;gap:6px"><input id="sp_drift" type="number" step="1" value="0" style="flex:1"><select id="sp_driftDir" aria-label="Drift direction"><option value="none">none</option><option value="R">right</option><option value="L">left</option></select></div></label>
       </div>
       <div id="spareHost"></div>
       <p class="hint">Stand board = the foul-line board for your target arrow + laydown distance, adjusted for drift. Pick the arrow you like for each pin; saved with the bowler. Arrows are placed at their usual spots (center arrow ~15½ ft out).</p>
@@ -496,11 +580,19 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <li>Film from <b>directly behind</b> the ball, low, in line with its path. Pick the frame just as the fingers leave the ball.</li>
       <li>Click the <b>center</b> of the ball, then its <b>edge</b>, then the <b>PAP tape</b>.</li>
     </ol>
-    <div class="row"><input type="file" id="papFile" accept="image/*,video/*" style="width:auto"><button class="btn sm" id="papGrab" type="button" hidden>Use this video frame</button><button class="btn sm" id="papReset" type="button">Redo clicks</button></div>
+    <div class="row"><input type="file" id="papFile" accept="image/*,video/*" style="width:auto" aria-label="Release photo or video"><button class="btn sm" id="papGrab" type="button" hidden>Use this video frame</button><button class="btn sm" id="papReset" type="button">Redo clicks</button></div>
     <video id="papVideo" controls playsinline muted hidden style="max-width:100%;margin-top:8px;border-radius:8px"></video>
-    <canvas id="papCanvas" style="max-width:100%;margin-top:8px;border-radius:8px;cursor:crosshair;display:block"></canvas>
+    <canvas id="papCanvas" role="img" aria-label="Release photo: click the ball center, its edge, then the PAP tape" aria-describedby="papMsg" style="max-width:100%;margin-top:8px;border-radius:8px;cursor:crosshair;display:block"></canvas>
     <p id="papMsg" class="target" style="margin:8px 0">Load a photo or video to start. It stays on this device.</p>
     <div class="row"><button class="btn primary" id="papApply" type="button" disabled>Use these numbers</button></div>
+  </div>
+</dialog>
+<dialog id="printChk" class="xd pchk" aria-labelledby="printChkTitle">
+  <div class="body">
+    <h2 id="printChkTitle">Check before printing</h2>
+    <p class="hint" style="margin:0">This is what goes to the drill press. Anything marked “not entered” prints blank.</p>
+    <div id="printChkBody"></div>
+    <div class="row2"><button class="btn" type="button" id="printChkBack">Back to edit</button><button class="btn primary" type="button" id="printChkGo">Print drill sheet</button></div>
   </div>
 </dialog>
 <div id="sheet"></div>
@@ -1462,7 +1554,7 @@ function impactVerdict(im) {
 /* ==================== UI: layout cards ==================== */
 function layoutCardHTML(X) {
   return `
-  <h2>Layout ${X} <span class="tag tag${X}">${X}</span></h2>
+  <h2>Layout <span class="tag tag${X}">${X}</span></h2>
   <div class="sys"><label><input type="radio" name="${X}_sys" value="dual" checked> Dual Angle</label><label><input type="radio" name="${X}_sys" value="vls"> VLS / Pin Buffer</label></div>
   <fieldset id="${X}_dual"><div class="grid3">
     <label class="f"><span>Drilling angle °</span><input id="${X}_da" type="number" step="5" value="50"></label>
@@ -1668,6 +1760,8 @@ class BallView {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     host.appendChild(this.renderer.domElement);
+    { const X = host.id === 'ballB' ? 'B' : 'A', c = this.renderer.domElement;   // the layout readout says in words what the ball shows
+      c.setAttribute('role', 'img'); c.setAttribute('aria-label', `3D ball, Layout ${X}: PAP, pin, PSA, grip and flare rings. Drag to rotate.`); c.setAttribute('aria-describedby', 'layOut' + X); }
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200); this.camera.position.set(0, 1.5, 17.5);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -1888,6 +1982,7 @@ class LaneView {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     host.appendChild(this.renderer.domElement);
+    this.renderer.domElement.setAttribute('role', 'img'); this.renderer.domElement.setAttribute('aria-label', '3D lane: the simulated path of each layout'); this.renderer.domElement.setAttribute('aria-describedby', 'statsHost');
     this.scene = new THREE.Scene(); this.scene.background = new THREE.Color(0x14181d); this.scene.fog = new THREE.Fog(0x14181d, 40, 90);
     this.camera = new THREE.PerspectiveCamera(50, 1, 0.05, 200);
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x404850, 1.3));
@@ -2303,15 +2398,21 @@ function layoutBlock(state, X, r) {
   const L = r.L, g = r.geo, surf = surfaceRec(r.s, state.ball);
   // Radical's symmetric charts still use a drilling angle: it sets where the thumb (and the drilled PSA) lands vs the pin and CG
   const chartSym = sym && !!r.stats.spec.chart;
-  const ou = (p) => `${fmtIn(Math.abs(p.over))} ${p.over >= 0 ? 'over (PAP side)' : 'over (other side)'}, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}`;
+  // the drill sheet's own order: the three Dual Angle numbers first, then where the pin and PSA land from the grip center
+  const mark = (p) => `${fmtIn(Math.abs(p.over))} over, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}<small>${p.over >= 0 ? 'toward the PAP side' : 'away from the PAP side'}</small>`;
+  const psa = r.psaOU || r.dpsaOU;
   return `<div>
-    <div class="row" style="margin-bottom:6px"><span class="tag tag${X}" style="color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px">${X}</span>
-      <span class="big">${sym && !chartSym ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</span><span class="chip">pin ${L.pin}</span></div>
+    <div class="ds-figs" aria-label="Layout ${X}, Dual Angle">
+      <div><b>${sym && !chartSym ? '—' : Math.round(L.da) + '°'}</b><span>drilling angle${sym && !chartSym ? ' (n/a, symmetric)' : ''}</span></div>
+      <div><b>${fmtIn(L.p2p)}</b><span>pin to PAP</span></div>
+      <div><b>${Math.round(L.val)}°</b><span>VAL angle</span></div>
+    </div>
+    <div class="ds-marks">
+      <div><span>Pin · ${L.pin === 'up' ? 'pin up' : 'pin down'}</span><b>${mark(r.pinOU)}</b></div>
+      ${psa ? `<div><span>${r.psaOU ? 'PSA' : 'PSA after drilling'}</span><b>${mark(psa)}</b>${r.psaOU ? '' : '<small>symmetric ball: 1" from the center of the thumb toward the PAP side</small>'}</div>` : ''}
+    </div>
     <dl class="kv">
-      <dt>Dual Angle</dt><dd>${sym && !chartSym ? 'n/a (sym)' : Math.round(L.da) + '°'} drilling · ${fmtIn(L.p2p)} pin-to-PAP · ${Math.round(L.val)}° VAL</dd>
       <dt>VLS / Pin Buffer</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
-      <dt>Pin lands</dt><dd>${ou(r.pinOU)}</dd>
-      ${r.psaOU ? `<dt>PSA lands</dt><dd>${ou(r.psaOU)}</dd>` : r.dpsaOU ? `<dt>PSA after drilling</dt><dd>${ou(r.dpsaOU)} <span class="hint" style="margin:0">(symmetric ball: 1" from the center of the thumb toward the PAP side)</span></dd>` : ''}
       <dt>Revs up</dt><dd>${!r.stats.cross ? 'no — the axis doesn’t reach the pin-to-spin line before the pins' : r.stats.cross.onLine ? 'right away — the PAP sits on the pin-to-spin line' : `at ${r.stats.cross.py.toFixed(0)} ft, board ${r.stats.cross.b.toFixed(1)} <span class="hint" style="margin:0">(axis crosses the pin-to-spin line ${r.stats.cross.oil > 0.5 ? 'in the oil, so it mostly keeps skidding' : r.stats.cross.oil > 0.1 ? 'where the oil runs out' : 'on dry boards, so it grabs'})</span>`}</dd>
       <dt>Track flare (simulated)</dt><dd>${r.stats.flareSim.toFixed(1)}" <span class="hint" style="margin:0">(${r.stats.flareOil.toFixed(1)}" in oil + ${r.stats.flareDry.toFixed(1)}" dry)</span></dd>
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
@@ -2354,7 +2455,7 @@ function myLineRows(state, s, f) {
 function renderStats(state, res) {
   const one = (X, r) => {
     const s = r.stats, f = v => isFinite(v) ? v.toFixed(1) : '—';
-    return `<div class="stat"><h3><span class="tag tag${X}" style="color:#fff;font-size:11px;padding:1px 7px;border-radius:99px">${X}</span>${Math.round(r.L.da)}° × ${fmtIn(r.L.p2p)} × ${Math.round(r.L.val)}°</h3>
+    return `<div class="stat"><h3><span class="tag tag${X}">${X}</span>${Math.round(r.L.da)}° × ${fmtIn(r.L.p2p)} × ${Math.round(r.L.val)}°</h3>
     <div class="hint" style="margin:-2px 0 6px"><span class="dot" style="background:${r.ball.color}"></span>${r.ball.name} · ${r.ball.weight || 15} lb · ${GRIT_LABEL[r.ball.grit] || r.ball.grit}</div>
     <dl class="kv">
       <dt>Laydown → arrows</dt><dd>${s.laydown}${state.lane.auto ? ' (auto line)' : s.mine ? ' (my line)' : s.moved != null ? ' (moved)' : ''} → ${f(s.arrows)}${s.mine ? ` <span class="hint">at ${f(s.mine.arrowFt)} ft</span>` : ''}${s.autoExp != null ? `<br><span class="hint">Best strike line on this lane: ~${Math.round(s.autoExp)}% expected, counting a 1-board miss either way at the arrows</span>` : ''}</dd>
@@ -2900,7 +3001,7 @@ const spRound = b => Math.round(b * 2) / 2;
 function spareHTML() {
   let h = `<table class="fit spare"><tr><th>Pin</th><th>2nd arrow</th><th>3rd</th><th>4th</th><th>5th</th><th>Your arrow</th><th>Stand on</th></tr>`;
   for (const grp of SP_ROWS) h += `<tr><th>${grp.join(' or ')}</th>${[2, 3, 4, 5].map(a => `<td data-sp="${grp[0]}_${a}"></td>`).join('')}
-    <td><select id="sp_arrow_${grp[0]}">${[2, 3, 4, 5].map(a => `<option value="${a}" ${a === SP_DEFAULT_ARROW[grp[0]] ? 'selected' : ''}>${a}${a === 2 ? 'nd' : a === 3 ? 'rd' : 'th'}</option>`).join('')}</select></td>
+    <td><select id="sp_arrow_${grp[0]}" aria-label="Target arrow for the ${grp.join('-')}">${[2, 3, 4, 5].map(a => `<option value="${a}" ${a === SP_DEFAULT_ARROW[grp[0]] ? 'selected' : ''}>${a}${a === 2 ? 'nd' : a === 3 ? 'rd' : 'th'}</option>`).join('')}</select></td>
     <td data-stand="${grp[0]}"></td></tr>`;
   return h + '</table>';
 }
@@ -3409,7 +3510,7 @@ function drawCoverage(ars) {
     g.fillStyle = getCss('--ink-2'); g.textAlign = 'center'; g.font = '600 14px system-ui';
     g.fillText('Arsenal coverage is part of Pro', w / 2, h / 2 - 6); g.font = '12px system-ui';
     g.fillText('See where every ball in the bag hooks and where the gaps are. Click to see plans.', w / 2, h / 2 + 16);
-    cv.style.cursor = 'pointer'; cv.dataset.upsell = 'coverage'; return;
+    cv.setAttribute('aria-label', 'Arsenal coverage is part of Pro'); cv.style.cursor = 'pointer'; cv.dataset.upsell = 'coverage'; return;
   }
   const state = last.state;
   $('covWhere').textContent = `— on ${state.lane.pat ? state.lane.pat.n : 'generic pattern'}, ${state.lane.auto ? 'each ball on its best strike line' : 'from board ' + state.lane.laydown}`;
@@ -3419,7 +3520,7 @@ function drawCoverage(ars) {
   const x0 = Math.min(32, ...all.map(s => s.bpFt - 2)), x1 = Math.max(56, ...all.map(s => s.bpFt + 2)), y1 = Math.max(16, ...all.map(s => s.totalHook + 2));
   const L = 46, Rt = 14, T = 14, B = 34, X = v => L + (v - x0) / (x1 - x0) * (w - L - Rt), Y = v => h - B - v / y1 * (h - T - B);
   const ink = getCss('--ink-2'), line = getCss('--line');
-  g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = ink; g.font = '11px system-ui'; g.textAlign = 'center';
+  g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = ink; g.font = '12px system-ui'; g.textAlign = 'center';
   for (let v = Math.ceil(x0 / 4) * 4; v <= x1; v += 4) { g.beginPath(); g.moveTo(X(v), T); g.lineTo(X(v), h - B); g.stroke(); g.fillText(v + ' ft', X(v), h - B + 14); }
   g.textAlign = 'right'; for (let v = 0; v <= y1; v += 4) { g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(w - Rt, Y(v)); g.stroke(); g.fillText(v, L - 6, Y(v) + 4); }
   g.textAlign = 'center'; g.fillText('breakpoint distance → more length', (L + w - Rt) / 2, h - 4);
@@ -3427,8 +3528,10 @@ function drawCoverage(ars) {
   for (const { r, s } of pts) {
     if (!isFinite(s.bpFt)) continue; const x = X(s.bpFt), y = Y(s.totalHook);
     g.fillStyle = r.ball.color; g.strokeStyle = getCss('--ink'); g.lineWidth = 1.2; g.beginPath(); g.arc(x, y, 7, 0, Math.PI * 2); g.fill(); g.stroke();
-    g.fillStyle = getCss('--ink'); g.font = '600 11px system-ui'; g.textAlign = 'left'; g.fillText(r.ball.name.replace(/^(Storm|Hammer|Roto Grip|Motiv|Brunswick|Ebonite|Radical|Track|DV8|900 Global|SWAG|Pyramid) /, ''), x + 10, y + 4);
+    g.fillStyle = getCss('--ink'); g.font = '600 12px system-ui'; g.textAlign = 'left'; g.fillText(r.ball.name.replace(/^(Storm|Hammer|Roto Grip|Motiv|Brunswick|Ebonite|Radical|Track|DV8|900 Global|SWAG|Pyramid) /, ''), x + 10, y + 4);
   }
+  const said = s => isFinite(s.bpFt) ? `breaks at ${s.bpFt.toFixed(0)} ft with ${s.totalHook.toFixed(0)} boards of hook` : 'no breakpoint';
+  cv.setAttribute('aria-label', `Arsenal coverage chart. ${pts.length ? pts.map(({ r, s }) => `${r.ball.name}: ${said(s)}`).join('; ') + '. ' : 'No balls in the arsenal yet. '}Ball on screen: ${said(cur.s)}.`);
   if (isFinite(cur.s.bpFt)) { const x = X(cur.s.bpFt), y = Y(cur.s.totalHook); g.strokeStyle = getCss('--accent'); g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 10, 0, Math.PI * 2); g.stroke(); }
 }
 
@@ -3797,8 +3900,40 @@ function calibUI() {
 }$('patPreset').addEventListener('change', calibUI);
 
 /* ---------- drill sheet ---------- */
+// Check before printing: the grip, the layout and the weight, the three things a driller can't fix after the holes are in.
 $('btnPrint').addEventListener('click', () => {
   if (!last || !cloud.require('print')) return;
+  const { state, res } = last, f = readFit(), sym = state.ball.core === 'sym', L = res.A.L;
+  const dd = (v, unit = '') => (v || '').trim() ? `<dd>${escH(v.trim())}${unit}</dd>` : '<dd class="miss">not entered</dd>';
+  const where = p => `${fmtIn(Math.abs(p.over))} over, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}`;
+  const noThumb = /^two-handed/i.test(f.fit_grip || '');
+  const spanOf = h => { const k = SPAN_TYPES[spanType(f, h)]; return [k[1], f[`fit_${h}_${k[0]}`]]; };
+  const [smL, smV] = spanOf('mf'), [srL, srV] = spanOf('rf');
+  const psa = res.A.psaOU || res.A.dpsaOU;
+  $('printChkBody').innerHTML = `
+    <section class="pchk-sec"><h3>Grip</h3><dl>
+      <dt>Grip</dt>${dd(f.fit_grip)}
+      ${noThumb ? '' : `<dt>Thumb hole</dt>${dd(f.fit_th_size, '"')}`}
+      <dt>Middle / ring</dt>${(f.fit_mf_size || '').trim() || (f.fit_rf_size || '').trim() ? `<dd>${escH(f.fit_mf_size || '—')}" / ${escH(f.fit_rf_size || '—')}"</dd>` : '<dd class="miss">not entered</dd>'}
+      ${noThumb ? '' : `<dt>Middle span</dt>${dd(smV, `" <small>${escH(smL.toLowerCase())}</small>`)}<dt>Ring span</dt>${dd(srV, `" <small>${escH(srL.toLowerCase())}</small>`)}`}
+      <dt>Bridge</dt>${dd(f.fit_bridge, '"')}
+    </dl></section>
+    <section class="pchk-sec"><h3>Layout A</h3><div>
+      <div class="pchk-fig">${sym && !res.A.stats.spec.chart ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</div>
+      <dl style="margin-top:8px"><dt>Pin</dt><dd>${where(res.A.pinOU)}</dd>${psa ? `<dt>PSA</dt><dd>${where(psa)}</dd>` : ''}</dl>
+    </div></section>
+    ${res.B ? `<section class="pchk-sec"><h3>Layout B</h3><div class="pchk-fig">${sym ? '—' : Math.round(res.B.L.da) + '°'} × ${fmtIn(res.B.L.p2p)} × ${Math.round(res.B.L.val)}°</div></section>` : ''}
+    <section class="pchk-sec"><h3>Ball</h3><dl>
+      <dt>Ball</dt><dd>${escH(state.ball.name || '—')}</dd>
+      <dt>Weight</dt>${dd(String(state.ball.weight || ''), ' lb')}
+    </dl></section>`;
+  $('printChk').showModal();
+  $('printChkGo').focus();
+});
+$('printChkBack').addEventListener('click', () => $('printChk').close());
+$('printChkGo').addEventListener('click', () => { $('printChk').close(); printDrillSheet(); });
+function printDrillSheet() {
+  if (!last) return;
   const { state, rec, res } = last, sym = state.ball.core === 'sym';
   const ou = p => `${fmtIn(Math.abs(p.over))} ${p.over >= 0 ? 'over' : 'over (other side)'}, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}`;
   const imgs = [];
@@ -3829,7 +3964,7 @@ $('btnPrint').addEventListener('click', () => {
     <div class="imgs">${imgs.map(s => `<img src="${s}">`).join('')}</div>
     <p style="font-size:8.5pt;color:#555">${madeWith()}. Predictions are a model. Confirm the PAP and fit in person, and check the manufacturer’s layout chart for this ball.</p>`;
   setTimeout(() => window.print(), 50);
-});
+}
 
 /* ---------- init ---------- */
 // A ball you saved by hand is dropped once the ball list update brings in the official version (same name, with or
@@ -3843,6 +3978,8 @@ const replacedMine = (() => {
 $('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(b => !b.disc).length} current${DB_BALLS.some(b => b.disc) ? ` + ${DB_BALLS.filter(b => b.disc).length} retired, kept ${KEEP_YEARS} years from release` : ''}). New releases are added as they come out${catalog.length ? `; ${catalog.length} added or corrected since ${BALL_DB_DATE}` : ''}.`
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
+{ const hdr = document.querySelector('header'), setHdr = () => document.documentElement.style.setProperty('--hdr', hdr.offsetHeight + 'px');
+  setHdr(); new ResizeObserver(setHdr).observe(hdr); } // the sticky inputs column sits just under the header
 fillBallSelect(startBall); loadBall(startBall); fillBowlers(); renderArsenal(); calibUI();
 let m = store.get('layoutlab.mode', 'simple'); if (m === 'driller') m = 'advanced'; // "Driller" mode was renamed Advanced
 if (m === 'advanced' && !cloud.can('advanced')) m = 'simple'; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m));

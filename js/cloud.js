@@ -266,7 +266,7 @@ const css = `
 .acct { display:inline-flex; align-items:center; gap:8px; }
 .acct .sync { font-size:12px; color:var(--ink-2); }
 .acct .sync.offline { color:var(--warn-ink); }
-.plan-badge { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:1px 7px; border-radius:999px; background:var(--chip); color:var(--ink-2); }
+.plan-badge { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:1px 7px; border-radius:999px; background:var(--chip); color:var(--ink-2); }
 .plan-badge.paid { background:var(--accent); color:var(--accent-ink); }
 dialog.xd { border:1px solid var(--line); border-radius:12px; background:var(--panel); color:var(--ink); padding:0; width:min(420px, calc(100vw - 32px)); }
 dialog.xd::backdrop { background:rgba(0,0,0,.55); }
@@ -284,13 +284,24 @@ dialog.xd::backdrop { background:rgba(0,0,0,.55); }
 .xd .link { background:none; border:0; padding:0; color:var(--a); cursor:pointer; font:inherit; font-size:12px; justify-self:start; }
 .xd ul { margin:0; padding-left:18px; }
 .import-banner { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:8px 16px; background:var(--warn-bg); color:var(--warn-ink); border-bottom:1px solid var(--line); font-size:13px; }
-#logBox.locked > span:first-child::after, .locked[data-badge]::after { content:attr(data-badge); margin-left:6px; font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:1px 6px; border-radius:999px; background:var(--accent); color:var(--accent-ink); vertical-align:middle; }
+#logBox.locked > span:first-child::after, .locked[data-badge]::after { content:attr(data-badge); margin-left:6px; font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:1px 6px; border-radius:999px; background:var(--accent); color:var(--accent-ink); vertical-align:middle; }
 #logBox.locked > span:first-child::after { content:'Pro'; }
 .locked[data-badge] { opacity:.6; white-space:nowrap; }
 .locked[data-badge]:hover { opacity:.85; }
 .plan-lock { display:inline-flex; gap:6px; align-items:center; }
+/* Signed out: the inputs and header tools are dimmed and locked; the results stay at full strength as a worked example,
+   with their own controls muted so nothing there looks clickable. "Create free account" is the one primary action. */
 .guest-dim { opacity:.45; filter:grayscale(.4); user-select:none; }
-.guest-banner { background:var(--panel-2); color:var(--ink); }
+body.guest-locked main.guest-dim { opacity:1; filter:none; }
+body.guest-locked main .form { opacity:.45; filter:grayscale(.4); }
+body.guest-locked main .out :is(input, select, button, label.tog, label.btn, .seg, .sys, details > summary) { opacity:.5; }
+body.guest-locked :is(.guest-dim .btn.primary, .btn.primary.guest-dim) { background:transparent; color:var(--ink-2); border-color:var(--line); font-weight:500; }
+.guest-banner { background:var(--panel-2); color:var(--ink); padding:12px 16px; gap:8px 16px; }
+.guest-banner .gb-text { flex:1 1 420px; display:grid; gap:2px; }
+.guest-banner .gb-text b { font:700 18px/1.2 var(--font-shop, system-ui); text-transform:uppercase; letter-spacing:.04em; }
+.guest-banner .gb-text span { color:var(--ink-2); font-size:13px; max-width:68ch; }
+.guest-banner .gb-acts { display:flex; gap:8px; flex-wrap:wrap; }
+.guest-banner .btn.primary { padding:8px 16px; }
 `;
 const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); Object.assign(e, attrs); if (html) e.innerHTML = html; return e; };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -334,9 +345,10 @@ function lockForGuests(hg, box) {
   document.body.classList.add('guest-locked');
   const targets = [document.querySelector('main'), ...[...hg.children].filter(c => c !== box)].filter(Boolean);
   targets.forEach(t => { t.inert = true; t.classList.add('guest-dim'); });
-  const b = el('div', { className: 'import-banner guest-banner', role: 'status' },
-    `<span><b>Sign in or create a free account to start.</b> Your bowlers, balls and layouts are saved to your account.</span>
-     <button class="btn sm primary" type="button" data-a="signup">Create free account</button><button class="btn sm" type="button" data-a="signin">Sign in</button>`);
+  const b = el('section', { className: 'import-banner guest-banner', ariaLabel: 'Get started' },
+    `<div class="gb-text"><b>This is a worked example</b>
+       <span>The layout, the ball view and the ball motion below come from the example numbers on the left. Create a free account to enter your own bowler. Everything you enter is saved to your account.</span></div>
+     <div class="gb-acts"><button class="btn primary" type="button" data-a="signup">Create free account</button><button class="btn" type="button" data-a="signin">Sign in</button></div>`);
   b.addEventListener('click', e => { const a = e.target.dataset.a; if (a) openAuth(a); });
   document.querySelector('header').after(b);
 }
