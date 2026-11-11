@@ -15,6 +15,18 @@ if (!CHROME) throw new Error('Chrome or Edge not found');
 
 // [x, y, width, height] in source pixels; pad adds the card's white margin around the stack
 const crops = {
+  // the hero window: the ball view cut to the ball and its labels (the empty dark sides are left out), 3:2
+  'ball-hero': { src: 'ball-view.png', pad: 0, rects: [[380, 0, 1080, 720]] },
+  // the printed drill sheet (tools/sheet.mjs): its head (letterhead, title, date and ball) for a small card
+  'sheet-head': { src: 'drill-sheet.png', pad: 0, rects: [[60, 50, 790, 300]] },
+  // the pro shop view of the sheet: the letterhead, then the fit card down to the grip and ball box
+  'sheet-fit': { src: 'drill-sheet.png', pad: 0, rects: [[60, 50, 1400, 190], [60, 780, 1400, 1608]] },
+  // Compare A and B: the top of each ball, where the two layouts differ (DA 55° vs 65°, 5" vs 5 1/2", VAL 45° vs 55°)
+  'compare-crop': { src: 'compare-balls.png', pad: 0, rects: [[240, 20, 580, 215], [1230, 20, 580, 215]] },
+  // the shot log, narrow: the pin deck to tap, then the log's last shots and strike rate
+  'log-crop': { src: 'log-a-shot.png', pad: 0, rects: [[0, 112, 410, 420], [0, 742, 410, 146]] },
+  // the coverage chart around the three balls (40 to 44 ft), so the points and their names stay whole
+  'coverage-crop': { src: 'coverage.png', pad: 0, rects: [[560, 140, 640, 500]] },
   // the worked example, step 1: the bowler's numbers (name to rev rate), no hints or calculators
   'ex-inputs': { src: 'app-first-screen.png', pad: 0, rects: [[36, 166, 756, 834]] },
   // the worked example, step 2: the layout and its reasons (the Pinel line, bullet 4, is left out)
