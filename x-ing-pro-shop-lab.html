@@ -1055,9 +1055,12 @@ const TWO_HAND_LAYOUTS = [
 const chartFor = ball => DRILL_CHARTS[(ball.name || '').trim()] || null;
 const CHART_GRIP = { span: 4.75, fspace: 1.25 };
 const CHART_PAP = { papOver: 5, papUp: 0.5, style: '1H' };
-// the drilled ball's high-RG direction: the PSA for an asymmetric core; for a symmetric core the drilling makes one,
-// and Radical's sheets put it by the thumb hole (grip center without a thumb)
-function drilledPsa(ball, geo) { if (geo.psa) return geo.psa; const t = geo.holes.find(h => h.key === 'th'); return t ? t.p : { lat: 0, lon: 0 }; }
+// the drilled ball's high-RG direction: the PSA for an asymmetric core; for a symmetric core the drilling makes one
+// 1" from the center of the thumb hole toward the PAP side (right of the thumb for a right-hander, left for a lefty --
+// the layout frame is right-handed and mirrored for lefties, so +lon / bearing 90 deg covers both). Without a thumb hole
+// it stays at the grip center.
+const SYM_PSA_OFF = 1;
+function drilledPsa(ball, geo) { if (geo.psa) return geo.psa; const t = geo.holes.find(h => h.key === 'th'); return t ? dest(t.p, Math.PI / 2, SYM_PSA_OFF) : { lat: 0, lon: 0 }; }
 const rgAbout = (spec, geo, axisPt) => { const a = llToV(axisPt), I = inertia(spec, geo).I; return Math.sqrt(Math.max(0, V.dot(a, mv(I, a)))) * 12; };
 /* For each chart row: correction factors from the generic model to the chart. The chart gives RG about the PAP, not the
    low RG, so the low RG is solved from it: with the chart's diff and int. diff and the layout's pin / PSA positions,
@@ -1083,7 +1086,7 @@ const layoutDist = (a, b) => Math.hypot((a.da - b.da) / 30, (a.p2p - b.p2p) / 1,
    chart's corrections on top of that weight's own specs. */
 function drilledSpecs(ball, L, geo) {
   const m = modelSpecs(ball, L), ch = chartFor(ball);
-  if (!ch) return m;
+  if (!ch) return { ...m, psa: geo ? drilledPsa(ball, geo) : null };
   const rows = chartCorrections(ch, ball);
   let sw = 0, kD = 0, kI = 0, dR = 0, near = null;
   for (const r of rows) { const d = layoutDist(L, r.L), w = 1 / (d * d + 0.0025); sw += w; kD += w * r.kDiff; kI += w * r.kInt; dR += w * r.dRg; if (!near || d < near.d) near = { id: r.id, name: r.name, d }; }
@@ -2185,6 +2188,7 @@ function analyze(state, X, rec) {
   for (const h of geo.holes) { const hv = llToV(h.p); let mind = 1e9; for (const p of run.pts) { const d = Math.acos(clamp(V.dot(p.c, hv), -1, 1)) * R; if (d < mind) mind = d; } if (mind < h.d / 2) fl.hits.push(h.name); else if (mind < h.d / 2 + 1) fl.near.push(`${h.name} (${(mind - h.d / 2).toFixed(2)}" from the edge)`); }
   const s = strengthOf(L);
   const pinOU = toOU(geo.pin), psaOU = geo.psa ? toOU(geo.psa) : null;
+  const dpsaOU = !geo.psa && spec.psa ? toOU(spec.psa) : null; // symmetric: the PSA the drilling makes (1" off the thumb)
   const warns = [...L.warn];
   for (const h of geo.holes) if (gcDist(h.p, geo.pin) < h.d / 2 + 0.1) warns.push(`Pin lands in/at the ${h.name} hole — fine on modern balls, but tell the driller.`);
   if (geo.psa) for (const h of geo.holes) if (gcDist(h.p, geo.psa) < h.d / 2 + 0.1) warns.push(`PSA lands at the ${h.name} hole.`);
@@ -2197,7 +2201,7 @@ function analyze(state, X, rec) {
   else if (a.status === 'tooRight') warns.push(`Layout ${X}: even aimed straight, this ball can’t get back to the pocket from board ${state.lane.laydown}. Move the laydown left${state.b.hand === 'L' ? ' (toward the lower boards for a lefty — the app shows mirrored)' : ''}, or use a stronger setup.`);
   if (!state.lane.auto && a.status === 'tooLeft') warns.push(`Layout ${X}: this ball hooks too much to reach the pocket from board ${state.lane.laydown}. Move the laydown farther in, or use a weaker setup.`);
   if (!state.lane.auto && moved == null && stats.gutter != null && stats.gutter < 60) warns.push(`Layout ${X}: the path leaves the lane at ${stats.gutter.toFixed(0)} ft — move your laydown/target.`);
-  return { L, geo, fl, cfg, run, stats, s, pinOU, psaOU, warns, tilt, rot };
+  return { L, geo, fl, cfg, run, stats, s, pinOU, psaOU, dpsaOU, warns, tilt, rot };
 }
 const toOU = p => ({ over: p.lon * R, up: p.lat * R });
 
@@ -2277,7 +2281,7 @@ function layoutBlock(state, X, r) {
       <dt>Dual Angle</dt><dd>${sym && !chartSym ? 'n/a (sym)' : Math.round(L.da) + '°'} drilling · ${fmtIn(L.p2p)} pin-to-PAP · ${Math.round(L.val)}° VAL</dd>
       <dt>VLS / Pin Buffer</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
       <dt>Pin lands</dt><dd>${ou(r.pinOU)}</dd>
-      ${r.psaOU ? `<dt>PSA lands</dt><dd>${ou(r.psaOU)}</dd>` : ''}
+      ${r.psaOU ? `<dt>PSA lands</dt><dd>${ou(r.psaOU)}</dd>` : r.dpsaOU ? `<dt>PSA after drilling</dt><dd>${ou(r.dpsaOU)} <span class="hint" style="margin:0">(symmetric ball: 1" from the center of the thumb toward the PAP side)</span></dd>` : ''}
       <dt>Revs up</dt><dd>${!r.stats.cross ? 'no — the axis doesn’t reach the pin-to-spin line before the pins' : r.stats.cross.onLine ? 'right away — the PAP sits on the pin-to-spin line' : `at ${r.stats.cross.py.toFixed(0)} ft, board ${r.stats.cross.b.toFixed(1)} <span class="hint" style="margin:0">(axis crosses the pin-to-spin line ${r.stats.cross.oil > 0.5 ? 'in the oil, so it mostly keeps skidding' : r.stats.cross.oil > 0.1 ? 'where the oil runs out' : 'on dry boards, so it grabs'})</span>`}</dd>
       <dt>Track flare (simulated)</dt><dd>${r.stats.flareSim.toFixed(1)}" <span class="hint" style="margin:0">(${r.stats.flareOil.toFixed(1)}" in oil + ${r.stats.flareDry.toFixed(1)}" dry)</span></dd>
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
@@ -3648,7 +3652,7 @@ $('btnPrint').addEventListener('click', () => {
   if (res.B && views.B) imgs.push(views.B.renderer.domElement.toDataURL('image/png'));
   drawLane2D(last.laneState); imgs.push($('lane2d').toDataURL('image/png'));
   const row = (X, r) => `<tr><td><b>${X}</b></td><td>${sym ? 'n/a' : Math.round(r.L.da) + '°'} × ${fmtIn(r.L.p2p)} × ${Math.round(r.L.val)}°, pin ${r.L.pin}</td>
-    <td>${fmtIn(r.L.p2p)} × ${r.geo.psa2pap != null ? fmtIn(r.geo.psa2pap) : 'n/a'} × ${fmtIn(r.geo.buffer)}</td><td>${ou(r.pinOU)}</td><td>${r.psaOU ? ou(r.psaOU) : 'n/a'}</td>
+    <td>${fmtIn(r.L.p2p)} × ${r.geo.psa2pap != null ? fmtIn(r.geo.psa2pap) : 'n/a'} × ${fmtIn(r.geo.buffer)}</td><td>${ou(r.pinOU)}</td><td>${r.psaOU ? ou(r.psaOU) : r.dpsaOU ? ou(r.dpsaOU) + ' (after drilling)' : 'n/a'}</td>
     <td>${surfaceRec(r.s, state.ball).grit}</td><td>BP ${r.stats.bpBoard.toFixed(1)} @ ${r.stats.bpFt.toFixed(0)} ft; entry ${r.stats.entry.toFixed(1)}°</td></tr>`;
   const warns = [...res.A.warns, ...(res.B ? res.B.warns : [])];
   $('sheet').innerHTML = `${letterhead()}
