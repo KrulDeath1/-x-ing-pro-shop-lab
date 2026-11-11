@@ -116,6 +116,39 @@ if (user) {
   sb?.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT' || (session && session.user.id !== user.id)) location.reload(); });
 }
 
+/* ---------- ball catalog: balls the admin typed in from the makers' spec sheets ----------
+   Table public.balls: everyone reads, only an admin writes (enforced by the database). Loaded before the app starts
+   and cached on this device, so the list still works offline. */
+const CATALOG_CACHE = 'xing.catalogCache';
+const BALL_COLS = 'id,brand,name,rg,diff,mb_diff,coverstock,cover_type,core,core_type,finish,weights,released,discontinued,updated_at';
+export let catalog = parse(ls.get(CATALOG_CACHE), []);
+if (sb) {
+  try {
+    const { data, error } = await withTimeout(sb.from('balls').select(BALL_COLS).order('brand').order('name'), 6000);
+    if (error) throw error;
+    catalog = data; ls.set(CATALOG_CACHE, JSON.stringify(data));
+  } catch (e) { console.warn('[cloud] ball catalog not loaded, using this device’s copy', e?.message || e); }
+}
+const catErr = e => new Error(e?.code === '42501' || /row-level security/i.test(e?.message || '') ? 'Only an admin can change the ball list.'
+  : e?.code === '23505' ? 'That brand already has a ball with this name. Edit that one instead.'
+  : e?.message === 'timeout' ? 'Couldn’t reach the server. Check your connection and try again.' : (e?.message || 'Something went wrong.'));
+export const ballAdmin = {
+  async save(row) {
+    if (!sb || !user) throw new Error('Sign in first.');
+    try {
+      const q = row.id ? sb.from('balls').update(row).eq('id', row.id) : sb.from('balls').insert(row);
+      const { data, error } = await withTimeout(q.select(BALL_COLS).single(), 10000); if (error) throw error;
+      catalog = [...catalog.filter(b => b.id !== data.id), data]; ls.set(CATALOG_CACHE, JSON.stringify(catalog)); return data;
+    } catch (e) { throw catErr(e); }
+  },
+  async remove(id) {
+    if (!sb || !user) throw new Error('Sign in first.');
+    try { const { error } = await withTimeout(sb.from('balls').delete().eq('id', id), 10000); if (error) throw error;
+      catalog = catalog.filter(b => b.id !== id); ls.set(CATALOG_CACHE, JSON.stringify(catalog)); }
+    catch (e) { throw catErr(e); }
+  }
+};
+
 /* ---------- plans ---------- */
 export const cloud = {
   get user() { return user; },
@@ -124,6 +157,8 @@ export const cloud = {
   get isPaid() { return !!profile && PAID_PLANS.includes(profile.plan) && PAID_STATUS.includes(profile.plan_status); },
   get isShop() { return this.isPaid && profile.plan === 'shop'; },
   get plan() { return this.isShop ? 'shop' : this.isPaid ? 'pro' : 'free'; },
+  /** site admin (profiles.is_admin, set in the database only): may edit the shared ball list */
+  get isAdmin() { return !!profile?.is_admin; },
   /** how many bowlers, and balls in each bowler's arsenal, the plan can edit (more are kept, read-only) */
   get limits() { return LIMITS[this.plan]; },
   onChange(f) { listeners.add(f); },
@@ -383,12 +418,14 @@ function openAccount() {
     <div class="row2">
       ${cloud.isPaid ? '' : '<button class="btn primary" type="button" data-a="upgrade">See Pro plans</button>'}
       ${cloud.isShop || p.account_type === 'shop' ? '<button class="btn" type="button" data-a="shop">Shop details</button>' : ''}
+      ${cloud.isAdmin ? '<button class="btn" type="button" data-a="balladmin">Ball list admin</button>' : ''}
       <button class="btn" type="button" data-a="signout">Sign out</button>
       <button class="btn" type="button" data-a="close">Close</button>
     </div></div>`);
   d.querySelector('[data-a=close]').addEventListener('click', () => d.close());
   d.querySelector('[data-a=upgrade]')?.addEventListener('click', () => { d.close(); openUpsell(); });
   d.querySelector('[data-a=shop]')?.addEventListener('click', () => { d.close(); openShopDetails(); });
+  d.querySelector('[data-a=balladmin]')?.addEventListener('click', () => { d.close(); window.dispatchEvent(new Event('xing:ball-admin')); });
   d.querySelector('[data-a=signout]').addEventListener('click', async () => {
     await flush();
     await sb?.auth.signOut();

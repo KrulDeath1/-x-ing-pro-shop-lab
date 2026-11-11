@@ -1,9 +1,16 @@
+// RETIRED (2026-11-11): use update-balls-makers.js instead. bowwwl.com's terms allow personal use only, so the app's
+// list now comes from the manufacturers' own pages. Running this would copy bowwwl's data over the makers' data again.
+//
 // Pulls current balls plus balls discontinued in the last 5 years (every weight) from bowwwl.com's database and injects
 // them into the app HTML. US releases only: balls bowwwl marks as international are skipped. Discontinued balls carry x: 1.
 // usage: node update-balls.js [path-to-app.html]   (default: x-ing-pro-shop-lab.html next to this script)
 // Safe to re-run: it backs up the app first, refuses to write if the download looks broken, and lists what changed.
+if (!process.argv.includes('--force-bowwwl')) {
+  console.error('This script is retired: it copies bowwwl.com data, which their terms allow for personal use only.\nRun "node update-balls-makers.js" (or "Update ball list.bat") instead.');
+  process.exit(1);
+}
 const fs = require('fs'), path = require('path');
-const app = process.argv[2] || path.join(__dirname, 'x-ing-pro-shop-lab.html');
+const app = process.argv.slice(2).find(a => !a.startsWith('--')) || path.join(__dirname, 'x-ing-pro-shop-lab.html');
 const BRAND = {
   '900-global': '900 Global', 'abs-300': 'ABS 300', brunswick: 'Brunswick', dv8: 'DV8', ebonite: 'Ebonite', elite: 'Elite',
   hammer: 'Hammer', 'hih-bowling': 'HIH Bowling', 'kr-strikeforce': 'KR Strikeforce', motiv: 'Motiv', 'on-the-ball-bowling': 'On The Ball',

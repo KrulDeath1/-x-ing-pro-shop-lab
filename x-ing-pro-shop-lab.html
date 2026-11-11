@@ -88,6 +88,15 @@ dialog.cust { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48
 .cust-form input { background: var(--panel); }
 .cust-form .row2 { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .cust-form .row2 .spacer { flex: 1; }
+/* ball list admin (reuses the customer dialog layout) */
+.cust.balladm { width: min(680px, calc(100vw - 32px)); }
+.balladm .wts { grid-column: 1 / -1; border-collapse: collapse; width: 100%; font-size: 13px; }
+.balladm .wts th, .balladm .wts td { padding: 3px 4px; text-align: left; }
+.balladm .wts th { font-weight: 600; color: var(--ink-2); font-size: 12px; }
+.balladm .wts input { width: 100%; min-width: 0; }
+.balladm .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.balladm .tabs .on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.balladm .tag { font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-left: 6px; }
 @media (max-width: 520px) { .cust-form { grid-template-columns: 1fr; } .cust-row { flex-wrap: wrap; } .cust-row .acts { width: 100%; justify-content: flex-end; } }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
@@ -502,7 +511,7 @@ const $ = id => document.getElementById(id);
 const R = 27 / (2 * Math.PI);           // ball radius, inches
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-import { store, cloud, customers, brand } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
+import { store, cloud, customers, brand, catalog, ballAdmin } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
 function parseIn(s) {
   if (s === undefined || s === null) return NaN;
   s = String(s).trim().replace(/["”]/g, '');
@@ -586,7 +595,28 @@ const ballSlug = s => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-
 const _seenIds = new Set();
 const ballKey = x => { let id = 'db-' + ballSlug(`${x.b} ${x.n}${x.i ? ' intl' : ''}`), k = 2; while (_seenIds.has(id)) id = id.replace(/-\d+$/, '') + '-' + k++; _seenIds.add(id); return id; };
 const nameHash = s => [...String(s)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-const DB_BALLS = BALL_DB.map((x, i) => ({
+/* Admin-entered balls (shared catalog in the database, see js/cloud.js) merged into the built-in list: the same brand +
+   name corrects the built-in ball, anything else is added. Retired balls are dropped KEEP_YEARS after their release. */
+const KEEP_YEARS = 7, MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const coverKeyOf = t => { t = (t || '').toLowerCase(); return /urethane|microcell/.test(t) ? 'urethane' : /polyester|plastic|rubber/.test(t) ? 'plastic' : /pearl/.test(t) ? 'pearl' : /hybrid/.test(t) ? 'hybrid' : 'solid'; };
+const gritKeyOf = f => { const s = (f || '').toLowerCase(), n = (s.match(/\d{3,5}/g) || []).map(Number), top = n.length ? Math.max(...n) : 2000;
+  if (/lsp|polish|compound|shine|gloss|reacta|crown/.test(s)) return top <= 2000 ? '1500p' : 'polish';
+  return String([360, 500, 1000, 1500, 2000, 3000, 4000].reduce((a, b) => Math.abs(b - top) < Math.abs(a - top) ? b : a)); };
+const catalogToDb = c => {
+  const r = c.released ? new Date(c.released + 'T00:00:00') : null, w = c.weights && Object.keys(c.weights).length ? c.weights : { 15: [+c.rg, +c.diff, +c.mb_diff || 0] }, m = w[15] || Object.values(w)[0];
+  return { b: c.brand, n: c.name, d: r ? `${MONTHS[r.getMonth()]} ${r.getFullYear()}` : '', cv: c.coverstock || '', ct: c.cover_type || '', c: coverKeyOf(c.cover_type || c.coverstock),
+    f: c.finish || '', g: gritKeyOf(c.finish), k: c.core || '', s: c.core_type === 'asym' ? 'asym' : 'sym', rg: +m[0], df: +m[1], mb: c.core_type === 'asym' ? +m[2] || 0 : 0, i: 0, w,
+    ...(c.discontinued ? { x: 1 } : {}), cat: c.id };
+};
+const relOf = x => { const m = String(x.d || '').match(/([A-Za-z]{3})[a-z]*\.?\s+(\d{4})/); const k = m ? MONTHS.findIndex(s => s.toLowerCase() === m[1].toLowerCase()) : -1; return k >= 0 ? new Date(+m[2], k, 1) : null; };
+const ALL_DB = (() => {
+  const key = x => `${x.b}|${x.n}`.toLowerCase().replace(/\s+/g, ' ').trim(), cut = new Date(); cut.setFullYear(cut.getFullYear() - KEEP_YEARS);
+  const added = (catalog || []).map(catalogToDb), byKey = new Map(added.map(x => [key(x), x]));
+  const merged = [...BALL_DB.map(x => byKey.get(key(x)) ? { ...byKey.get(key(x)), i: x.i } : x), ...added.filter(x => !BALL_DB.some(y => key(y) === key(x)))];
+  // only retired balls age out; a ball the maker still sells stays however old it is
+  return merged.filter(x => { const d = relOf(x); return !x.x || !d || d >= cut; });
+})();
+const DB_BALLS = ALL_DB.map((x, i) => ({
   id: ballKey(x), brand: x.b, name: x.n, label: x.n + (x.i ? ' (intl)' : '') + (x.x ? ' (disc.)' : ''), disc: !!x.x, core: x.s, rg: x.rg, diff: x.df, intdiff: x.mb, cover: x.c, grit: x.g, pin2psa: '6 3/4',
   w: x.w || { 15: [x.rg, x.df, x.mb] }, info: x,
   color: BRAND_COLORS[nameHash(x.b + x.n) % BRAND_COLORS.length],
@@ -1483,15 +1513,15 @@ function fillBallB(sel) {
 function ballBNote() {
   const b = allBalls().find(x => x.id === $('B_ball').value); if (!b) return;
   $('B_color').value = b.color || '#c2378f';
-  const s = $('B_wt'), cur = +s.value || +$('ballWt').value || 15, ws = b.w ? Object.keys(b.w).map(Number).sort((x, y) => y - x) : [16, 15, 14, 13, 12, 11, 10];
+  const s = $('B_wt'), cur = +s.value || +$('ballWt').value || 15, ws = ballWeights(b);
   s.innerHTML = ''; ws.forEach(w => s.append(new Option(w + ' lb', w))); s.value = ws.includes(cur) ? cur : (ws.includes(15) ? 15 : ws[0]);
-  const x = b.info, sp = b.w && b.w[+s.value];
+  const x = b.info, sp = specAt(b, +s.value);
   $('B_note').textContent = x ? `${x.cv} (${x.ct}) · ${x.k} ${x.s === 'asym' ? 'asym' : 'sym'} core · box ${x.f} · ${s.value} lb: RG ${sp ? sp[0].toFixed(3) : b.rg}, diff ${sp ? sp[1].toFixed(3) : b.diff}${b.core === 'asym' ? ', int. ' + (sp ? sp[2].toFixed(3) : b.intdiff) : ''}` : (b.note || '');
 }
 function readBallB(ballA) {
   if (!$('B_diff').checked) return ballA;
   const b = allBalls().find(x => x.id === $('B_ball').value); if (!b) return ballA;
-  const wt = +$('B_wt').value || 15, sp = b.w && b.w[wt];
+  const wt = +$('B_wt').value || 15, sp = specAt(b, wt);
   return { name: (b.brand && b.brand !== TYPES && b.brand !== MINE ? b.brand + ' ' : '') + b.name, core: b.core, cover: b.cover,
     rg: sp ? sp[0] : +b.rg, diff: sp ? sp[1] : +b.diff, intdiff: sp ? sp[2] : (+b.intdiff || 0), weight: wt,
     grit: $('B_grit').value || b.grit, pin2psa: clamp(parseIn(b.pin2psa) || 6.75, 1, 6.75), color: $('B_color').value };
@@ -2600,17 +2630,24 @@ function loadBall(id) {
 }
 /* ball weight: specs change with weight (lighter balls usually have a higher RG and lower differentials), so the
    app keeps each ball's published specs for every weight it is made in and switches RG / diff / int. diff to match */
+/* Per-weight specs. Some makers publish one set only (usually 15 lb): then every weight is offered and that set is
+   used for all of them (the note says so). */
+const ALL_WTS = [16, 15, 14, 13, 12, 11, 10];
+const oneWeightOnly = b => !!(b && b.w && Object.keys(b.w).length === 1);
+const ballWeights = b => b && b.w && !oneWeightOnly(b) ? Object.keys(b.w).map(Number).sort((x, y) => y - x) : ALL_WTS;
+const specAt = (b, wt) => !b || !b.w ? null : b.w[wt] || (oneWeightOnly(b) ? Object.values(b.w)[0] : null);
 function fillWeights(b, want) {
   const s = $('ballWt'), cur = want || +s.value || 15;
-  const ws = b && b.w ? Object.keys(b.w).map(Number).sort((x, y) => y - x) : [16, 15, 14, 13, 12, 11, 10];
+  const ws = ballWeights(b);
   s.innerHTML = ''; ws.forEach(w => s.append(new Option(w + ' lb', w)));
   s.value = ws.includes(+cur) ? cur : (ws.includes(15) ? 15 : ws[0]);
 }
 function applyWeight() {
   const b = allBalls().find(x => x.id === $('ballPreset').value), wt = +$('ballWt').value;
-  const sp = b && b.w && b.w[wt];
+  const sp = specAt(b, wt);
   if (sp) { $('rg').value = sp[0]; $('diff').value = sp[1]; $('intdiff').value = sp[2]; }
-  $('ballWtNote').textContent = sp ? `Specs below are for ${wt} lb` : (b && b.w ? '' : 'No per-weight specs for this ball — RG/diff stay as entered');
+  $('ballWtNote').textContent = oneWeightOnly(b) ? `The maker publishes ${Object.keys(b.w)[0]} lb specs only; they're used for every weight`
+    : sp ? `Specs below are for ${wt} lb` : (b && b.w ? '' : 'No per-weight specs for this ball — RG/diff stay as entered');
   $('arsWeight').value = wt;
   renderBallSpecs(b, wt);
 }
@@ -3066,6 +3103,123 @@ $('bDel').addEventListener('click', () => { const n = $('bSaved').value; if (!n)
 var custCache = []; // last contact cards loaded (fills the phone on the printed fit card)
 $('bCust').addEventListener('click', () => { if (cloud.require('customers')) openCustomers(); });
 if (cloud.can('customers')) customers.list().then(r => { custCache = r; }).catch(() => {});
+/* ---------- Ball list admin (site admin only; the database enforces it too) ----------
+   Add a ball from the maker's spec sheet, edit or remove one you added, correct a built-in ball (saving it under the same
+   brand + name overrides the built-in specs), and mark a ball retired. Saved balls are live for everyone at their next load. */
+const COVER_TYPES = ['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'];
+function openBallAdmin() {
+  if (!cloud.isAdmin) return;
+  const d = document.createElement('dialog'); d.className = 'xd cust balladm';
+  const brands = [...new Set(BALL_DB.map(x => x.b).concat(catalog.map(c => c.brand)))].sort((a, b) => a.localeCompare(b));
+  d.innerHTML = `<div class="body">
+    <div class="head"><h2>Ball list admin <span class="count" id="baCount"></span></h2>
+      <button class="btn sm primary" type="button" data-a="new">Add a ball</button><button class="btn sm" type="button" data-a="close">Close</button></div>
+    <div class="tabs"><button class="btn sm on" type="button" data-t="added">Added &amp; corrected</button><button class="btn sm" type="button" data-t="builtin">Correct a built-in ball</button></div>
+    <input id="baSearch" type="search" autocomplete="off" placeholder="Search brand or name" aria-label="Search balls">
+    <form class="cust-form" id="baForm" hidden novalidate>
+      <label class="f"><span>Brand</span><input id="baBrand" list="baBrands" required maxlength="60" autocomplete="off"></label>
+      <label class="f"><span>Ball name</span><input id="baName" required maxlength="120" autocomplete="off"></label>
+      <datalist id="baBrands">${brands.map(b => `<option value="${escH(b)}">`).join('')}</datalist>
+      <label class="f"><span>Released</span><input id="baRel" type="month"></label>
+      <label class="f"><span>Core type</span><select id="baSym"><option value="sym">Symmetric</option><option value="asym">Asymmetric</option></select></label>
+      <label class="f"><span>Core name</span><input id="baCore" maxlength="80" autocomplete="off"></label>
+      <label class="f"><span>Coverstock</span><input id="baCover" maxlength="80" autocomplete="off" placeholder="e.g. HK22 Hybrid"></label>
+      <label class="f"><span>Cover type</span><select id="baCt">${COVER_TYPES.map(t => `<option>${t}</option>`).join('')}</select></label>
+      <label class="f"><span>Factory finish</span><input id="baFin" maxlength="80" autocomplete="off" placeholder="e.g. 3000 Abralon"></label>
+      <table class="wts"><tr><th>Weight</th><th>RG</th><th>Differential</th><th>Int. diff (asym)</th></tr>
+        ${ALL_WTS.map(w => `<tr><td>${w} lb${w === 15 ? ' *' : ''}</td><td><input data-w="${w}" data-k="0" inputmode="decimal" placeholder="${w === 15 ? '2.500' : ''}"></td><td><input data-w="${w}" data-k="1" inputmode="decimal" placeholder="${w === 15 ? '0.045' : ''}"></td><td><input data-w="${w}" data-k="2" inputmode="decimal"></td></tr>`).join('')}</table>
+      <p class="hint full" style="margin:0">* 15 lb RG and differential are required; fill in other weights when the maker lists them (otherwise the 15 lb specs are used for every weight).</p>
+      <label class="tog full" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="baRetired" style="width:auto"> Retired by the maker <span class="hint" style="margin:0">(stays in the list until 7 years after release)</span></label>
+      <div class="row2"><button class="btn sm" type="button" data-a="remove" hidden>Remove</button><span class="spacer"></span>
+        <button class="btn sm" type="button" data-a="cancel">Cancel</button><button class="btn sm primary" type="submit">Save</button></div>
+    </form>
+    <div class="msg" id="baMsg" role="status"></div>
+    <div class="cust-list" id="baList"></div>
+  </div>`;
+  document.body.append(d);
+  const q = s => d.querySelector(s), form = q('#baForm'), msg = (t, cls = '', html = false) => { const m = q('#baMsg'); m[html ? 'innerHTML' : 'textContent'] = t; m.className = 'msg ' + cls; };
+  let tab = 'added', editing = null;
+  const keyOf = (b, n) => `${b}|${n}`.toLowerCase().replace(/\s+/g, ' ').trim();
+  const builtinKeys = new Set(BALL_DB.map(x => keyOf(x.b, x.n)));
+  const relText = r => r ? (([y, m]) => `${MONTHS[+m - 1]} ${y}`)(r.split('-')) : '';
+  const draw = () => {
+    const words = q('#baSearch').value.trim().toLowerCase().split(/\s+/).filter(Boolean), box = q('#baList'); box.innerHTML = '';
+    const hit = s => words.every(w => s.toLowerCase().includes(w));
+    const items = tab === 'added'
+      ? [...catalog].sort((a, b) => a.brand.localeCompare(b.brand) || a.name.localeCompare(b.name)).filter(c => hit(`${c.brand} ${c.name}`)).map(c => ({ c, title: `${c.brand} ${c.name}`, sub: [relText(c.released?.slice(0, 7)), c.cover_type, `RG ${(+c.rg).toFixed(3)} / ${(+c.diff).toFixed(3)}`].filter(Boolean).join(' · '), tag: builtinKeys.has(keyOf(c.brand, c.name)) ? 'corrects built-in' : 'added', retired: c.discontinued }))
+      : BALL_DB.filter(x => hit(`${x.b} ${x.n}`)).slice(0, 80).map(x => ({ x, title: `${x.b} ${x.n}`, sub: [x.d, x.ct, `RG ${x.rg} / ${x.df}`].filter(Boolean).join(' · '), tag: catalog.some(c => keyOf(c.brand, c.name) === keyOf(x.b, x.n)) ? 'already corrected' : '', retired: !!x.x }));
+    q('#baCount').textContent = `· ${catalog.length} added or corrected`;
+    if (!items.length) { box.innerHTML = `<div class="cust-empty">${tab === 'added' ? (catalog.length ? 'No ball matches that.' : 'Nothing added yet. Use “Add a ball”, or “Correct a built-in ball”.') : 'No built-in ball matches that.'}</div>`; return; }
+    items.forEach(it => {
+      const r = document.createElement('div'); r.className = 'cust-row';
+      const who = document.createElement('div'); who.className = 'who';
+      const b = document.createElement('b'); b.textContent = it.title; who.append(b);
+      if (it.tag) { const t = document.createElement('span'); t.className = 'tag'; t.textContent = it.tag; b.append(t); }
+      if (it.retired) { const t = document.createElement('span'); t.className = 'tag'; t.textContent = 'retired'; b.append(t); }
+      const s = document.createElement('span'); s.textContent = it.sub; who.append(s);
+      const acts = document.createElement('div'); acts.className = 'acts';
+      const e = document.createElement('button'); e.className = 'btn sm'; e.type = 'button'; e.textContent = it.c ? 'Edit' : 'Correct';
+      e.addEventListener('click', () => open(it.c ? fromCatalog(it.c) : fromBuiltin(it.x), it.c || null)); acts.append(e);
+      r.append(who, acts); box.append(r);
+    });
+  };
+  const fromCatalog = c => ({ brand: c.brand, name: c.name, rel: c.released ? c.released.slice(0, 7) : '', sym: c.core_type, core: c.core, cover: c.coverstock, ct: c.cover_type, fin: c.finish, w: c.weights || { 15: [c.rg, c.diff, c.mb_diff] }, retired: c.discontinued });
+  const fromBuiltin = x => { const r = relOf(x); return { brand: x.b, name: x.n, rel: r ? `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, '0')}` : '', sym: x.s, core: x.k, cover: x.cv, ct: COVER_TYPES.find(t => t.toLowerCase() === (x.ct || '').toLowerCase()) || COVER_TYPES.find(t => coverKeyOf(t) === x.c) || COVER_TYPES[0], fin: x.f, w: x.w || { 15: [x.rg, x.df, x.mb] }, retired: !!x.x }; };
+  const open = (v, row) => {
+    editing = row; form.hidden = false; msg('');
+    q('#baBrand').value = v?.brand || ''; q('#baName').value = v?.name || ''; q('#baRel').value = v?.rel || ''; q('#baSym').value = v?.sym === 'asym' ? 'asym' : 'sym';
+    q('#baCore').value = v?.core || ''; q('#baCover').value = v?.cover || ''; q('#baCt').value = v?.ct || COVER_TYPES[0]; q('#baFin').value = v?.fin || ''; q('#baRetired').checked = !!v?.retired;
+    form.querySelectorAll('[data-w]').forEach(i => { const s = v?.w?.[i.dataset.w]; i.value = s && s[+i.dataset.k] != null && s[+i.dataset.k] !== '' ? (+s[+i.dataset.k]).toFixed(3) : ''; });
+    q('[data-a=remove]').hidden = !row;
+    (v ? q('#baRel') : q('#baBrand')).focus(); form.scrollIntoView({ block: 'nearest' });
+  };
+  const close = () => { form.hidden = true; editing = null; };
+  q('[data-a=new]').addEventListener('click', () => open(null, null));
+  q('[data-a=cancel]').addEventListener('click', close);
+  q('[data-a=close]').addEventListener('click', () => d.close());
+  d.addEventListener('close', () => d.remove());
+  q('#baSearch').addEventListener('input', draw);
+  d.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', () => { tab = b.dataset.t; d.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); draw(); }));
+  const reloadNote = 'Saved. It’s live for everyone the next time they open the app. <button class="btn sm" type="button" data-a="reload">Reload to see it here</button>';
+  q('#baMsg').addEventListener('click', e => { if (e.target.dataset.a === 'reload') location.reload(); });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const brandV = q('#baBrand').value.trim(), nameV = q('#baName').value.trim(), sym = q('#baSym').value;
+    if (!brandV || !nameV) return msg('Enter the brand and the ball name.', 'err');
+    const w = {}; let bad = '';
+    for (const wt of ALL_WTS) {
+      const v = [0, 1, 2].map(k => { const s = form.querySelector(`[data-w="${wt}"][data-k="${k}"]`).value.trim(); return s === '' ? null : parseFloat(s); });
+      if (v[0] == null && v[1] == null) continue;
+      if (!(v[0] >= 2.3 && v[0] <= 2.9)) bad = `${wt} lb RG should be between 2.300 and 2.900.`;
+      else if (!(v[1] >= 0 && v[1] <= 0.08)) bad = `${wt} lb differential should be between 0.000 and 0.080.`;
+      else if (v[2] != null && !(v[2] >= 0 && v[2] <= 0.04)) bad = `${wt} lb intermediate differential should be between 0.000 and 0.040.`;
+      if (bad) break;
+      w[wt] = [v[0], v[1], sym === 'asym' ? (v[2] || 0) : 0];
+    }
+    if (bad) return msg(bad, 'err');
+    if (!w[15]) return msg('15 lb RG and differential are required.', 'err');
+    const rel = q('#baRel').value;
+    const row = { brand: brandV, name: nameV, released: rel ? rel + '-01' : null, core_type: sym, core: q('#baCore').value.trim() || null, coverstock: q('#baCover').value.trim() || null,
+      cover_type: q('#baCt').value, finish: q('#baFin').value.trim() || null, weights: w, rg: w[15][0], diff: w[15][1], mb_diff: w[15][2], discontinued: q('#baRetired').checked };
+    // correcting a built-in ball that was already corrected: update that entry instead of making a duplicate
+    const same = catalog.find(c => keyOf(c.brand, c.name) === keyOf(brandV, nameV));
+    if (!editing && same) editing = same;
+    if (editing) row.id = editing.id;
+    const btn = form.querySelector('[type=submit]'); btn.disabled = true; msg('Saving…');
+    try { await ballAdmin.save(row); close(); tab = 'added'; d.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x.dataset.t === 'added')); draw(); msg(reloadNote, 'ok', true); }
+    catch (err) { msg(err.message, 'err'); }
+    finally { btn.disabled = false; }
+  });
+  q('[data-a=remove]').addEventListener('click', async () => {
+    if (!editing) return;
+    const corrects = builtinKeys.has(keyOf(editing.brand, editing.name));
+    if (!confirm(corrects ? `Remove your correction to ${editing.brand} ${editing.name}? The built-in specs come back.` : `Remove ${editing.brand} ${editing.name} from the ball list for everyone? Saved arsenal records keep their specs.`)) return;
+    try { await ballAdmin.remove(editing.id); close(); draw(); msg('Removed. <button class="btn sm" type="button" data-a="reload">Reload to see it here</button>', 'ok', true); }
+    catch (err) { msg(err.message, 'err'); }
+  });
+  draw(); d.showModal();
+}
+window.addEventListener('xing:ball-admin', openBallAdmin);
 function openCustomers() {
   const d = document.createElement('dialog'); d.className = 'xd cust';
   d.innerHTML = `<div class="body">
@@ -3686,7 +3840,7 @@ const replacedMine = (() => {
   if (keep.length !== mine.length) store.set('layoutlab.balls', keep);
   return mine.filter(b => !keep.includes(b)).map(b => b.name);
 })();
-$('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(b => !b.disc).length} current${DB_BALLS.some(b => b.disc) ? ` + ${DB_BALLS.filter(b => b.disc).length} discontinued in the last 5 years` : ''}), updated ${BALL_DB_DATE}. For new releases, close this page, double-click <b>Update ball list.bat</b> in the app’s folder, then reopen.`
+$('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(b => !b.disc).length} current${DB_BALLS.some(b => b.disc) ? ` + ${DB_BALLS.filter(b => b.disc).length} retired, kept ${KEEP_YEARS} years from release` : ''}). New releases are added as they come out${catalog.length ? `; ${catalog.length} added or corrected since ${BALL_DB_DATE}` : ''}.`
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
 fillBallSelect(startBall); loadBall(startBall); fillBowlers(); renderArsenal(); calibUI();
