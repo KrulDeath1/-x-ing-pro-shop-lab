@@ -20,7 +20,7 @@ const list = fs.readFileSync(path.join(landing, 'tools', 'loaded-files.txt'), 'u
 for (const f of list) copy(path.join(landing, f), path.join(out, f));
 copy(path.join(landing, 'share.jpg'), path.join(out, 'share.jpg'));
 // each effect and moment the page uses ships whole (stills and fallbacks it may load later)
-for (const d of ['assets/effects/painterly-landscape', 'assets/moments/word-highlight', 'assets/moments/iris-opens']) copyDir(path.join(landing, d), path.join(out, d));
+for (const d of ['assets/moments/word-highlight', 'assets/moments/iris-opens']) copyDir(path.join(landing, d), path.join(out, d));
 
 // old links to the app's file name open the app
 fs.writeFileSync(path.join(out, '_redirects'), '/x-ing-pro-shop-lab.html /app/ 301\n');

@@ -26,7 +26,7 @@
 <link rel="stylesheet" href="assets/icons/icon.css">
 <style>
 :root {
-  --p-bg: #eef0f3; --p-surface: #e2e5ea; --p-ink: #0b0c0e; --p-muted: #5d6470;
+  --p-bg: #eef0f3; --p-surface: #e2e5ea; --p-ink: #0b0c0e; --p-muted: #4b515c;
   --p-accent: #1f2de6; --p-accent-ink: #ffffff; --p-action: #1f2de6; --p-action-ink: #ffffff;
   --p-inv-bg: #0b0c0e; --p-inv-surface: #17181a; --p-inv-ink: #eef0f3; --p-inv-muted: #8e8f92;
   --p-inv-accent: #eef0f3; --p-inv-accent-ink: #0b0c0e; --p-inv-action: #eef0f3; --p-inv-action-ink: #0b0c0e;
@@ -53,20 +53,73 @@
   .menu-card .panel { --p-h: 200px; }
   #features .panel { --p-h: 400px; }
   #more .panel { --p-h: 336px; }
-  #shops .frame--split .stage img, #lane .frame--split .stage img { width: 1000px; max-width: none; }
-  @media (max-width: 1023px) { #shops .frame--split .stage img, #lane .frame--split .stage img { width: 760px; } }
-  /* hero window: the drilled ball view from Layout A */
+  /* the app's views at their real size in the app (the crops are 2x), cut by the frame's edge */
+  #shops .frame--split .stage img { width: 800px; max-width: none; }
+  #shops .frame--split { --ratio: 64% !important; }
+  /* a document view (rows of text): shown whole, as a sheet on the panel, not cropped to fill it */
+  .panel.panel--doc { display: grid; align-content: center; padding: var(--s-5); }
+  .panel.panel--doc > img { position: static; inset: auto; width: 100%; height: auto; object-fit: initial; border-radius: var(--r-md); box-shadow: 0 0 0 1px rgb(11 12 14 / 6%), 0 18px 36px -20px rgb(11 12 14 / 25%); }
+  /* a wide view at the app's own size, cut by the panel's right edge */
+  .panel.panel--cut > img { width: 818px; max-width: none; }
+  #plans .card--plan .price { min-height: 48px; display: flex; align-items: center; }
+  #lane .frame--split .stage img { width: 1000px; max-width: none; }
+  @media (max-width: 1023px) { #lane .frame--split .stage img { width: 760px; } }
+  /* hero window: the drilled ball view from Layout A, over a lane seen from above (boards, gutters, the foul
+     line, the range dots, the arrows, and the oil, heaviest in the middle boards, fading out at 38 ft) */
+  .hero__window .d-win { background: #1b2028; color: #eceef0; border-radius: var(--r-lg); overflow: hidden; box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 30px 60px -30px rgb(11 12 14 / .55); }
+  .hero__window .d-win__bar { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; border-bottom: 1px solid rgb(255 255 255 / .07); font-size: 13px; color: #a7adb5; white-space: nowrap; overflow: hidden; }
+  .hero__window .d-win__bar b { font-weight: 500; color: #eceef0; }
+  .hero__window .d-win__bar .sp { flex: 1; }
+  .hero__window .d-win__dots { display: flex; gap: 6px; } .hero__window .d-win__dots i { width: 10px; height: 10px; border-radius: 50%; background: #3a3e43; }
+  @media (max-width: 479px) { .hero__window .d-win__bar > span:last-child { display: none; } }
   .hero__window .d-win__body.ball { display: block; padding: 0; background: #1b2028; }
   .hero__window .d-win__body.ball img { display: block; width: 100%; height: auto; }
-  /* the workbench: the real app window, cut by the frame's foot */
-  .app-shot { position: relative; margin-top: var(--s-7); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgb(11 12 14 / 6%), 0 24px 48px -24px rgb(11 12 14 / 22%); }
-  .app-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; }
-  .app-shot::after { content: ""; position: absolute; inset: auto 0 0 0; height: 72px; background: linear-gradient(transparent, #fff); pointer-events: none; }
+  .hero__window--lane { background: var(--p-bg); container-type: size; }
+  .lane-ground { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .lane-ground .lg-gutter { fill: color-mix(in oklab, var(--p-ink) 13%, var(--p-bg)); }
+  .lane-ground .lg-a { fill: color-mix(in oklab, var(--p-ink) 2%, var(--p-bg)); }
+  .lane-ground .lg-b { fill: color-mix(in oklab, var(--p-ink) 5%, var(--p-bg)); }
+  .lane-ground .lg-mark { fill: color-mix(in oklab, var(--p-ink) 40%, var(--p-bg)); }
+  .lane-ground stop { stop-color: var(--p-accent); }
+  .lane-ground rect[mask] { opacity: .16; }
+  /* the window fits whole above the frame's fade on any screen height: its width follows the frame's height */
+  .hero--centred .hero__window--lane > .ly-piece { left: 50%; transform: translateX(-50%); width: min(880px, calc(100cqw - 2 * var(--s-4)), calc((80cqh - var(--s-6) - 40px) * 2.728)); }
+  .hero__who { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--t-small); }
+  @media (pointer: coarse) { .hero__who .pill { height: 44px; padding-inline: var(--s-4); } }
+  /* the worked example: the bowler's numbers, then the layout and its reasons, at the app's own size */
+  .ex { display: flex; align-items: flex-start; gap: var(--s-6); margin-top: var(--s-7); }
+  .ex__step { margin: 0; display: grid; gap: var(--s-3); justify-items: start; min-width: 0; }
+  .ex__step figcaption { display: flex; align-items: center; gap: var(--s-2); font-weight: 500; }
+  .ex__n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font: 500 12px/1 var(--font-mono); }
+  .ex__shot { max-width: 100%; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgb(11 12 14 / 6%), 0 24px 48px -24px rgb(11 12 14 / 22%); }
+  .ex__shot img { display: block; max-width: 100%; height: auto; }
+  .ex__step--out .ex__shot img { width: 442px; }
+  .ex__arrow { flex: none; width: 48px; align-self: center; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .ex__gloss { max-width: 46ch; margin: var(--s-2) 0 0; font-size: var(--t-small); line-height: 1.55; }
+  .counter { margin: auto 0 0; padding-top: var(--s-5); border-top: 1px solid var(--line); max-width: 78ch; }
+  .counter b { font-weight: 500; }
+  @media (max-width: 767px) {
+    .ex { flex-direction: column; gap: var(--s-4); }
+    .ex__arrow { transform: rotate(90deg); align-self: flex-start; margin-left: var(--s-2); }
+    .counter { margin-top: var(--s-7); }
+  }
+  /* pro shops: the counter's four steps */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; }
+  .steps li { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: var(--s-3); padding-block: var(--s-3); border-top: 1px solid var(--line); }
+  .steps li:last-child { border-bottom: 1px solid var(--line); }
+  .steps b { font-weight: 500; }
+  /* plans: the key differences per plan, a quiet price until checkout opens */
+  .price__soon { font-size: var(--t-body); font-weight: 500; color: var(--muted); }
+  .plan-next { margin: calc(-1 * var(--s-2)) 0 0; font-size: var(--t-small); color: var(--muted); }
+  .plan-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  .plan-list li { position: relative; padding-left: 24px; }
+  .plan-list li::before { content: ""; position: absolute; left: 3px; top: .5em; width: 10px; height: 5px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg); }
+  .plans__all { align-self: flex-start; margin-top: var(--s-6); }
   /* the lane split: the shot log card from the app, cut by the frame */
   /* the top-down lane in the questions section, cut by its frame */
   .lane-top { position: relative; height: 360px; margin-top: var(--s-4); overflow: hidden; }
   .lane-top img { position: absolute; left: 50%; top: 24px; height: 640px; transform: translateX(-50%); border-radius: var(--r-md); }
-  @media (max-width: 639px) { .lane-top { height: 360px; } .lane-top img { height: 560px; } #plans .card--plan > p.muted { display: none; } }
+  @media (max-width: 639px) { .lane-top { height: 360px; } .lane-top img { height: 560px; } }
   /* the hero's sub-line is read text: ink, not grey (7:1) */
   .hero--centred .hero__lead { color: var(--ink); }
   /* the name in the close: room for its cap height so nothing is clipped */
@@ -103,7 +156,7 @@
   .pc .pc__val { font-size: var(--t-small); font-weight: 500; }
   @media (max-width: 639px) {
     .pc col.pc__plan { width: 60px; }
-    .pc .pc__val { font-size: 11px; overflow-wrap: anywhere; }
+    .pc .pc__val { font-size: 12px; overflow-wrap: anywhere; }
     .pc th, .pc td { padding: var(--s-2) 6px; }
     .pc th:first-child, .pc td:first-child { padding-left: var(--s-3); }
     .pc thead th { font-size: var(--t-small); }
@@ -129,7 +182,7 @@
         <div class="nav__menu">
           <div class="wrap grid">
             <a class="menu-card span-4" href="#features">
-              <div class="panel"><img class="frame__img shot--top" src="assets/app/layout.png" alt="Layout A with drilling angle, pin-to-PAP and VAL angle" loading="lazy"></div>
+              <div class="panel panel--doc"><img class="frame__img" src="assets/app/specs-crop.png" alt="Layout A in Dual Angle and VLS" loading="lazy"></div>
               <span class="t-card">Layout recommendations</span>
               <span class="t-small muted">Dual Angle and VLS, with the reasons</span>
             </a>
@@ -164,12 +217,13 @@
   <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text">
       <div class="hero__c">
-        <a class="pill" href="#questions"><span>567 US balls built in</span><span class="muted">Current releases plus the last five years</span></a>
-        <h1 id="hero-h" aria-label="Drilling layout app for bowlers"><span class="ly-mark" aria-hidden="true"></span> Drilling layout app for bowlers</h1>
-        <p class="hero__lead">Enter your PAP, speed, rev rate and axis tilt. X-ING picks a Dual Angle or VLS layout, explains why, and rolls the drilled ball down your oil pattern.</p>
-        <div class="btn-row"><a class="btn btn--primary" href="app/#signup">Create a free account</a><a class="btn btn--secondary" href="#app">See the workbench</a></div>
+        <h1 id="hero-h">Know the layout before you drill</h1>
+        <p class="hero__lead">For pro shops and serious bowlers. Enter the bowler’s PAP (the point the ball spins around), speed and rev rate. X-ING picks a drilling layout, explains why, and shows how the drilled ball will roll on your lane’s oil.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="app/#signup">Create a free account</a><a class="btn btn--secondary" href="#app">See an example</a></div>
+        <p class="hero__who"><span class="muted">Start with</span> <a class="pill" href="#app">I bowl</a> <a class="pill" href="#shops">I run a pro shop</a></p>
       </div>
-      <div class="hero__window" data-fx="painterly-landscape" data-fx-seed="11" role="img" aria-label="X-ING's ball view: a drilled ball with its pin, PAP, PSA and the track of its axis migration">
+      <div class="hero__window hero__window--lane" role="img" aria-label="X-ING's ball view over a lane: a drilled ball with its pin, PAP, PSA and the track of its axis migration">
+        <svg class="lane-ground" viewBox="0 0 1750 426" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><defs><linearGradient id="oil-across" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--lane-oil)" stop-opacity="0"/><stop offset=".22" stop-color="var(--lane-oil)" stop-opacity=".55"/><stop offset=".5" stop-color="var(--lane-oil)" stop-opacity="1"/><stop offset=".78" stop-color="var(--lane-oil)" stop-opacity=".55"/><stop offset="1" stop-color="var(--lane-oil)" stop-opacity="0"/></linearGradient><linearGradient id="oil-end" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".8" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="oil-len"><rect x="60" y="0" width="1520" height="426" fill="url(#oil-end)"/></mask></defs><rect class="lg-gutter" width="1750" height="426"/><rect class="lg-a" x="0" y="18" width="1750" height="10"/><rect class="lg-b" x="0" y="28" width="1750" height="10"/><rect class="lg-a" x="0" y="38" width="1750" height="10"/><rect class="lg-b" x="0" y="48" width="1750" height="10"/><rect class="lg-a" x="0" y="58" width="1750" height="10"/><rect class="lg-b" x="0" y="68" width="1750" height="10"/><rect class="lg-a" x="0" y="78" width="1750" height="10"/><rect class="lg-b" x="0" y="88" width="1750" height="10"/><rect class="lg-a" x="0" y="98" width="1750" height="10"/><rect class="lg-b" x="0" y="108" width="1750" height="10"/><rect class="lg-a" x="0" y="118" width="1750" height="10"/><rect class="lg-b" x="0" y="128" width="1750" height="10"/><rect class="lg-a" x="0" y="138" width="1750" height="10"/><rect class="lg-b" x="0" y="148" width="1750" height="10"/><rect class="lg-a" x="0" y="158" width="1750" height="10"/><rect class="lg-b" x="0" y="168" width="1750" height="10"/><rect class="lg-a" x="0" y="178" width="1750" height="10"/><rect class="lg-b" x="0" y="188" width="1750" height="10"/><rect class="lg-a" x="0" y="198" width="1750" height="10"/><rect class="lg-b" x="0" y="208" width="1750" height="10"/><rect class="lg-a" x="0" y="218" width="1750" height="10"/><rect class="lg-b" x="0" y="228" width="1750" height="10"/><rect class="lg-a" x="0" y="238" width="1750" height="10"/><rect class="lg-b" x="0" y="248" width="1750" height="10"/><rect class="lg-a" x="0" y="258" width="1750" height="10"/><rect class="lg-b" x="0" y="268" width="1750" height="10"/><rect class="lg-a" x="0" y="278" width="1750" height="10"/><rect class="lg-b" x="0" y="288" width="1750" height="10"/><rect class="lg-a" x="0" y="298" width="1750" height="10"/><rect class="lg-b" x="0" y="308" width="1750" height="10"/><rect class="lg-a" x="0" y="318" width="1750" height="10"/><rect class="lg-b" x="0" y="328" width="1750" height="10"/><rect class="lg-a" x="0" y="338" width="1750" height="10"/><rect class="lg-b" x="0" y="348" width="1750" height="10"/><rect class="lg-a" x="0" y="358" width="1750" height="10"/><rect class="lg-b" x="0" y="368" width="1750" height="10"/><rect class="lg-a" x="0" y="378" width="1750" height="10"/><rect class="lg-b" x="0" y="388" width="1750" height="10"/><rect class="lg-a" x="0" y="398" width="1750" height="10"/><rect x="60" y="18" width="1690" height="390" fill="url(#oil-across)" mask="url(#oil-len)"/><rect class="lg-mark" x="58" y="18" width="3" height="390"/><circle class="lg-mark" cx="340" cy="43" r="2.6"/><circle class="lg-mark" cx="340" cy="63" r="2.6"/><circle class="lg-mark" cx="340" cy="93" r="2.6"/><circle class="lg-mark" cx="340" cy="123" r="2.6"/><circle class="lg-mark" cx="340" cy="153" r="2.6"/><circle class="lg-mark" cx="340" cy="273" r="2.6"/><circle class="lg-mark" cx="340" cy="303" r="2.6"/><circle class="lg-mark" cx="340" cy="333" r="2.6"/><circle class="lg-mark" cx="340" cy="363" r="2.6"/><circle class="lg-mark" cx="340" cy="383" r="2.6"/><path class="lg-mark" d="M554 59.4L580 63L554 66.6Z"/><path class="lg-mark" d="M594 109.4L620 113L594 116.6Z"/><path class="lg-mark" d="M634 159.4L660 163L634 166.6Z"/><path class="lg-mark" d="M674 209.4L700 213L674 216.6Z"/><path class="lg-mark" d="M634 259.4L660 263L634 266.6Z"/><path class="lg-mark" d="M594 309.4L620 313L594 316.6Z"/><path class="lg-mark" d="M554 359.4L580 363L554 366.6Z"/></svg>
         <div class="ly-piece d-win" aria-hidden="true">
           <div class="d-win__bar"><span class="d-win__dots"><i></i><i></i><i></i></span><span><b>Ball view</b> · Layout A</span><span class="sp"></span><span>55° × 5" × 45° · pin up</span></div>
           <div class="d-win__body ball"><img src="assets/app/ball-view.png" alt="" width="1964" height="720" fetchpriority="high" data-source="client" data-subject="X-ING ball view screen"></div>
@@ -181,15 +235,24 @@
   <section class="section" id="app" aria-labelledby="app-h">
     <div class="wrap">
       <div class="grid">
-        <h2 id="app-h" class="span-5">Bowler, ball and fit on one screen</h2>
+        <h2 id="app-h" class="span-5">One bowler, start to finish</h2>
         <div class="span-6 start-7">
-          <p>Enter the bowler’s numbers on the left, and the read, fit specs, layout and ball motion update on the right as you type. Everything saves to the bowler’s profile.</p>
-          <a class="link" href="app/">Open the app</a>
+          <p>A sample right-hander: 16.5 mph, 360 rpm, PAP 5 1/4" over and 1/2" up. Type the numbers in, and the layout and its reasons update as you type. Everything saves to the bowler’s profile.</p>
         </div>
       </div>
-      <div class="app-shot fill" role="img" aria-label="The X-ING app: bowler inputs on the left, the bowler read and fit specs on the right">
-        <img src="assets/app/app-first-screen.png" alt="" width="2880" height="1800" loading="lazy" data-source="client" data-subject="X-ING app screen">
+      <div class="ex">
+        <figure class="ex__step">
+          <figcaption><span class="ex__n" aria-hidden="true">1</span>The bowler’s numbers</figcaption>
+          <div class="ex__shot"><img src="assets/app/ex-inputs.png" width="378" height="417" alt="The bowler card: right hand, one-handed, PAP 5 1/4 inches over and 1/2 inch up, 16.5 mph, 360 rpm" loading="lazy" data-source="client" data-subject="X-ING bowler inputs"></div>
+        </figure>
+        <svg class="ex__arrow" viewBox="0 0 48 16" aria-hidden="true"><path d="M2 8h40M35 2l7 6-7 6"/></svg>
+        <figure class="ex__step ex__step--out">
+          <figcaption><span class="ex__n" aria-hidden="true">2</span>The layout, and why</figcaption>
+          <div class="ex__shot"><img src="assets/app/ex-layout.png" width="340" height="148" alt="Layout A: 55 degrees by 5 inches by 45 degrees, pin up, with the reasons: benchmark timing, length with a strong move downlane, a balanced transition" loading="lazy" data-source="client" data-subject="X-ING layout and reasons"></div>
+          <p class="ex__gloss">Read it as a 55° drilling angle, the pin 5" from the PAP and a 45° VAL angle. That is Dual Angle, one of the two ways drillers write a layout; VLS writes the same layout as three distances. X-ING gives both.</p>
+        </figure>
       </div>
+      <p class="counter"><b>At the counter:</b> fit specs in 1/64ths, every ball you drill saved with the bowler, drill sheets with your shop’s name and logo, and a customer list. <a class="link" href="#shops">See the pro shop tools</a></p>
     </div>
   </section>
 
@@ -201,12 +264,12 @@
       <div class="grid">
         <article class="card card--row card--open span-6">
           <h3>Layout recommendations in both systems</h3>
-          <p>Get the drilling angle, pin-to-PAP and VAL angle from the bowler’s speed, revs, tilt and pattern, plus where the pin and PSA land.</p>
-          <div class="panel"><img class="frame__img shot--top" src="assets/app/layout.png" alt="Layout A: 55 degrees, 5 inches, 45 degrees, pin up, with the reasons listed" loading="lazy" data-source="client" data-subject="X-ING layout screen"></div>
+          <p>Every layout in Dual Angle and VLS, from the bowler’s speed, revs, tilt and pattern, plus where the pin and the PSA (the ball’s mass bias marker) will land.</p>
+          <div class="panel panel--doc"><img class="frame__img" src="assets/app/specs-crop.png" alt="Layout A in Dual Angle (55 degrees, 5 inches, 45 degrees) and VLS (5 by 4 3/8 by 3 inches), with where the pin and PSA land" loading="lazy" data-source="client" data-subject="X-ING layout in both systems"></div>
         </article>
         <article class="card card--row card--open span-6">
-          <h3>3D lane with the drilled ball</h3>
-          <p>Watch the ball roll down a real house or PBA pattern, from behind the bowler or following the ball. <span class="badge">Pro</span></p>
+          <h3>3D lane view</h3>
+          <p>Watch the drilled ball roll down a real house or PBA pattern, from behind the bowler or following the ball. <span class="badge">Pro</span></p>
           <div class="panel"><img class="frame__img" src="assets/app/lane-3d.png" alt="A ball rolling down a 3D lane over the oil pattern" loading="lazy" data-source="client" data-subject="X-ING 3D lane"></div>
         </article>
       </div>
@@ -221,26 +284,25 @@
       <div class="grid">
         <article class="card card--row card--open span-4">
           <h3>Layout A and B side by side</h3>
-          <p>Try a stronger or weaker layout B on the same ball or a different one. <span class="badge">Pro</span></p>
+          <p>Try a stronger or weaker layout B on the same ball or a different one.</p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/compare-balls.png" alt="Two drilled balls side by side, 55 and 65 degree drilling angles" loading="lazy" data-source="client" data-subject="X-ING compare A and B"></div>
         </article>
         <article class="card card--row card--open span-4">
           <h3>Ball coverage across the arsenal</h3>
-          <p>See each ball’s length and hook on this pattern, and let the gap point to your next ball. <span class="badge">Pro</span></p>
+          <p>See each ball’s length and hook on this pattern, and let the gap point to your next ball.</p>
           <div class="panel"><img class="frame__img shot--top" src="assets/app/coverage.png" alt="A chart of three balls by breakpoint distance and boards of hook" loading="lazy" data-source="client" data-subject="X-ING arsenal coverage"></div>
         </article>
         <article class="card card--row card--open span-4">
           <h3>Drill sheet with the layout and bowler read</h3>
-          <p>Print the bowler’s type, speed and revs alongside the layout and fit. <span class="badge">Pro</span></p>
-          <div class="panel"><img class="frame__img shot--top" src="assets/app/read.png" alt="The bowler read: rev-dominant, medium speed, high revs, tilt and rotation" loading="lazy" data-source="client" data-subject="X-ING bowler read"></div>
+          <p>Print the bowler’s type, speed and revs alongside the layout and fit.</p>
+          <div class="panel panel--doc panel--cut"><img class="frame__img" src="assets/app/read-crop.png" alt="The bowler read: strongly rev-dominant, medium speed, high revs, and the target motion" loading="lazy" data-source="client" data-subject="X-ING bowler read"></div>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="section statement" id="statement" data-moment="word-highlight" aria-label="Why X-ING is different">
+  <section class="section statement" id="statement" style="--h: .7; --hm: .7" data-moment="word-highlight" aria-label="Why X-ING is different">
     <div class="wrap">
-      <p class="t-label">Why X-ING is different</p>
       <p class="mo-wh__text">A ball maker’s layout chart suggests the same layouts to everyone. X-ING builds yours from your own PAP, speed and rev rate, then shows how the ball will roll on <strong>your lane pattern</strong>, so you know what to expect before it’s drilled.</p>
     </div>
   </section>
@@ -250,13 +312,18 @@
       <div class="grid">
         <div class="span-5 stack-4">
           <h2 id="shops-h">Pro shop tools. <span class="muted">Every customer’s specs in one place.</span></h2>
-          <p class="t-lead">Advanced mode shows each layout in Dual Angle and VLS with the drilled RG and differential, beside the bowler’s fit table.</p>
-          <p>Hole sizes, spans and pitches in 1/64ths<br>Every ball you’ve drilled, saved with the bowler<br>Drill sheets and spec sheets with your shop’s name and logo<br>A customer list with phone, email and notes</p>
+          <p class="t-lead">Advanced mode shows each layout in Dual Angle and VLS with the drilled RG and differential, beside the bowler’s fit.</p>
+          <ol class="steps">
+            <li><b>Measure</b> The PAP, hole sizes, spans and pitches in 1/64ths.</li>
+            <li><b>Pick</b> The layout in both systems, with reasons to show the bowler.</li>
+            <li><b>Drill</b> Every ball you drill is saved with the bowler.</li>
+            <li><b>Print</b> Drill and spec sheets with your shop’s name and logo, and a customer list with phone, email and notes.</li>
+          </ol>
           <a class="link" href="#plans">See the Shop plan</a>
         </div>
         <div class="frame frame--split frame--lit span-6 start-7" style="--ratio: 100%">
           <div class="stage stage--fade-br"><div class="at-corner to-edge" style="--ax:56px;--ay:56px">
-            <img class="shot" src="assets/app/driller-layout.png" alt="Advanced mode: Layout A with VLS pin-to-PAP, PSA-to-PAP and pin buffer" loading="lazy" data-source="client" data-subject="X-ING advanced mode">
+            <img class="shot" src="assets/app/driller-crop.png" width="648" height="229" alt="Advanced mode: Layout A in Dual Angle and VLS, where the pin and PSA land, track flare, RG at the PAP, and the drilled RG, differential and intermediate" loading="lazy" data-source="client" data-subject="X-ING advanced mode">
           </div></div>
         </div>
       </div>
@@ -267,7 +334,7 @@
     <div class="wrap">
       <div class="section-head">
         <h2 id="plans-h">Plans</h2>
-        <p>Free never expires: one bowler, up to 9 balls in the arsenal, and every ball in the database to try. Pro and Shop prices arrive with online checkout.</p>
+        <p>Free never expires and needs no card. Pro and Shop prices come with online checkout; until then, email us and we’ll upgrade your account by hand.</p>
       </div>
       <div class="grid">
         <article class="card card--plan span-4">
@@ -275,23 +342,26 @@
           <p class="muted">For any bowler</p>
           <div class="price"><span class="t-stat">$0</span></div>
           <a class="btn btn--secondary" href="app/?plan=free#signup">Start for free</a>
-          <p>One bowler, up to 9 balls in the arsenal<br>Every ball in the database<br>Layout recommendations<br>The 3D drilled ball<br>Top-down lane and ball motion<br>Import your saved data</p>
+          <ul class="plan-list"><li>One bowler, up to 9 balls</li><li>Layouts with the reasons</li><li>3D ball view and top-down lane</li><li>Every ball in the database</li></ul>
         </article>
         <article class="card card--plan is-featured span-4">
           <h3>Pro</h3>
           <p class="muted">For bowlers. Everything in Free, plus</p>
-          <div class="price"><span class="t-stat">Price coming soon</span></div>
-          <a class="btn btn--primary" href="mailto:Proshoplab@gmail.com?subject=Pro">Ask about Pro</a>
-          <p>Up to 5 bowlers, unlimited arsenals<br>Advanced mode: ball specs, track and rev measuring, your own line<br>Auto line and strike chance<br>The 3D lane<br>Compare A and B<br>Arsenal coverage chart<br>Printed drill and spec sheets, data export<br>Shot log and lane calibration</p>
+          <div class="price"><span class="price__soon">Price coming soon</span></div>
+          <a class="btn btn--primary" href="mailto:Proshoplab@gmail.com?subject=Upgrade%20to%20Pro">Email us to get Pro</a>
+          <p class="plan-next">Opens your email. We reply and upgrade your account by hand.</p>
+          <ul class="plan-list"><li>Up to 5 bowlers, unlimited balls</li><li>Advanced mode and the 3D lane view</li><li>Shot log and lane calibration</li><li>Printed drill sheets, Compare A and B</li></ul>
         </article>
         <article class="card card--plan span-4">
           <h3>Shop</h3>
           <p class="muted">Everything in Pro, plus</p>
-          <div class="price"><span class="t-stat">Price coming soon</span></div>
-          <a class="btn btn--secondary" href="mailto:Proshoplab@gmail.com?subject=Shop">Ask about Shop</a>
-          <p>Unlimited bowlers<br>Customer list<br>Your shop’s name and logo on printed sheets</p>
+          <div class="price"><span class="price__soon">Price coming soon</span></div>
+          <a class="btn btn--secondary" href="mailto:Proshoplab@gmail.com?subject=Upgrade%20to%20Shop">Email us to get Shop</a>
+          <p class="plan-next">Opens your email. We reply and upgrade your account by hand.</p>
+          <ul class="plan-list"><li>Unlimited bowlers</li><li>Customer list with phone, email and notes</li><li>Your shop’s name and logo on printed sheets</li></ul>
         </article>
       </div>
+      <a class="link plans__all" href="#compare">See every feature, plan by plan</a>
     </div>
   </section>
 
@@ -313,14 +383,14 @@
               <tr><th scope="row">Every ball in the database<small>567 US balls to pick and try</small></th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Layout recommendations<small>Dual Angle or VLS, with the reasons</small></th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">PAP and ball motion</th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
-              <tr><th scope="row">3D drilled ball<small>Holes, pin, PSA and flare rings</small></th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
+              <tr><th scope="row">3D ball view<small>The drilled ball: holes, pin, PSA and flare rings</small></th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Top-down lane</th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Arsenal list</th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Import your saved data</th><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr class="pc__group"><th scope="rowgroup" colspan="4">Pro tools</th></tr>
               <tr><th scope="row">Advanced mode<small>Ball specs, track and rev measuring, your own line</small></th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Auto line and strike chance<small>Best strike line for the pattern</small></th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
-              <tr><th scope="row">3D lane view</th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
+              <tr><th scope="row">3D lane view<small>The ball rolling down the pattern</small></th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Compare A and B<small>Two balls or layouts side by side</small></th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Arsenal coverage chart</th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
               <tr><th scope="row">Printed sheets<small>Drill sheet, spec sheet, fit card</small></th><td><span class="pc__no"><svg aria-hidden="true"><use href="#pc-n"/></svg><span class="sr-only">Not included</span></span></td><td class="is-pro"><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td><td><span class="pc__yes"><svg aria-hidden="true"><use href="#pc-y"/></svg><span class="sr-only">Included</span></span></td></tr>
@@ -332,7 +402,7 @@
             </tbody>
           </table>
         </div>
-        <p class="pc__note">Pro and Shop will offer monthly or yearly billing with a 14-day free trial when online checkout opens.</p>
+        <p class="pc__note">When online checkout opens, Pro and Shop will offer monthly or yearly billing with a 14-day free trial. Over a plan’s limit, your data turns read-only; it is never deleted.</p>
       </div>
     </div>
   </section>
@@ -393,13 +463,12 @@
           <p class="footer__lede">Drilling layouts and ball motion for bowlers and pro shops.</p>
         </div>
         <div class="span-2 footer__col"><h3>Features</h3><ul><li><a href="#app">Workbench</a></li><li><a href="#features">Layouts</a></li><li><a href="#more">Arsenal</a></li><li><a href="#lane">Shot log</a></li></ul></div>
-        <div class="span-2 footer__col"><h3>Pro shops</h3><ul><li><a href="#shops">Advanced mode</a></li><li><a href="#shops">Fit specs</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Pro shops</h3><ul><li><a href="#shops">Pro shop tools</a></li><li><a href="#compare">Shop plan features</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Plans</h3><ul><li><a href="#plans">Free, Pro, Shop</a></li><li><a href="app/">Sign in</a></li></ul></div>
-        <div class="span-2 footer__col"><h3>Questions</h3><ul><li><a href="#questions">Answers</a></li><li><a href="mailto:Proshoplab@gmail.com">Contact</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Questions</h3><ul><li><a href="#questions">Common questions</a></li><li><a href="mailto:Proshoplab@gmail.com">Email us</a></li></ul></div>
       </div>
       <div class="footer__legal">
         <span>&copy; 2026 X-ING Pro Shop Lab</span>
-        <div class="socials"></div>
       </div>
     </div>
   </div>
