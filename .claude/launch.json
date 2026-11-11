@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": [".claude/serve.js"],
       "port": 5317
+    },
+    {
+      "name": "site-dist",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "wrangler@4", "pages", "dev", "dist", "--port", "8788", "--ip", "127.0.0.1"],
+      "port": 8788
     }
   ]
 }

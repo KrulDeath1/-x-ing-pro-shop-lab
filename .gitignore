@@ -3,3 +3,47 @@
 backups/
 x-ing-pro-shop-lab.before-update.html
 dist/
+
+# front page: keep the taste-skill kit, checker output and draft-only files out of git;
+# only the kit files the page loads (landing/tools/loaded-files.txt) are tracked
+landing/.taste-skill/
+landing/shots/
+landing/app/
+landing/assets/**
+!landing/assets/**/
+!landing/assets/app/app-first-screen.png
+!landing/assets/app/ball-view.png
+!landing/assets/app/compare-balls.png
+!landing/assets/app/coverage.png
+!landing/assets/app/driller-layout.png
+!landing/assets/app/lane-2d.png
+!landing/assets/app/lane-3d.png
+!landing/assets/app/layout.png
+!landing/assets/app/log-a-shot.png
+!landing/assets/app/read.png
+!landing/assets/backgrounds/backgrounds.css
+!landing/assets/backgrounds/backgrounds.js
+!landing/assets/effects/fx.js
+!landing/assets/effects/painterly-landscape/effect.js
+!landing/assets/icons/icon.css
+!landing/assets/layout/layout.css
+!landing/assets/layout/layout.js
+!landing/assets/moments/iris-opens/moment.css
+!landing/assets/moments/iris-opens/moment.js
+!landing/assets/moments/lib.js
+!landing/assets/moments/moments.js
+!landing/assets/moments/word-highlight/moment.css
+!landing/assets/moments/word-highlight/moment.js
+!landing/assets/motion/motion.css
+!landing/assets/motion/motion.js
+!landing/assets/system.css
+!landing/assets/system.js
+!landing/assets/ui/cards.css
+!landing/assets/ui/ui.js
+!landing/assets/effects/painterly-landscape/**
+!landing/assets/moments/word-highlight/**
+!landing/assets/moments/iris-opens/**
+.wrangler/
+
+# personal Claude Code settings
+.claude/settings.local.json
