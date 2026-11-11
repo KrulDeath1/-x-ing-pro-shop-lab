@@ -15,7 +15,7 @@ const SUPABASE_KEY = 'sb_publishable_yyPXb_0hDXRKt1_z_H_ung_5Pq1iI6n'; // publis
 const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 const AUTH_STORAGE_KEY = 'sb-yeoraqksuvaohauxvvgt-auth-token';
 
-export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode'];
+export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode', 'xing.shop'];
 const PAID_PLANS = ['pro', 'shop'];
 const PAID_STATUS = ['trialing', 'active', 'past_due'];
 
@@ -123,6 +123,9 @@ export const cloud = {
   get status() { return status; },
   get isPaid() { return !!profile && PAID_PLANS.includes(profile.plan) && PAID_STATUS.includes(profile.plan_status); },
   get isShop() { return this.isPaid && profile.plan === 'shop'; },
+  get plan() { return this.isShop ? 'shop' : this.isPaid ? 'pro' : 'free'; },
+  /** how many bowlers, and balls in each bowler's arsenal, the plan can edit (more are kept, read-only) */
+  get limits() { return LIMITS[this.plan]; },
   onChange(f) { listeners.add(f); },
   /** true if the user's plan includes this feature (no dialog) */
   can(feature) { return (FEATURES[feature]?.tier || 'pro') === 'shop' ? this.isShop : this.isPaid; },
@@ -162,6 +165,66 @@ export const customers = {
     catch (e) { throw custErr(e); }
   }
 };
+
+/* ---------- Shop: branding on printouts ----------
+   Saved as the synced key 'xing.shop' { name, address, phone, email, web, logo } (logo = small data URL).
+   brand() returns it only for a paid Shop account with a shop name; otherwise prints stay unbranded. */
+export function brand() {
+  if (!cloud.can('branding')) return null;
+  const b = store.get('xing.shop', null);
+  return b && b.name?.trim() ? b : null;
+}
+// shrink an uploaded logo so it stays small in the synced record: at most 480 x 200 px, PNG if it has transparency
+function shrinkLogo(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 480 / img.width, 200 / img.height), w = Math.max(1, Math.round(img.width * k)), h = Math.max(1, Math.round(img.height * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d'); g.drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+      const px = g.getImageData(0, 0, w, h).data; let alpha = false; for (let i = 3; i < px.length; i += 4) if (px[i] < 250) { alpha = true; break; }
+      res(alpha ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('That file isn’t an image the browser can read.')); };
+    img.src = url;
+  });
+}
+export function openShopDetails() {
+  if (!cloud.require('branding')) return;
+  const b = store.get('xing.shop', {}) || {};
+  if (!b.name && profile?.display_name) b.name = profile.display_name;
+  let logo = b.logo || '';
+  const d = dialog(`<form method="dialog" novalidate>
+    <h2>Shop details</h2>
+    <div class="hint">Printed at the top of drill sheets, spec sheets and fit cards.</div>
+    <label>Shop name<input name="name" maxlength="80" required></label>
+    <label>Address<input name="address" maxlength="160" placeholder="Street, city, state, zip"></label>
+    <label>Phone<input name="phone" maxlength="40" autocomplete="off"></label>
+    <label>Email<input name="email" type="email" maxlength="120" autocomplete="off"></label>
+    <label>Website<input name="web" maxlength="120" autocomplete="off"></label>
+    <label>Logo <span class="hint">(PNG or JPG; shrunk to fit)</span><input name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+    <div class="logo-row" style="display:flex;gap:10px;align-items:center"><img class="logo-prev" alt="Logo preview" style="max-height:48px;max-width:160px;background:#fff;border-radius:4px;padding:2px"><button class="link" type="button" data-a="nologo">Remove logo</button></div>
+    <div class="msg"></div>
+    <div class="row2"><button class="btn" type="button" data-a="cancel">Cancel</button><button class="btn primary" type="submit">Save</button></div>
+  </form>`);
+  const f = d.querySelector('form'), msg = d.querySelector('.msg'), prev = d.querySelector('.logo-prev'), row = d.querySelector('.logo-row');
+  for (const k of ['name', 'address', 'phone', 'email', 'web']) f[k].value = b[k] || '';
+  const showLogo = () => { row.style.display = logo ? 'flex' : 'none'; prev.src = logo || ''; };
+  showLogo();
+  f.logo.addEventListener('change', async () => {
+    const file = f.logo.files[0]; if (!file) return;
+    try { logo = await shrinkLogo(file); msg.textContent = ''; showLogo(); } catch (e) { msg.textContent = e.message; msg.className = 'msg err'; }
+  });
+  d.querySelector('[data-a=nologo]').addEventListener('click', () => { logo = ''; f.logo.value = ''; showLogo(); });
+  d.querySelector('[data-a=cancel]').addEventListener('click', () => d.close());
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = k => f[k].value.trim();
+    if (!v('name')) { msg.textContent = 'Enter the shop name.'; msg.className = 'msg err'; f.name.focus(); return; }
+    store.set('xing.shop', { name: v('name'), address: v('address'), phone: v('phone'), email: v('email'), web: v('web'), logo });
+    d.close();
+  });
+}
 
 /* ==================== UI ==================== */
 const css = `
@@ -319,11 +382,13 @@ function openAccount() {
     <div class="hint">${status === 'offline' ? 'Some changes are only on this device. They upload when you’re back online.' : 'Your bowlers, balls, shots and lane calibration are saved to your account.'}</div>
     <div class="row2">
       ${cloud.isPaid ? '' : '<button class="btn primary" type="button" data-a="upgrade">See Pro plans</button>'}
+      ${cloud.isShop || p.account_type === 'shop' ? '<button class="btn" type="button" data-a="shop">Shop details</button>' : ''}
       <button class="btn" type="button" data-a="signout">Sign out</button>
       <button class="btn" type="button" data-a="close">Close</button>
     </div></div>`);
   d.querySelector('[data-a=close]').addEventListener('click', () => d.close());
   d.querySelector('[data-a=upgrade]')?.addEventListener('click', () => { d.close(); openUpsell(); });
+  d.querySelector('[data-a=shop]')?.addEventListener('click', () => { d.close(); openShopDetails(); });
   d.querySelector('[data-a=signout]').addEventListener('click', async () => {
     await flush();
     await sb?.auth.signOut();
@@ -331,8 +396,13 @@ function openAccount() {
   });
 }
 
+// plan limits (decided 2026-11-11): the ball database itself is never limited, only what's saved to an arsenal
+const LIMITS = { free: { bowlers: 1, balls: 9 }, pro: { bowlers: 5, balls: Infinity }, shop: { bowlers: Infinity, balls: Infinity } };
 // every gated feature: what it's called in the upsell and the lowest plan that includes it
 const FEATURES = {
+  bowlers2: { label: 'More than one bowler', tier: 'pro' },
+  bowlers6: { label: 'More than 5 bowlers', tier: 'shop' },
+  balls10:  { label: 'More than 9 balls in an arsenal', tier: 'pro' },
   shotlog:  { label: 'The shot log and lane calibration', tier: 'pro' },
   autoline: { label: 'Auto line (best strike line)', tier: 'pro' },
   strike:   { label: 'Strike chance', tier: 'pro' },
@@ -341,17 +411,18 @@ const FEATURES = {
   print:    { label: 'Printing drill and spec sheets', tier: 'pro' },
   coverage: { label: 'The arsenal coverage chart', tier: 'pro' },
   export:   { label: 'Exporting your data', tier: 'pro' },
-  driller:  { label: 'Driller mode', tier: 'shop' },
-  customers: { label: 'The customer list', tier: 'shop' }
+  advanced: { label: 'Advanced mode', tier: 'pro' },
+  customers: { label: 'The customer list', tier: 'shop' },
+  branding: { label: 'Your shop’s name and logo on printouts', tier: 'shop' }
 };
 function openUpsell(feature) {
   const f = FEATURES[feature], plan = f?.tier === 'shop' ? 'Shop' : 'Pro';
   const d = dialog(`<div class="body">
     <h2>${f ? `${esc(f.label)} is part of ${plan}` : 'X-ING plans'}</h2>
     <ul>
-      <li><b>Free</b>: unlimited bowlers and balls, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
-      <li><b>Pro</b> (bowlers): plus Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
-      <li><b>Shop</b> (pro shops): everything in Pro, plus Driller mode and the customer list.</li>
+      <li><b>Free</b>: one bowler with up to 9 balls in the arsenal, every ball in the database, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
+      <li><b>Pro</b> (bowlers): up to 5 bowlers with unlimited arsenals, plus Advanced mode (ball specs, track and rev measuring, My line, lane calibration), Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
+      <li><b>Shop</b> (pro shops): everything in Pro with unlimited bowlers, plus the customer list and your shop’s name and logo on printouts.</li>
     </ul>
     <div class="hint">${user ? 'Online checkout is coming soon.' : 'Create a free account first, then upgrade.'}</div>
     <div class="row2">

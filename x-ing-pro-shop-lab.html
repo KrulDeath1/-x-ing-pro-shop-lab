@@ -133,7 +133,7 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .ctl select { width: auto; }
 .adv { }
 body[data-mode="simple"] .adv { display: none !important; }
-body[data-mode="driller"] .simple-only { display: none !important; }
+body[data-mode="advanced"] .simple-only { display: none !important; }
 .hidden { display: none !important; }
 #sheet { display: none; }
 .fit { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -204,6 +204,10 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
   #sheet .fcard .ft table td, #sheet .fcard .ft table th { border: 0; padding: 2px 4px; }
   #sheet .fcard .ft table td i { font-style: normal; display: block; border-bottom: 1px solid #000; min-height: 1.2em; font-weight: 600; }
   #sheet .fcard .shop { text-align: center; font: 700 12pt ui-monospace, Consolas, monospace; margin-top: 4px; }
+  #sheet .lh { display: flex; gap: 12px; align-items: center; padding-bottom: 6px; margin-bottom: 8px; border-bottom: 2px solid #000; }
+  #sheet .lh img { max-height: 18mm; max-width: 55mm; object-fit: contain; }
+  #sheet .lh-name { font-size: 15pt; font-weight: 700; }
+  #sheet .lh-ct { font-size: 9pt; color: #333; }
   #sheet .imgs { display: flex; gap: 10px; }
   #sheet .imgs img { max-height: 70mm; border: 1px solid #ccc; }
 }
@@ -213,7 +217,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
 <header>
   <div class="brand">X-ING Pro Shop Lab <small>drilling layouts · PAP · ball motion</small></div>
   <div class="hgroup">
-    <div class="seg" id="modeSeg"><button data-mode="simple" class="on">Simple</button><button data-mode="driller" data-plan="driller">Driller</button></div>
+    <div class="seg" id="modeSeg"><button data-mode="simple" class="on">Simple</button><button data-mode="advanced" data-plan="advanced">Advanced</button></div>
     <label class="tog" data-plan="compare"><input type="checkbox" id="compare"> Compare A / B</label>
     <button class="btn primary" id="btnRec">Recommend layout</button>
     <button class="btn" id="btnPrint" data-plan="print">Print drill sheet</button>
@@ -237,9 +241,9 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
         <label class="f"><span>Speed measured at</span><select id="speedSrc"><option value="release">Release (tracking)</option><option value="monitor">Lane monitor</option></select></label>
         <label class="f"><span>Rev rate (rpm)</span><input id="revs" type="number" step="10" value="330"></label>
         <label class="f"><span>Rev rate came from</span><select id="revSrc"><option value="measured">Measured (video, oil rings, sensor ball)</option><option value="tracking">Tracking system / TV / guess (reads ~50% high)</option></select></label>
-        <div class="f full"><span>Speed &amp; revs were measured with a ball of… <span class="hint">(leave blank = this ball; the same release gives other balls different speed and revs)</span></span>
+        <div class="f full adv"><span>Speed &amp; revs were measured with a ball of… <span class="hint">(leave blank = this ball; the same release gives other balls different speed and revs)</span></span>
           <div class="row" style="flex-wrap:nowrap"><input id="refWt" type="number" step="1" placeholder="weight lb" style="flex:1"><input id="refRg" type="number" step="0.001" placeholder="RG" style="flex:1"><button class="btn sm" id="refThis" type="button">This ball</button></div></div>
-        <details class="f full" id="revCalc"><summary>Rev-rate calculator (book methods)</summary>
+        <details class="f full adv" id="revCalc"><summary>Rev-rate calculator</summary>
           <div class="grid3" style="margin-top:6px">
             <label class="f"><span>Revolutions counted</span><input id="rc_rev" type="number" step="1" value="2"></label>
             <label class="f"><span>Video frames</span><input id="rc_fr" type="number" step="1" placeholder="e.g. 15"></label>
@@ -255,8 +259,8 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
         </details>
         <label class="f"><span>Axis tilt (°)</span><input id="tilt" type="number" step="1" placeholder="auto"></label>
         <label class="f"><span>Axis rotation (°)</span><input id="rotation" type="number" step="1" placeholder="auto"></label>
-        <div class="f full" style="border-top:1px solid var(--line);padding-top:8px;margin-top:2px"><span><b>Tilt from the oil track (no photo)</b> — read the first oil ring on a fresh shot. Enter the <b>track crossing and ring diameter together</b> for the most accurate tilt; the app combines them and checks your PAP.</span></div>
-        <label class="f full"><span>Where does the oil track pass the grip?</span><select id="trackSel">
+        <div class="f full adv" style="border-top:1px solid var(--line);padding-top:8px;margin-top:2px"><span><b>Tilt from the oil track (no photo)</b> — read the first oil ring on a fresh shot. Enter the <b>track crossing and ring diameter together</b> for the most accurate tilt; the app combines them and checks your PAP.</span></div>
+        <label class="f full adv"><span>Where does the oil track pass the grip?</span><select id="trackSel">
           <option value="">Not checked</option>
           <option value="0">Full roller — runs between thumb and fingers</option>
           <option value="0.6">High roller — touches the holes</option>
@@ -265,15 +269,15 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
           <option value="6">High spinner — 5"–7" outside the holes</option>
           <option value="7.75">Low spinner — more than 7" away</option>
         </select></label>
-        <label class="f"><span>…or first track line, distance from grip center (in)</span><input id="trackGap" placeholder="e.g. 4"></label>
-        <label class="f"><span>measured along</span><select id="trackDir">
+        <label class="f adv"><span>…or first track line, distance from grip center (in)</span><input id="trackGap" placeholder="e.g. 4"></label>
+        <label class="f adv"><span>measured along</span><select id="trackDir">
           <option value="mid">Midline, away from the PAP (past the thumb side)</option>
           <option value="below">Grip centerline, below the thumb</option>
           <option value="above">Grip centerline, above the fingers</option>
         </select></label>
-        <label class="f"><span>…or PAP → track distance (in, ≥ 6 3/4)</span><input id="ringDist" placeholder="e.g. 8"></label>
-        <label class="f"><span>…or oil ring diameter, over the ball (in)</span><input id="ringDiam" placeholder="13 1/2 = 0°"></label>
-        <div class="f"><span>&nbsp;</span><span class="hint" style="margin:0" id="tiltHow"></span></div>
+        <label class="f adv"><span>…or PAP → track distance (in, ≥ 6 3/4)</span><input id="ringDist" placeholder="e.g. 8"></label>
+        <label class="f adv"><span>…or oil ring diameter, over the ball (in)</span><input id="ringDiam" placeholder="13 1/2 = 0°"></label>
+        <div class="f adv"><span>&nbsp;</span><span class="hint" style="margin:0" id="tiltHow"></span></div>
         <div class="f full"><button class="btn" id="btnPapPhoto" type="button">📷 Measure tilt &amp; rotation from a release photo</button></div>
         <label class="f simple-only full"><span>Release type</span><select id="relType"><option value="">Not sure</option><option value="spinner">Spinner (lots of tilt)</option><option value="stroker">Stroker / smooth</option><option value="tweener">Tweener</option><option value="cranker">Cranker / power</option></select></label>
       </div>
@@ -350,12 +354,12 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       </div>
       <div class="legend">
         <span><i style="background:#3ddc84"></i>PAP</span><span><i style="background:#ffd23f"></i>Pin</span>
-        <span><i style="background:#ff4d4d"></i>PSA (mass bias side)</span><span><i style="background:#ffffff;border:1px solid #888"></i>Release track (first oil line)</span><span><i style="background:#8fd3ff"></i>Flare rings (simulated)</span>
+        <span><i style="background:#ff4d4d"></i>PSA (mass bias side)</span><span><i style="background:#ffffff;border:1px solid #888"></i>Release track (first oil line)</span><span><i style="background:#8fd3ff"></i>Flare rings (simulated)</span><span><i style="background:#c58bff"></i>Pin-to-spin line; the ring is where the axis crosses it and the ball revs up</span>
         <span><i style="background:#c7cdd4"></i>Midlines (grip / through PAP)</span><span><i style="background:#56e0e0"></i>VAL + VAL angle</span>
         <span id="rgLegend" class="hidden"><i style="width:56px;border-radius:3px;background:linear-gradient(90deg,#2b4cff,#22c3e6,#3ddc84,#ffd23f,#ff4d4d)"></i><span id="rgLegendTxt"></span></span>
-        <span><i style="background:#ff6b6b"></i>Pin–PSA line + drilling angle</span>
+        <span><i style="background:#ff6b6b"></i>Pin–PSA (pin-to-spin) line + drilling angle</span>
       </div>
-      <div class="hint">Dual Angle, per Mo Pinel: draw pin→PSA (6 3/4" from the pin), turn the drilling angle to get the pin→PAP line, mark the PAP at the pin-to-PAP distance, turn the VAL angle at the PAP to draw the VAL, then the midline square to the VAL, then measure back to the grip center.
+      <div class="hint">Dual Angle: draw pin→PSA (6 3/4" from the pin), turn the drilling angle to get the pin→PAP line, mark the PAP at the pin-to-PAP distance, turn the VAL angle at the PAP to draw the VAL, then the midline square to the VAL, then measure back to the grip center.
       </div>
     </div>
 
@@ -364,7 +368,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       <div class="ctl">
         <div class="seg" id="laneSeg"><button data-v="2d" class="on">Top-down</button><button data-v="3d" data-plan="lane3d">3D</button></div>
         <button class="btn primary sm" id="play">▶ Play</button>
-        <button class="btn sm" id="runMachine" title="Watch a Kegel Ikon lay this pattern (top-down view)">🛢 Run lane machine</button>
+        <button class="btn sm" id="runMachine" title="Watch a lane machine lay this pattern (top-down view)">🛢 Run lane machine</button>
         <select id="slowmo"><option value="1">1×</option><option value="0.5" selected>½×</option><option value="0.25">¼×</option></select>
         <select id="cam" class="hidden"><option value="chase">Chase cam</option><option value="behind">Behind ball (see tilt)</option><option value="pins">Pin cam</option><option value="high">High cam</option></select>
       </div>
@@ -375,7 +379,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
         </div>
         <div>
           <div class="stats" id="statsHost"></div>
-          <p class="hint">Rigid-body physics: Coulomb friction at the contact point (oil ≈ 0.04, dry ≈ 0.20), Euler rigid-body rotation using the drilled ball's RG / differential / intermediate differential oriented by your layout, so track flare and axis migration come out of the simulation. Also modeled: oil picked up and absorbed by the cover, oil thinning down the pattern, Pinel's drilled-spec changes and his drilling-angle timing rule. Not modeled: lane topography, CG offset, pin action. Use it to compare layouts; confirm on the lanes.</p>
+          <p class="hint">Rigid-body physics: Coulomb friction at the contact point (oil ≈ 0.04, dry ≈ 0.20), Euler rigid-body rotation using the drilled ball's RG / differential / intermediate differential oriented by your layout, so track flare and axis migration come out of the simulation. Also modeled: oil picked up and absorbed by the cover, oil thinning down the pattern, how the layout changes the drilled RG and differentials, the drilling angle + VAL angle timing (sum and ratio), and the rev-up where the axis crosses the pin-to-spin line. Not modeled: lane topography, CG offset, pin action. Use it to compare layouts; confirm on the lanes.</p>
         </div>
       </div>
       <div id="laneSet" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
@@ -400,7 +404,8 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
       </div>
       <p class="hint" id="lineHint">The app aims each ball for the pocket (board 17.5) from your laydown board.</p>
         <div id="logBox" style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
-          <span><b>Log a shot</b> — calibrates the lane. Every shot with a breakpoint retunes the lane to where this bowler’s ball (the ball and Layout A on screen) really went. This is the only thing that changes the lane; every other view just simulates on it.</span>
+          <span class="simple-only"><b>Log a shot</b> — tap the pins you left and the app reads the leave and suggests your move. Every shot is saved with the bowler. (Advanced mode can also tune the lane to your shots.)</span>
+          <span class="adv"><b>Log a shot</b> — calibrates the lane. Every shot with a breakpoint retunes the lane to where this bowler’s ball (the ball and Layout A on screen) really went. This is the only thing that changes the lane; every other view just simulates on it.</span>
           <div class="shotwrap" style="margin-top:6px">
             <div><div id="pinDeck" class="pindeck" aria-label="Tap the pins left standing"></div><p class="hint" style="text-align:center;margin:4px 0 0">Tap the pins left standing</p>
               <label class="f hidden" id="pinTypeBox" style="margin-top:6px"><span id="pinTypeLbl">That pin was</span><select id="pinType"></select></label></div>
@@ -413,7 +418,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
                 <label class="f" style="flex:1"><span>Missed by</span><input id="calMiss" type="number" step="0.5" min="0" placeholder="0" title="Boards you missed your target at the arrows"></label>
                 <label class="f" style="flex:1"><span>which way</span><select id="calMissDir"><option value="left">left</option><option value="right">right</option></select></label>
               </div>
-              <div class="row" style="margin-top:4px;flex-wrap:nowrap">
+              <div class="row adv" style="margin-top:4px;flex-wrap:nowrap">
                 <label class="f" style="flex:1"><span>Breakpoint</span><input id="calBoard" type="number" step="0.5" placeholder="board"></label>
                 <label class="f" style="flex:1"><span>at (ft)</span><input id="calFt" type="number" step="1" placeholder="ft"></label>
                 <label class="f" style="flex:1"><span>Hit at pins</span><input id="calHit" type="number" step="0.5" placeholder="optional" title="Board where the ball hit the headpin (pocket = 17.5)"></label>
@@ -423,7 +428,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
                 <button class="btn primary sm" id="shotStrike" type="button">Strike ✕</button>
                 <button class="btn sm" id="shotLog" type="button">Log leave</button>
                 <button class="btn sm" id="shotClear" type="button">Clear pins</button>
-                <button class="btn sm" id="calReset" type="button" title="Back to the physics defaults for this pattern">Reset lane</button>
+                <button class="btn sm adv" id="calReset" type="button" title="Back to the physics defaults for this pattern">Reset lane</button>
               </div>
               <p class="hint" id="calInfo" style="margin:6px 0 0"></p>
             </div>
@@ -442,6 +447,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
 
     <div class="card" id="arsCard">
       <h2>Arsenal &amp; drill history <span id="arsWho" style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)"></span></h2>
+      <p class="hidden" id="limitNote" style="margin:0 0 10px;background:var(--warn-bg);color:var(--warn-ink);padding:6px 10px;border-radius:8px;font-size:13px"></p>
       <div class="grid3" style="margin-bottom:10px">
         <label class="f"><span>Driller</span><input id="arsDriller" placeholder="Initials / name"></label>
         <label class="f"><span>Ball weight (lb)</span><input id="arsWeight" type="number" step="1" value="15"></label>
@@ -468,7 +474,7 @@ dialog#papDlg::backdrop { background: rgba(0,0,0,.55); }
         <label class="f"><span>Drift (boards)</span><div class="row" style="flex-wrap:nowrap;gap:6px"><input id="sp_drift" type="number" step="1" value="0" style="flex:1"><select id="sp_driftDir"><option value="none">none</option><option value="R">right</option><option value="L">left</option></select></div></label>
       </div>
       <div id="spareHost"></div>
-      <p class="hint">Stand board = the foul-line board for your target arrow + laydown distance, adjusted for drift. Pick the arrow you like for each pin; saved with the bowler. Arrows are placed as on a Brunswick Pro Lane (center arrow ~15½ ft out).</p>
+      <p class="hint">Stand board = the foul-line board for your target arrow + laydown distance, adjusted for drift. Pick the arrow you like for each pin; saved with the bowler. Arrows are placed at their usual spots (center arrow ~15½ ft out).</p>
     </div>
   </section>
 </main>
@@ -496,7 +502,7 @@ const $ = id => document.getElementById(id);
 const R = 27 / (2 * Math.PI);           // ball radius, inches
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-import { store, cloud, customers } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
+import { store, cloud, customers, brand } from './js/cloud.js'; // per-user storage (Supabase) with a localStorage cache; guests keep plain localStorage
 function parseIn(s) {
   if (s === undefined || s === null) return NaN;
   s = String(s).trim().replace(/["”]/g, '');
@@ -587,7 +593,7 @@ const DB_BALLS = BALL_DB.map((x, i) => ({
   note: `Pin-to-PSA uses the Dual Angle standard 6 3/4" — confirm on the ball.`,
 }));
 const BALL_PRESETS = [
-  { id: 'a-strong', name: 'Type: strong solid asymmetric', core: 'asym', rg: 2.48, diff: 0.055, intdiff: 0.018, cover: 'solid', grit: '2000', pin2psa: '6 3/4', color: '#3b2c5e', note: 'Typical specs for this type of ball — enter your ball’s real specs in Driller mode.' },
+  { id: 'a-strong', name: 'Type: strong solid asymmetric', core: 'asym', rg: 2.48, diff: 0.055, intdiff: 0.018, cover: 'solid', grit: '2000', pin2psa: '6 3/4', color: '#3b2c5e', note: 'Typical specs for this type of ball — enter your ball’s real specs in Advanced mode.' },
   { id: 'a-bench', name: 'Type: benchmark hybrid symmetric', core: 'sym', rg: 2.52, diff: 0.048, intdiff: 0, cover: 'hybrid', grit: '2000', pin2psa: '6 3/4', color: '#7a2e2e', note: 'Typical specs for this type of ball.' },
   { id: 'a-pearl', name: 'Type: pearl asymmetric (length/backend)', core: 'asym', rg: 2.53, diff: 0.050, intdiff: 0.015, cover: 'pearl', grit: 'polish', pin2psa: '6 3/4', color: '#1f6f8b', note: 'Typical specs for this type of ball.' },
   { id: 'a-pearlsym', name: 'Type: pearl symmetric (skid/flip)', core: 'sym', rg: 2.55, diff: 0.040, intdiff: 0, cover: 'pearl', grit: '3000', pin2psa: '6 3/4', color: '#2a8f6a', note: 'Typical specs for this type of ball.' },
@@ -735,11 +741,11 @@ function resolveLayout(raw, ball) {
     } else L.da = isFinite(raw.da) ? raw.da : 45;
   }
   if (!(L.p2p > 0 && L.p2p < 6.75)) L.warn.push('Pin-to-PAP must be between 0 and 6 3/4".');
-  else if (L.p2p < 1.5) L.warn.push('Dual Angle only works accurately with the pin at least 1 1/2" from the PAP (Pinel).');
-  if (ball.core === 'asym' && isFinite(L.da) && (L.da < 10 || L.da > 90)) L.warn.push('Drilling angle outside Pinel’s effective 10°–90° range.');
+  else if (L.p2p < 1.5) L.warn.push('Dual Angle only works accurately with the pin at least 1 1/2" from the PAP.');
+  if (ball.core === 'asym' && isFinite(L.da) && (L.da < 10 || L.da > 90)) L.warn.push('Drilling angle outside the effective 10°–90° range.');
   if (isFinite(L.val) && (L.val < 20 || L.val > 90)) L.warn.push('VAL angle outside the effective range (20°–70°, up to 90° for a Rico-type layout).');
   const sum = (ball.core === 'asym' ? L.da : 45) + L.val;
-  if (isFinite(sum) && (sum < 30 || sum > 160)) L.warn.push(`Drilling angle + VAL angle = ${Math.round(sum)}°. Pinel keeps the sum between 30° and 160° so the ball still hits.`);
+  if (isFinite(sum) && (sum < 30 || sum > 160)) L.warn.push(`Drilling angle + VAL angle = ${Math.round(sum)}°. Keep the sum between 30° and 160° so the ball still hits.`);
   L.p2p = clamp(L.p2p || 4.5, 0.25, 6.7);
   L.val = clamp(isFinite(L.val) ? L.val : 45, 0, 90);
   L.da = clamp(isFinite(L.da) ? L.da : 45, 0, 90);
@@ -881,7 +887,7 @@ function buildOilGrid(p) { // µL of oil per board per foot, boards 1..39 x feet
   }
   return out;
 }
-const ALL_PATTERNS = [...MY_HOUSE.map(p => ({ ...p, group: 'My house shot' })), ...PBA_PATTERNS.map(p => ({ ...p, group: 'PBA 2026 season', pba: true })), ...PBA_ANIMALS.map(p => ({ ...p, group: 'PBA animal patterns (2025)', pba: true })), ...KEGEL_PATTERNS.map(p => ({ ...p, group: 'Kegel pattern library' })), { ...PREV_HOUSE, group: 'My house shot' }];
+const ALL_PATTERNS = [...MY_HOUSE.map(p => ({ ...p, group: 'My house shot' })), ...PBA_PATTERNS.map(p => ({ ...p, group: 'PBA 2026 season', pba: true })), ...PBA_ANIMALS.map(p => ({ ...p, group: 'PBA animal patterns (2025)', pba: true })), ...KEGEL_PATTERNS.map(p => ({ ...p, group: 'Pattern library' })), { ...PREV_HOUSE, group: 'My house shot' }];
 // "Plays like" length: the farthest point where the machine actually lays oil, plus ~4 ft the buffer brush carries it.
 // The programmed distance includes a buff-only tail with very little oil, so lanes play shorter than the number
 // (BEP House 26: oil ends at 36.9 ft -> plays like ~41 ft -> Rule of 31 says board 10).
@@ -1102,8 +1108,15 @@ function inertia(spec, geo) { // per unit mass, ft^2, in the ball's local (layou
   const ks = [[eLow, spec.rg / 12], [eHigh, (spec.rg + spec.diff * fk) / 12], [eInt, (spec.rg + (spec.diff - spec.intdiff) * fk) / 12]];
   const I = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], Inv = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   for (const [e, k] of ks) for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { I[i][j] += k * k * e[i] * e[j]; Inv[i][j] += e[i] * e[j] / (k * k); }
-  return { I, Inv };
+  // the pin-to-spin line (pin -> drilled PSA) is the great circle in the low/high RG plane; eInt is its normal
+  return { I, Inv, eLow, eHigh, eInt };
 }
+/* Pin-to-spin line rev-up (driller lore, Mo Pinel): when the migrating axis crosses the line from the pin to the drilled
+   PSA, the ball revs up. Modelled as extra grip after the crossing, ramped in over one revolution and multiplied into
+   whatever the lane gives there, so a crossing in the oil still mostly skids and one on dry boards grabs.
+   SPIN_REV = extra grip share once fully revved up; SPIN_EPS = how far past the line (as a sine) counts as crossed,
+   so the averaged axis has to really get to the other side. */
+const SPIN_REV = 0.2, SPIN_EPS = 0.004;
 const COVER_OIL = { solid: { absorb: 0.35 }, hybrid: { absorb: 0.28 }, pearl: { absorb: 0.22 }, urethane: { absorb: 0.03 }, plastic: { absorb: 0.01 } };
 /* Surface (grit) acts differently in each part of the lane ("Bowling Beyond the Basics" ch. 8, tribology):
    - thick oil in the heads (hydrodynamic): the oil film keeps the surface off the lane, so grit barely matters;
@@ -1116,15 +1129,31 @@ function gritInOil(g, thin) { return 1 + (g - 1) * (0.25 + 1.05 * clamp(thin, 0,
    Frohlich's analysis say wider flare rings expose fresh, dry cover and raise backend friction: 5-10 boards from min to
    max flare (~5 in Blueprint's blems example). Set between the two at the user's call: 0.9 gives ~3.5-4.5 boards. */
 const TRACK_PEN = 0.9;
+/* Dual Angle timing (Mo Pinel, "The effective use of Dual Angle Layouts", 2013; empirical, not from the rigid-body
+   model). Sum of drilling angle + VAL angle sets how fast the ball goes skid -> hook -> roll: 30 deg the quickest,
+   160 the slowest (more grip in the oil for a small sum). Ratio: a drilling angle large next to the VAL angle gives a
+   later, sharper breakpoint; small next to it a sooner, heavier roll. Both core types.
+   The ratio works through the pin-to-spin line: before the axis crosses it the ball grips a little less (pre), and the
+   rev-up when it crosses is stronger (rev) -- later, then sharper. (Simply adding backend grip made lines on dry outside
+   boards hook EARLIER, the opposite of the rule.) The rigid-body physics already spreads the roll point ~7 ft from
+   30 to 160 at 17 mph / 330 rpm, so the sum term is small; together with the rev-up the spread is ~9-10 ft. */
+const DA_SUM = 0.03, DA_RATIO_PRE = 0.08, DA_RATIO_REV = 0.8;
+// "Rule of the N" (Pinel / Radical): pin->PSA, pin->PAP and the VAL draw an N; its width is the angle sum (narrow < 85,
+// neutral 85-105, wide > 105). It only applies to asymmetric cores: a symmetric ball has no mass bias to place, so its
+// drilling angle and N don't change the motion (pin-to-PAP and the VAL angle do, through flare and the drilled specs).
+const N_NARROW = 85, N_WIDE = 105;
+function dualTiming(L, core) {
+  if (core !== 'asym' || !L || !isFinite(L.da) || !isFinite(L.val)) return { oil: 1, pre: 1, rev: 1 };
+  const da = clamp(L.da, 10, 90), val = clamp(L.val, 20, 70), sN = (95 - clamp(da + val, 30, 160)) / 65, rN = (da - val) / (da + val);
+  return { oil: 1 + DA_SUM * sN, pre: 1 - DA_RATIO_PRE * rN, rev: Math.max(0.2, 1 + DA_RATIO_REV * rN) };
+}
 function makeFriction(lane, ball, L) {
   const g = GRIT[ball.grit] || 1, cov = COVER[ball.cover] || COVER.solid;
-  // Empirical Pinel term (not produced by the rigid-body model): on asymmetric balls a 10 deg drilling angle "rolls the soonest",
-  // 90 deg "the latest". Applied as a modest change to grip in the oil, scaled by how asymmetric the ball is.
-  const pinel = ball.core === 'asym' && L ? 1 + 0.25 * (50 - clamp(L.da, 10, 90)) / 40 * clamp(ball.intdiff / 0.015, 0, 1.3) : 1;
+  const da = dualTiming(L, ball.core);
   // calibOil: oil friction from a calibration shot that also gave the pin hit (1 = physics default)
-  const muO = 0.04 * cov.oil * pinel * (lane.calibOil || 1), muD = 0.20 * cov.dry * (1 - (g - 1) * 0.15) * (lane.calib || 1);
+  const muO = 0.04 * cov.oil * da.oil * (lane.calibOil || 1), muD = 0.20 * cov.dry * (1 - (g - 1) * 0.15) * (lane.calib || 1);
   return {
-    muO: muO * g, muD, absorb: (COVER_OIL[ball.cover] || COVER_OIL.solid).absorb, trackPen: TRACK_PEN,
+    muO: muO * g, muD, absorb: (COVER_OIL[ball.cover] || COVER_OIL.solid).absorb, trackPen: TRACK_PEN, pre: da.pre, rev: da.rev,
     // oil film is thickest in the heads and thins toward the end of the pattern, so friction in the oil rises downlane
     at(y, b) { const o = laneOil(lane, y, b); let d = muD; if (lane.cond === 'trans' && y > lane.len && y < lane.len + 8) d *= 0.88; // real pattern: friction in the oil depends on how thick the oil is there (thin = grippier); generic: thins toward the end
       const ul = laneOilUL(lane, y, b);
@@ -1154,17 +1183,30 @@ function simulate(cfg, alphaDeg, record = false) {
   let Lw = mv(rart(Rm, cfg.inert.I), V.sc(axis, w));
   const ballOil = new Float32Array(NLAT * NLON), fr = cfg.fr, absorbStep = Math.exp(-fr.absorb * 0.05);
   const pts = []; let t = 0, gutter = null, i = 0, rolling = false;
+  // pin-to-spin line: side of the line the (revolution-averaged) axis starts on, and where it crosses
+  const eInt = cfg.inert.eInt, revT = 60 / Math.max(60, cfg.rpm);
+  let axAvg = null, side0 = 0, cross = null;
   while (py < 60 && t < 6) {
     Rm = qToM(q);
     const Iinv = rart(Rm, cfg.inert.Inv), om = mv(Iinv, Lw);
-    const b = 20 - px / BW, [muLane, o] = fr.at(py, b);
+    const b = 20 - px / BW, [muLane0, o] = fr.at(py, b);
+    let muLane = muLane0;
+    if (eInt) {
+      const wl0 = V.norm(mtv(Rm, om));
+      axAvg = axAvg ? V.norm(V.add(V.sc(axAvg, 1 - dt / revT), V.sc(wl0, dt / revT))) : wl0;
+      const d = V.dot(axAvg, eInt);
+      if (!side0) side0 = Math.abs(d) < SPIN_EPS ? 0.5 : Math.sign(d);    // 0.5: the PAP starts on the line
+      if (!cross && (side0 === 0.5 ? t > revT : d * side0 < -SPIN_EPS)) cross = { t, py, b, oil: o, onLine: side0 === 0.5 };
+      const pre = fr.pre ?? 1, ramp = cross ? clamp((t - cross.t) / revT, 0, 1) : 0;
+      muLane *= pre + (1 + SPIN_REV * (fr.rev ?? 1) - pre) * ramp;
+    }
     const cl = mtv(Rm, [0, 0, -1]);                       // contact point in ball-local coordinates
     const bi = clamp(Math.floor((Math.asin(clamp(cl[1], -1, 1)) + Math.PI / 2) / Math.PI * NLAT), 0, NLAT - 1);
     const bj = clamp(Math.floor((Math.atan2(cl[0], cl[2]) + Math.PI) / (2 * Math.PI) * NLON), 0, NLON - 1), bin = bi * NLON + bj;
     const bo = ballOil[bin];
     // oil carried on the cover cuts grip on dry lane (TRACK_PEN): a tight, re-used track stays oily and grips less;
     // flaring rings put fresh cover down each revolution, so more flare = more backend grip
-    const mu = muLane > fr.muO ? muLane - (muLane - fr.muO) * bo * fr.trackPen : muLane;
+    const mu = muLane0 > fr.muO ? muLane - (muLane0 - fr.muO) * bo * fr.trackPen : muLane;
     // pick up oil in the pattern (the contact patch is ~1" wide, so neighbouring bins load too); wipe a little off on dry boards
     if (o > 0.05) { ballOil[bin] = Math.min(1, bo + 0.2 * o); const l = bi * NLON + (bj + 1) % NLON, r = bi * NLON + (bj + NLON - 1) % NLON; ballOil[l] = Math.min(1, ballOil[l] + 0.1 * o); ballOil[r] = Math.min(1, ballOil[r] + 0.1 * o); }
     else ballOil[bin] = bo * 0.96;
@@ -1188,7 +1230,7 @@ function simulate(cfg, alphaDeg, record = false) {
     if (vy <= 0.5) break;
   }
   pts.push({ t, px, py, b: 20 - px / BW, vx, vy, slip: 0, q: q.slice(), c: mtv(qToM(q), [0, 0, -1]), oil: 0, wl: V.norm(mtv(qToM(q), mv(rart(qToM(q), cfg.inert.Inv), Lw))) });
-  return { pts, gutter };
+  return { pts, gutter, cross };
 }
 /* Oil rings as they really form. A flare ring is laid down over one whole revolution of the ball, so its axis is the
    spin axis averaged over that revolution — not the instantaneous axis. Under strong friction (skid on dry boards) the
@@ -1388,7 +1430,7 @@ function impactVerdict(im) {
 function layoutCardHTML(X) {
   return `
   <h2>Layout ${X} <span class="tag tag${X}">${X}</span></h2>
-  <div class="sys"><label><input type="radio" name="${X}_sys" value="dual" checked> Dual Angle</label><label><input type="radio" name="${X}_sys" value="vls"> Storm VLS / Pin Buffer</label></div>
+  <div class="sys"><label><input type="radio" name="${X}_sys" value="dual" checked> Dual Angle</label><label><input type="radio" name="${X}_sys" value="vls"> VLS / Pin Buffer</label></div>
   <fieldset id="${X}_dual"><div class="grid3">
     <label class="f"><span>Drilling angle °</span><input id="${X}_da" type="number" step="5" value="50"></label>
     <label class="f"><span>Pin-to-PAP (in)</span><input id="${X}_p2p" value="4 1/2"></label>
@@ -1491,6 +1533,11 @@ function readState() {
   b.revsTrue = Math.round(b.revs * (b.revSrc === 'tracking' ? 2 / 3 : 1));
   const lane = { len: num('patLen') || 40, vol: $('patVol').value, shape: $('patShape').value, cond: $('patCond').value, laydown: isFinite(num('laydown')) ? num('laydown') : 20 };
   if ($('lineMode').value === 'auto' && !cloud.can('autoline')) $('lineMode').value = 'pocket'; // Auto line is Pro (a loaded bowler may carry it)
+  { const o = $('lineMode').querySelector('option[value=mine]'); o.hidden = o.disabled = simpleMode(); } // My line is Advanced
+  // Simple shows My line as the pocket line; back in Advanced it comes back (unless the line was changed meanwhile)
+  { const s = $('lineMode');
+    if (simpleMode() && s.value === 'mine') { s.value = 'pocket'; s.dataset.was = 'mine'; }
+    else if (!simpleMode() && s.dataset.was === 'mine') { if (s.value === 'pocket') s.value = 'mine'; delete s.dataset.was; } }
   lane.mode = $('lineMode').value; lane.auto = lane.mode === 'auto';
   lane.mine = lane.mode === 'mine' && isFinite(num('myArrows')) ? { arrows: num('myArrows'), bpBoard: numOrNull('myBpBoard'), bpFt: numOrNull('myBpFt') } : null;
   if (lane.mine && !isFinite(lane.mine.bpBoard)) lane.mine.bpBoard = null;
@@ -1522,11 +1569,14 @@ function readState() {
 function explainDA(da, sym) { if (sym) return 'Symmetric ball: drilling angle doesn’t apply (no PSA).'; return da < 35 ? 'Low drilling angle: the ball starts reading the lane early.' : da <= 55 ? 'Medium drilling angle: benchmark timing.' : 'High drilling angle: pushes the hook further down the lane.'; }
 function explainP2P(p) { return p < 2.5 ? 'Pin close to the PAP: little flare, early stable roll, very controllable.' : p < 3.2 ? 'Moderate flare, early and smooth.' : p <= 4.2 ? 'Max-flare zone: the most hook this core can give.' : p <= 5.2 ? 'Length with a strong move downlane.' : 'Long pin: maximum length, less total hook.'; }
 function explainVAL(v) { return v < 35 ? 'Low VAL angle: quick, sharp response at the breakpoint.' : v <= 55 ? 'Medium VAL angle: balanced transition.' : 'High VAL angle: smooth, gradual transition.'; }
-function explainSum(da, val) {
+function explainSum(da, val, sym, chartSym) {
+  if (sym) return `Symmetric ball: the Rule of the N doesn’t apply, so the drilling angle doesn’t change when it revs up. Pin-to-PAP sets the flare, and the VAL angle changes the drilled RG and differential.${chartSym ? ' (The maker’s chart still lists a drilling angle: it sets where the thumb hole goes, which shifts the drilled specs a little.)' : ''}`;
   const s = Math.round(da + val);
-  const speed = s < 70 ? 'a quick transition from skid to hook to roll' : s <= 110 ? 'a medium-paced transition' : 'a slow, smooth transition';
+  const n = s < N_NARROW ? 'Narrow N: the pin-to-spin line sits close to the PAP, so the ball revs up and reads the lane sooner'
+    : s <= N_WIDE ? 'Neutral N: a balanced, benchmark transition'
+    : 'Wide N: the pin-to-spin line sits farther from the PAP, so the ball revs up later and the breakpoint moves downlane';
   const shape = da > val + 5 ? 'Drilling angle bigger than VAL angle: later, sharper breakpoint (more backend).' : da < val - 5 ? 'Drilling angle smaller than VAL angle: sooner, heavier roll (more midlane).' : 'Angles about equal: balanced shape.';
-  return `Angle sum ${s}° (Pinel range 30–160): ${speed}. ${shape}`;
+  return `Rule of the N, angle sum ${s}° (effective range 30–160): ${n}. ${shape}`;
 }
 function explainPin(p) { return p === 'up' ? 'Pin up: more length and a defined move downlane.' : 'Pin down: earlier, rounder read.'; }
 function targetText(s) {
@@ -1545,7 +1595,7 @@ function bookCheck(b) {
   const lo = row[2], hi = row[3], range = lo == null ? `under ${hi}` : hi == null ? `${lo}+` : `${lo}–${hi}`;
   const tier = rpm <= 270 ? 'low-rev' : rpm <= 350 ? 'medium-rev' : 'high-rev';
   const verdict = lo != null && mon < lo - 0.25 ? 'slower than balanced (the ball will want to hook early)' : hi != null && mon > hi + 0.25 ? 'faster than balanced (flatter, more deflection)' : 'in balance';
-  return `<b>Book check</b> (true revs ${rpm} rpm — ${tier} on Ebonite’s scale): balanced monitor speed is ${range} mph; this bowler is about ${mon.toFixed(1)} mph, ${verdict}.`;
+  return `<b>Speed check</b> (true revs ${rpm} rpm — ${tier}): balanced monitor speed is ${range} mph; this bowler is about ${mon.toFixed(1)} mph, ${verdict}.`;
 }
 function clsMeaning(c) {
   if (c.mph < 15) return 'At this speed the ball has a lot of time to hook. Watch that it doesn’t hook early and roll out.';
@@ -1742,6 +1792,26 @@ class BallView {
       dot(fr.smooth.at(-1), 0xb8ffd6);
       const mig = Math.acos(clamp(V.dot(fr.P[0].wl, fr.smooth.at(-1)), -1, 1)) * R;
       const s = textSprite(`axis migrates ${mig.toFixed(1)}" · ${fr.rings.length} rings`, '#3ddc84'); s.scale.set(1.6 * s.userData.aspect, 0.4, 1); s.position.copy(W(fr.smooth.at(-1), R + 0.7)); this.group.add(s);
+      // pin-to-spin line: the great circle from the pin through the drilled PSA (and a little past each), and the spot
+      // where the axis path crosses it -- where the ball revs up
+      if (d.inert?.eLow && d.inert?.eHigh) {
+        // with Lines on, the red pin->PSA line already is this line; otherwise draw it (a little past the pin and the PSA)
+        if (!d.showLines) {
+          const pl = []; for (let a = -25; a <= 115; a += 3) pl.push(W(V.add(V.sc(d.inert.eLow, Math.cos(a * D2R)), V.sc(d.inert.eHigh, Math.sin(a * D2R))), R + 0.04));
+          const g = new THREE.BufferGeometry().setFromPoints(pl), m = new THREE.LineDashedMaterial({ color: 0xc58bff, dashSize: 0.3, gapSize: 0.18 });
+          const l = new THREE.Line(g, m); l.computeLineDistances(); this.group.add(l);
+          const lbl = textSprite('pin-to-spin line', '#c58bff'); lbl.scale.set(1.5 * lbl.userData.aspect, 0.38, 1);
+          lbl.position.copy(W(V.add(V.sc(d.inert.eLow, Math.cos(45 * D2R)), V.sc(d.inert.eHigh, Math.sin(45 * D2R))), R + 0.5)); this.group.add(lbl);
+        }
+        const c = d.run.cross;
+        if (c) {
+          let k = 0; for (let i = 0; i < fr.P.length; i++) if (Math.abs(fr.P[i].py - c.py) < Math.abs(fr.P[k].py - c.py)) k = i;
+          const at = c.onLine ? fr.P[0].wl : fr.smooth[k];
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.045, 10, 32), new THREE.MeshBasicMaterial({ color: 0xc58bff }));
+          ring.position.copy(W(at, R + 0.07)); ring.lookAt(W(at, R + 2)); this.group.add(ring);
+          const t = textSprite(c.onLine ? 'revs up at once' : `revs up · ${c.py.toFixed(0)} ft`, '#c58bff'); t.scale.set(1.4 * t.userData.aspect, 0.36, 1); t.position.copy(W(at, R + 0.55)); this.group.add(t);
+        }
+      }
     }
     // release track = first oil line: the contact ring at release, (90 deg + tilt) from the PAP.
     // Marked where it crosses the grip midline and centerline, with the distance from grip center, to compare with a real ball.
@@ -1973,7 +2043,7 @@ function drawLane2D(state) {
     const my = Y(state.machine.y);
     g.fillStyle = 'rgba(230,90,40,.9)'; g.fillRect(x0 - 4, my - 9, laneW + 8, 9);
     g.fillStyle = '#fff'; g.font = '700 10px system-ui'; g.textAlign = 'center';
-    g.fillText(state.machine.dir > 0 ? 'IKON ↑ forward' : state.machine.dir < 0 ? 'IKON ↓ reverse' : 'done', x0 + laneW / 2, my - 1);
+    g.fillText(state.machine.dir > 0 ? 'machine ↑ forward' : state.machine.dir < 0 ? 'machine ↓ reverse' : 'done', x0 + laneW / 2, my - 1);
   }
   // Rule of 31 exit target (where the ball should leave the oil) and the pocket (board 17.5)
   if (!state.machine) {
@@ -2000,6 +2070,9 @@ function drawLane2D(state) {
     const st = state.stats[idx];
     const dot = (b, ft, txt, color) => { const x = boardX(b, x0, laneW, hand), y = Y(ft); g.fillStyle = color; g.beginPath(); g.arc(x, y, 4.5, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.stroke(); if (txt) { g.fillStyle = '#fff'; g.font = '600 10px system-ui'; g.textAlign = hand === 'L' ? 'right' : 'left'; g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 3; const tx = x + (hand === 'L' ? -8 : 8) * (idx ? -1 : 1); g.textAlign = (hand === 'L') !== (idx === 1) ? 'right' : 'left'; g.strokeText(txt, tx, y + 3); g.fillText(txt, tx, y + 3); } };
     if (isFinite(st.bpBoard)) dot(st.bpBoard, st.bpFt, `BP ${st.bpBoard.toFixed(1)}`, colors[idx]);
+    // where the axis crosses the pin-to-spin line (the ball revs up): a purple ring on the path
+    if (run.cross && !run.cross.onLine) { const x = boardX(run.cross.b, x0, laneW, hand), y = Y(run.cross.py); g.strokeStyle = '#c58bff'; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 6, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = '#fff'; g.font = '600 10px system-ui'; g.textAlign = (hand === 'L') !== (idx === 1) ? 'left' : 'right'; g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 3; const tx = x + ((hand === 'L') !== (idx === 1) ? 10 : -10); g.strokeText('revs up', tx, y + 3); g.fillText('revs up', tx, y + 3); }
     // My line: laydown and arrows targets, the breakpoint you saw (dashed ring) and the pin hit
     const m = st.mine;
     if (m && !state.machine) {
@@ -2090,6 +2163,7 @@ function analyze(state, X, rec) {
   const ax0 = axAvg(0, revFt), axO = axAvg(oilEnd - revFt / 2, oilEnd + revFt / 2), axP = axAvg(yEnd - revFt, yEnd);
   const arc = (u, v) => u && v ? Math.acos(clamp(V.dot(u, v), -1, 1)) * R : 0;
   stats.flareOil = arc(ax0, axO); stats.flareDry = arc(axO, axP); stats.flareSim = stats.flareOil + stats.flareDry;
+  stats.cross = run.cross; // where the axis crosses the pin-to-spin line (null: it never does before the pins)
   stats.spec = spec;
   // RG about the PAP: the drilled inertia tensor (RG^2 per unit mass, ft^2) taken along the PAP direction. It sits
   // between the low RG (PAP on the pin) and the high RG (PAP on the PSA). USBC found the axis migrates on roughly the
@@ -2148,7 +2222,7 @@ function compute() {
   renderLayout(state, res);
   renderStats(state, res);
   if (THREE) {
-    for (const X of ['A', 'B']) if (res[X]) views[X].update({ hand: state.b.hand, ball: res[X].ball, geo: res[X].geo, fl: res[X].fl, L: res[X].L, run: res[X].run, tilt: rec.tilt.both ? rec.tilt.both.tDiam : rec.tilt.v, ringPap: rec.tilt.both && Math.abs(rec.tilt.both.papShift) > 0.05 ? rec.tilt.both.papFix : null, showRings: $('showRings').checked, showLines: $('showLines').checked, showContours: $('showContours').checked, inertI: res[X].cfg.inert.I });
+    for (const X of ['A', 'B']) if (res[X]) views[X].update({ hand: state.b.hand, ball: res[X].ball, geo: res[X].geo, fl: res[X].fl, L: res[X].L, run: res[X].run, tilt: rec.tilt.both ? rec.tilt.both.tDiam : rec.tilt.v, ringPap: rec.tilt.both && Math.abs(rec.tilt.both.papShift) > 0.05 ? rec.tilt.both.papFix : null, showRings: $('showRings').checked, showLines: $('showLines').checked, showContours: $('showContours').checked, inertI: res[X].cfg.inert.I, inert: res[X].cfg.inert });
     const vA = views.A && views.A.rgRange, onC = $('showContours').checked;
     $('rgLegend').classList.toggle('hidden', !onC);
     if (onC && vA) $('rgLegendTxt').textContent = `RG contours (A): ${vA[0].toFixed(3)} low → ${vA[1].toFixed(3)} high, lines every ${((vA[1] - vA[0]) / 8).toFixed(4)}`;
@@ -2178,7 +2252,7 @@ function renderRead(state, rec, res) {
   $('rotation').placeholder = `${r.v}° ${r.est ? '· estimate' : ''}`;
   if (t.bad) warns.push(`The ${t.src} reading puts the track closer to the PAP than 6 3/4", which can't happen (6 3/4" is zero tilt). Re-check the measurement — the PAP→track distance is measured from the PAP across to the oil ring, not the PAP's distance from the grip.`);
   if (t.est || r.est) warns.push('Tilt/rotation are rough estimates. A PAP alone can’t give them (the same PAP can be released at different angles) — use "Measure tilt & rotation from a release photo" for real numbers.');
-  if (state.b.style === '2H') warns.push('Two-hander: no thumb hole, so the grip center is the center of the finger holes (USBC; Radical’s no-thumb guide). Measure the PAP from there, and drill the fingers at least 3 1/2" deep.');
+  if (state.b.style === '2H') warns.push('Two-hander: no thumb hole, so the grip center is the center of the finger holes. Measure the PAP from there, and drill the fingers at least 3 1/2" deep.');
   if (state.ball.core === 'asym' && Math.abs(state.ball.pin2psa - 6.75) > 0.05) warns.push(`PSA set ${fmtIn(state.ball.pin2psa)} from the pin. Dual Angle assumes 6 3/4" — if your ball's mass-bias marker is closer, the PSA is still 6 3/4" out along the same pin–MB line.`);
   $('readCard').innerHTML = `
     <h2>Bowler read</h2>
@@ -2204,16 +2278,17 @@ function layoutBlock(state, X, r) {
       <dt>VLS / Pin Buffer</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
       <dt>Pin lands</dt><dd>${ou(r.pinOU)}</dd>
       ${r.psaOU ? `<dt>PSA lands</dt><dd>${ou(r.psaOU)}</dd>` : ''}
+      <dt>Revs up</dt><dd>${!r.stats.cross ? 'no — the axis doesn’t reach the pin-to-spin line before the pins' : r.stats.cross.onLine ? 'right away — the PAP sits on the pin-to-spin line' : `at ${r.stats.cross.py.toFixed(0)} ft, board ${r.stats.cross.b.toFixed(1)} <span class="hint" style="margin:0">(axis crosses the pin-to-spin line ${r.stats.cross.oil > 0.5 ? 'in the oil, so it mostly keeps skidding' : r.stats.cross.oil > 0.1 ? 'where the oil runs out' : 'on dry boards, so it grabs'})</span>`}</dd>
       <dt>Track flare (simulated)</dt><dd>${r.stats.flareSim.toFixed(1)}" <span class="hint" style="margin:0">(${r.stats.flareOil.toFixed(1)}" in oil + ${r.stats.flareDry.toFixed(1)}" dry)</span></dd>
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
       <dt>Drilled RG / diff / int.</dt><dd>${r.stats.spec.rg.toFixed(3)} / ${r.stats.spec.diff.toFixed(3)} / ${r.stats.spec.intdiff.toFixed(3)} <span class="hint">(${(r.stats.spec.rg - state.ball.rg >= 0 ? '+' : '') + (r.stats.spec.rg - state.ball.rg).toFixed(3)} RG from drilling; ${r.stats.spec.chart
-        ? `from ${r.stats.spec.chart.src}${r.stats.spec.chart.near ? `, layout ${r.stats.spec.chart.near.id} (${r.stats.spec.chart.near.name})` : `, blended from the nearest chart layouts (closest: ${r.stats.spec.chart.closest.id} ${r.stats.spec.chart.closest.name})`}${state.b.style === '2H' ? '; the chart assumes a thumb hole' : ''}`
-        : 'book: pin-up layouts add about 0.01–0.02, pin-down about −0.01, Rico about −0.05'})</span></dd>
+        ? `from the maker’s drilling chart${r.stats.spec.chart.near ? `, layout ${r.stats.spec.chart.near.id} (${r.stats.spec.chart.near.name})` : `, blended from the nearest chart layouts (closest: ${r.stats.spec.chart.closest.id} ${r.stats.spec.chart.closest.name})`}${state.b.style === '2H' ? '; the chart assumes a thumb hole' : ''}`
+        : 'pin-up layouts add about 0.01–0.02, pin-down about −0.01, Rico about −0.05'})</span></dd>
       <dt>Holes</dt><dd>${g.holes.map(h => `${h.name} ${fmt64(h.d)}"${h.w > h.d ? ` (oval ${fmt64(h.w)}")` : ''}`).join(', ')} <span class="hint">(${g.holes.fromFit ? 'drilled from the Fit specs card: spans, sizes, oval, pitches' : g.holes.sizesFromFit ? 'sizes from the Fit specs card; placed by the Grip card span until the fit has cut-to-cut spans, hole sizes and the bridge' : 'stock sizes placed by the Grip card span — fill in the Fit specs card to drill the real holes'})</span></dd>
       <dt>Surface</dt><dd>${surf.grit}</dd>
     </dl>
     <ul class="why simple-only">
-      <li>${explainDA(L.da, sym && !chartSym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(sym && !chartSym ? 45 : L.da, L.val)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
+      <li>${explainDA(L.da, sym && !chartSym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(L.da, L.val, sym, chartSym)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
     </ul>
     <p class="hint adv">${surf.note} Measurements are from the center of the grip, the same way the PAP is measured (${hand}-handed view).</p>
   </div>`;
@@ -2277,7 +2352,7 @@ function lineUI(state) {
   $('myLineBox').classList.toggle('hidden', mode !== 'mine');
   $('laydown').closest('label').classList.toggle('hidden', mode === 'auto');
   $('lineHint').textContent = mode === 'auto'
-      ? `Auto line: the line most likely to strike on this lane as it’s tuned now — aimed at the pocket, scored on pocket board and entry angle, and forgiving of a 1-board miss at the arrows. ${state.lane.nTuned ? `The lane has been tuned by ${state.lane.nTuned} logged shot${state.lane.nTuned > 1 ? 's' : ''}, so Auto moves as you log more.` : 'Log shots in “Log a shot” and Auto moves as the lane is tuned to them.'}`
+      ? `Auto line: the line most likely to strike on this lane as it’s tuned now — aimed at the pocket, scored on pocket board and entry angle, and forgiving of a 1-board miss at the arrows. ${simpleMode() ? '' : state.lane.nTuned ? `The lane has been tuned by ${state.lane.nTuned} logged shot${state.lane.nTuned > 1 ? 's' : ''}, so Auto moves as you log more.` : 'Log shots in “Log a shot” and Auto moves as the lane is tuned to them.'}`
     : mode === 'pocket' ? 'The app aims each ball for the pocket (board 17.5) from your laydown board.'
     : 'My line: the ball leaves your laydown and crosses your arrows board, then goes wherever the physics takes it on this pattern (with its saved calibration). A breakpoint you enter is compared with the sim; it doesn’t change the lane.';
 }
@@ -2309,7 +2384,7 @@ document.querySelector('main').addEventListener('change', e => {
 });
 function fillPatterns() {
   const s = $('patPreset'); s.innerHTML = '';
-  for (const grp of ['My house shot', 'PBA 2026 season', 'PBA animal patterns (2025)', 'Kegel pattern library']) {
+  for (const grp of ['My house shot', 'PBA 2026 season', 'PBA animal patterns (2025)', 'Pattern library']) {
     const og = document.createElement('optgroup'); og.label = grp;
     ALL_PATTERNS.map((p, i) => [p, i]).filter(([p]) => p.group === grp).sort((a, b) => a[0].n.localeCompare(b[0].n))
       .forEach(([p, i]) => og.append(new Option(`${p.n} — ${p.d}' · ${p.ra}:1 · ${p.v} mL`, 'k:' + i)));
@@ -2325,7 +2400,7 @@ function patternUI() {
   for (const id of ['patLen', 'patVol', 'patShape']) $(id).disabled = real;
   if (real) {
     const p = ALL_PATTERNS[+v.slice(2)]; $('patLen').value = p.d;
-    $('patInfo').textContent = `${p.house ? 'Your house shot' : p.pba ? `PBA ${p.n.slice(0, 4)} (Kegel library)` : 'Kegel'} · ${p.d} ft${p.eff < p.d ? ` (plays like ~${p.eff} ft: oil ends at ${p.eff - 4} ft, the rest is brush buff → Rule of 31 board ${p.eff - 31})` : ''} · ratio ${p.ra}:1 · ${p.v} mL total · brush drop ${p.b} ft · ${p.t}. Oil is laid by a simulated Kegel Ikon (head crossings + buffer brush): ${p.machine.total.toFixed(1)} mL on the lane of ${p.machine.applied.toFixed(1)} mL applied (the rest stays in the brush).`;
+    $('patInfo').textContent = `${p.house ? 'Your house shot' : p.pba ? `PBA ${p.n.slice(0, 4)}` : 'Pattern library'} · ${p.d} ft${p.eff < p.d ? ` (plays like ~${p.eff} ft: oil ends at ${p.eff - 4} ft, the rest is brush buff → Rule of 31 board ${p.eff - 31})` : ''} · ratio ${p.ra}:1 · ${p.v} mL total · brush drop ${p.b} ft. Oil is laid by a simulated lane machine (head crossings + buffer brush): ${p.machine.total.toFixed(1)} mL on the lane of ${p.machine.applied.toFixed(1)} mL applied (the rest stays in the brush).`;
   } else $('patInfo').textContent = 'Generic shape (not a real load sheet).';
 }
 $('patPreset').addEventListener('change', e => { const p = PATTERNS[e.target.value]; if (p) { $('patLen').value = p.len; $('patVol').value = p.vol; $('patShape').value = p.shape; } patternUI(); schedule(); });
@@ -2334,9 +2409,11 @@ document.addEventListener('click', e => { const f = e.target.closest('[data-upse
 { // Free: Auto line shows as a Pro option; picking it opens the upsell and falls back to "Pocket from laydown"
   const o = $('lineMode').querySelector('option[value="auto"]');
   if (!cloud.can('autoline')) { o.textContent = 'Auto line (Pro)'; $('lineMode').value = 'pocket'; }
+  $('lineMode').addEventListener('change', () => { delete $('lineMode').dataset.was; });
   $('lineMode').addEventListener('change', e => { if (e.target.value === 'auto' && !cloud.require('autoline')) { e.target.value = 'pocket'; schedule(); } });
 }
-$('modeSeg').addEventListener('click', e => { const m = e.target.dataset.mode; if (!m) return; if (m === 'driller' && !cloud.require('driller')) return; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m)); store.set('layoutlab.mode', m); });
+$('modeSeg').addEventListener('click', e => { const m = e.target.dataset.mode; if (!m) return; if (m === 'advanced' && !cloud.require('advanced')) return; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m)); store.set('layoutlab.mode', m); schedule(); });
+function simpleMode() { return document.body.dataset.mode !== 'advanced'; }
 $('compare').addEventListener('change', () => { if ($('compare').checked && !cloud.require('compare')) { $('compare').checked = false; return; } if ($('compare').checked && recCache) setLayoutInputs('B', stepLayout(recCache.s, 1).layout); schedule(); });
 $('btnRec').addEventListener('click', applyRec);
 $('readCard').addEventListener('click', e => {
@@ -2358,7 +2435,7 @@ function fillMakerLayouts(state) {
   $('A_makerBox').classList.toggle('hidden', !out.length);
   if (!out.length) return;
   const sig = state.ball.name + '|' + state.b.style; if (s.dataset.sig === sig) return; s.dataset.sig = sig;
-  s.innerHTML = `<option value="">${ch ? ch.src.replace('drilling chart', 'chart') + ' — pick a layout…' : 'Pick a layout…'}</option>`
+  s.innerHTML = `<option value="">${ch ? 'Maker’s chart layouts — pick one…' : 'Pick a layout…'}</option>`
     + (state.b.style === '2H' ? [...out.filter(o => o.key.startsWith('2H')), ...out.filter(o => !o.key.startsWith('2H'))] : out).map(o => `<option value="${o.key}">${escH(o.label)}</option>`).join('');
   s.value = [...s.options].some(o => o.value === keep) ? keep : '';
 }
@@ -2403,7 +2480,7 @@ $('play').addEventListener('click', () => {
 new ResizeObserver(() => last && drawLane2D(last.laneState)).observe($('lane2d'));
 $('runMachine').addEventListener('click', () => {
   if (!last) return; const p = last.state.lane.pat;
-  if (!p) { alert('Pick a real pattern (house shot, PBA or Kegel) to run the lane machine.'); return; }
+  if (!p) { alert('Pick a real pattern (house shot, PBA or library pattern) to run the lane machine.'); return; }
   document.querySelector('#laneSeg [data-v="2d"]').click(); cancelAnimationFrame(playing);
   const m = machineLay(p, true), frames = m.frames; let i = 0, t0 = performance.now();
   const step = now => {
@@ -2511,7 +2588,7 @@ $('ballSearch').addEventListener('keydown', e => {
 $('ballSearchList').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the box so blur doesn't close it first
 $('ballSearchList').addEventListener('click', e => { e.preventDefault(); /* no label activation */ const d = e.target.closest('.bs-opt'); if (d) chooseBall(searchShown[+d.dataset.i]); });
 function loadBall(id) {
-  const b = allBalls().find(x => x.id === id); if (!b) { $('ballNote').textContent = 'Enter the ball specs in Driller mode.'; $('ballSpecs').innerHTML = ''; fillWeights(null); return; }
+  const b = allBalls().find(x => x.id === id); if (!b) { $('ballNote').textContent = 'Enter the ball specs in Advanced mode.'; $('ballSpecs').innerHTML = ''; fillWeights(null); return; }
   $('ballName').value = b.brand && b.brand !== TYPES && b.brand !== MINE ? `${b.brand} ${b.name}` : b.name; $('core').value = b.core; $('rg').value = b.rg; $('diff').value = b.diff; $('intdiff').value = b.intdiff;
   $('cover').value = b.cover; $('grit').value = b.grit; $('pin2psa').value = b.pin2psa; $('ballColor').value = b.color || '#5b2a86';
   $('ballNote').textContent = b.note || (b.mine ? 'Saved on this device.' : '');
@@ -2876,7 +2953,7 @@ function fitPrintCard(f, o = {}) {
   f = f || {};
   const v = id => (f[id] || '').trim(), lh = o.hand === 'L';
   const cust = (typeof custCache !== 'undefined' && custCache.find(c => c.bowler_key === o.name)) || {};
-  const shop = cloud.profile?.account_type === 'shop' && cloud.profile.display_name ? cloud.profile.display_name : 'X-ING Pro Shop Lab';
+  const b = brand(), shop = b ? [b.name, b.phone].filter(Boolean).join(' · ') : cloud.profile?.account_type === 'shop' && cloud.profile.display_name ? cloud.profile.display_name : 'X-ING Pro Shop Lab';
   // pitch in the box for its direction; a lateral pitch on a finger hole only has the outer box, so an inward one gets an arrow
   const p = (h, k, d) => v(`fit_${h}_${k}d`) === d ? v(`fit_${h}_${k}`) : '';
   const latOuter = (h, side) => { const val = v(`fit_${h}_lp`); if (!val) return ''; const d = v(`fit_${h}_lpd`) || 'L'; return d === side ? val : `${val} ${d === 'L' ? '←' : '→'}`; };
@@ -2939,7 +3016,7 @@ function fitPrintCard(f, o = {}) {
 }
 $('fitPrint').addEventListener('click', () => {
   if (!cloud.require('print')) return;
-  $('sheet').innerHTML = fitPrintCard(readFit(), { name: curBowler(), date: new Date().toLocaleDateString(), hand: $('hand').value,
+  $('sheet').innerHTML = letterhead() + fitPrintCard(readFit(), { name: curBowler(), date: new Date().toLocaleDateString(), hand: $('hand').value,
     pap: last ? { over: last.state.b.papOver, up: last.state.b.papUp } : null, ball: $('ballName').value, wgt: $('ballWt')?.value || $('arsWeight').value, sn: $('arsSerial').value.trim() });
   setTimeout(() => window.print(), 50);
 });
@@ -2948,14 +3025,35 @@ $('fitPrint').addEventListener('click', () => {
 const BKEY = 'layoutlab.bowlers';
 const getAll = () => store.get(BKEY, {});
 const curBowler = () => $('bSaved').value || $('bName').value.trim();
-function fillBowlers(sel) { const s = $('bSaved'); const all = getAll(); s.innerHTML = '<option value="">— load a bowler —</option>'; Object.keys(all).sort().forEach(n => s.append(new Option(`${n} (${(all[n].arsenal || []).length} balls)`, n))); if (sel) s.value = sel; }
+/* Plan limits (cloud.limits): Free 1 bowler / 9 arsenal balls, Pro 5 bowlers, Shop unlimited. Nothing over the limit
+   is deleted: the oldest bowlers (by when they were first saved) and each bowler's first balls stay editable, the rest
+   can be loaded, printed and deleted but not changed or added to. */
+const bornAt = p => p.created || p.saved || '';
+function activeBowlers(all = getAll()) {
+  const lim = cloud.limits.bowlers, names = Object.keys(all);
+  if (names.length <= lim) return new Set(names);
+  return new Set(names.sort((a, b) => bornAt(all[a]).localeCompare(bornAt(all[b])) || a.localeCompare(b)).slice(0, lim));
+}
+const bowlerLocked = n => !!getAll()[n] && !activeBowlers().has(n);
+const ballLocked = (p, id) => (p.arsenal || []).findIndex(r => r.id === id) >= cloud.limits.balls;
+const limitWhy = what => cloud.require(what) && false; // shows the upgrade window; always "not allowed"
+/** may this bowler be changed? (false, with the upgrade window, for a read-only bowler) */
+function canEditBowler(n) { return !bowlerLocked(n) || limitWhy(cloud.plan === 'pro' ? 'bowlers6' : 'bowlers2'); }
+/** may a new bowler be created? */
+function canAddBowler() { return Object.keys(getAll()).length < cloud.limits.bowlers || limitWhy(cloud.plan === 'pro' ? 'bowlers6' : 'bowlers2'); }
+/** may one more ball go into this bowler's arsenal? */
+function canAddBall(n) { return ((getAll()[n] || {}).arsenal || []).length < cloud.limits.balls || limitWhy('balls10'); }
+function fillBowlers(sel) { const s = $('bSaved'); const all = getAll(), act = activeBowlers(all); s.innerHTML = '<option value="">— load a bowler —</option>'; Object.keys(all).sort().forEach(n => s.append(new Option(`${n} (${(all[n].arsenal || []).length} balls)${act.has(n) ? '' : ' · read-only'}`, n))); if (sel) s.value = sel; }
 function saveBowler(n) {
-  const all = getAll(); const prev = all[n] || {};
-  all[n] = { ...Object.fromEntries([...BOWLER_FIELDS, ...Object.keys(LINE_DEFAULTS)].map(f => [f, $(f).value])), fit: readFit(), arsenal: prev.arsenal || [], shots: prev.shots || [], saved: new Date().toISOString() };
+  const all = getAll(); const prev = all[n];
+  if (prev ? !canEditBowler(n) : !canAddBowler()) return false;
+  const p = prev || {}, now = new Date().toISOString();
+  all[n] = { ...Object.fromEntries([...BOWLER_FIELDS, ...Object.keys(LINE_DEFAULTS)].map(f => [f, f === 'lineMode' && $(f).dataset.was === 'mine' && $(f).value === 'pocket' ? 'mine' : $(f).value])), fit: readFit(), /* Simple keeps a saved My line */ arsenal: p.arsenal || [], shots: p.shots || [], created: p.created || p.saved || now, saved: now };
   store.set(BKEY, all); fillBowlers(n); renderArsenal();
+  return true;
 }
 $('bSave').addEventListener('click', () => { const n = $('bName').value.trim(); if (!n) { $('bName').focus(); return; } saveBowler(n); });
-$('bSaved').addEventListener('change', e => { const p = getAll()[e.target.value]; if (!p) { renderArsenal(); return; } BOWLER_FIELDS.forEach(f => { if (p[f] != null) $(f).value = p[f]; }); for (const [f, d] of Object.entries(LINE_DEFAULTS)) $(f).value = p[f] != null ? p[f] : d; setFit(p.fit); applyRec(); renderArsenal(); });
+$('bSaved').addEventListener('change', e => { const p = getAll()[e.target.value]; if (!p) { renderArsenal(); return; } BOWLER_FIELDS.forEach(f => { if (p[f] != null) $(f).value = p[f]; }); delete $('lineMode').dataset.was; for (const [f, d] of Object.entries(LINE_DEFAULTS)) $(f).value = p[f] != null ? p[f] : d; setFit(p.fit); applyRec(); renderArsenal(); });
 $('bDel').addEventListener('click', () => { const n = $('bSaved').value; if (!n) return; if (!confirm(`Delete ${n} and their whole arsenal from this device?`)) return; const all = getAll(); delete all[n]; store.set(BKEY, all); fillBowlers(); renderArsenal(); });
 
 /* ---------- Shop: customer list ----------
@@ -3082,14 +3180,20 @@ const GRIT_LABEL = { '360': '360', '500': '500', '1000': '1000', '1500': '1500',
 $('arsAdd').addEventListener('click', () => {
   if (!last) return;
   let n = curBowler(); if (!n) { alert('Enter the bowler’s name (and Save) first.'); $('bName').focus(); return; }
-  if (!getAll()[n]) saveBowler(n);
+  if (getAll()[n] ? !canEditBowler(n) : !saveBowler(n)) return;
+  if (!canAddBall(n)) return;
   const all = getAll(); all[n].arsenal = [...(all[n].arsenal || []), makeRecord()]; store.set(BKEY, all);
   fillBowlers(n); $('arsNotes').value = ''; $('arsSerial').value = ''; renderArsenal();
 });
 function renderArsenal() {
   renderShots();
   const n = curBowler(), p = getAll()[n], ars = p ? (p.arsenal || []) : [];
-  $('arsWho').textContent = n ? `— ${n}` : '— (save a bowler to start an arsenal)';
+  const plan = cloud.plan === 'pro' ? 'Pro' : 'Free', lockB = p && bowlerLocked(n), lim = cloud.limits;
+  $('arsWho').textContent = n ? `— ${n}${lockB ? ' (read-only)' : ''}` : '— (save a bowler to start an arsenal)';
+  $('limitNote').innerHTML = lockB ? `<b>${escH(n)} is read-only on ${plan}</b> (up to ${lim.bowlers} bowler${lim.bowlers > 1 ? 's' : ''}). You can open, print and delete it, but not change it. <button class="btn sm" type="button" data-upsell="${cloud.plan === 'pro' ? 'bowlers6' : 'bowlers2'}">See plans</button>`
+    : p && ars.length > lim.balls ? `<b>${ars.length - lim.balls} ball${ars.length - lim.balls > 1 ? 's are' : ' is'} read-only on Free</b> (up to ${lim.balls} in an arsenal). <button class="btn sm" type="button" data-upsell="balls10">See plans</button>`
+    : p && ars.length === lim.balls ? `This arsenal is full on Free (${lim.balls} balls). <button class="btn sm" type="button" data-upsell="balls10">See plans</button>` : '';
+  $('limitNote').classList.toggle('hidden', !$('limitNote').innerHTML);
   if (!ars.length) { $('arsTable').innerHTML = `<tr><td class="hint">No balls yet. Set up the ball and Layout A, then press “Add current ball & Layout A”.</td></tr>`; drawCoverage([]); return; }
   $('arsTable').innerHTML = `<tr><th>Date</th><th>Ball</th><th>Layout (Dual Angle)</th><th>VLS</th><th>Surface</th><th>Pattern when drilled</th><th></th></tr>` +
     ars.slice().reverse().map(r => `<tr>
@@ -3099,7 +3203,7 @@ function renderArsenal() {
       <td>${vlsTxt(r)}</td>
       <td>${GRIT_LABEL[r.ball.grit] || r.ball.grit}</td>
       <td class="hint">${r.pattern}<br>BP ${isFinite(r.pred.bpBoard) ? r.pred.bpBoard.toFixed(1) : '—'} @ ${isFinite(r.pred.bpFt) ? r.pred.bpFt.toFixed(0) : '—'} ft</td>
-      <td><div class="row"><button class="btn sm" data-act="load" data-id="${r.id}">Load</button><button class="btn sm" data-act="print" data-id="${r.id}">Print</button><button class="btn sm" data-act="dup" data-id="${r.id}">Duplicate</button><button class="btn sm" data-act="del" data-id="${r.id}">✕</button></div></td></tr>`).join('');
+      <td><div class="row"><button class="btn sm" data-act="load" data-id="${r.id}">Load</button><button class="btn sm" data-act="print" data-id="${r.id}">Print</button>${lockB || ballLocked(p, r.id) ? '<span class="chip">read-only</span>' : `<button class="btn sm" data-act="dup" data-id="${r.id}">Duplicate</button>`}<button class="btn sm" data-act="del" data-id="${r.id}">✕</button></div></td></tr>`).join('');
   scheduleCoverage();
 }
 function loadRecord(r) {
@@ -3119,7 +3223,7 @@ $('arsTable').addEventListener('click', e => {
   const n = curBowler(), all = getAll(), ars = all[n]?.arsenal || [], r = ars.find(x => x.id === id); if (!r) return;
   if (act === 'load') loadRecord(r);
   if (act === 'print' && cloud.require('print')) printBallSheet(n, r);
-  if (act === 'dup') { const c = { ...JSON.parse(JSON.stringify(r)), id: Date.now().toString(36), date: new Date().toISOString().slice(0, 10), notes: (r.notes ? r.notes + ' · ' : '') + 'duplicate of ' + r.date }; all[n].arsenal.push(c); store.set(BKEY, all); renderArsenal(); loadRecord(c); }
+  if (act === 'dup' && canEditBowler(n) && canAddBall(n)) { const c = { ...JSON.parse(JSON.stringify(r)), id: Date.now().toString(36), date: new Date().toISOString().slice(0, 10), notes: (r.notes ? r.notes + ' · ' : '') + 'duplicate of ' + r.date }; all[n].arsenal.push(c); store.set(BKEY, all); renderArsenal(); loadRecord(c); }
   if (act === 'del' && confirm(`Remove ${r.ball.name} (${r.date}) from ${n}'s arsenal?`)) { all[n].arsenal = ars.filter(x => x.id !== id); store.set(BKEY, all); fillBowlers(n); renderArsenal(); }
 });
 
@@ -3170,6 +3274,13 @@ function drawCoverage(ars) {
   if (isFinite(cur.s.bpFt)) { const x = X(cur.s.bpFt), y = Y(cur.s.totalHook); g.strokeStyle = getCss('--accent'); g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 10, 0, Math.PI * 2); g.stroke(); }
 }
 
+/* ---------- printing: shop letterhead (Shop plan) ---------- */
+function letterhead() {
+  const b = brand(); if (!b) return '';
+  const contact = [b.address, b.phone, b.email, b.web].filter(Boolean).map(escH).join(' · ');
+  return `<div class="lh">${b.logo ? `<img src="${b.logo}" alt="">` : ''}<div><div class="lh-name">${escH(b.name)}</div>${contact ? `<div class="lh-ct">${contact}</div>` : ''}</div></div>`;
+}
+const madeWith = () => brand() ? 'Made with X-ING Pro Shop Lab' : 'X-ING Pro Shop Lab';
 /* ---------- printing: bowler spec sheet + per-ball drill sheet ---------- */
 function bowlerHead(name, b) {
   return `<table><tr><th>Bowler</th><th>Hand / style</th><th>PAP</th><th>Speed</th><th>Revs</th><th>Tilt / rotation</th></tr>
@@ -3177,7 +3288,7 @@ function bowlerHead(name, b) {
   <td>${(+b.mph).toFixed(1)} mph</td><td>${b.revs} rpm</td><td>${b.tilt}° / ${b.rot}°</td></tr></table>`;
 }
 function printBallSheet(name, r) {
-  $('sheet').innerHTML = `<h1>Drill sheet — ${name}</h1><div>${r.date}${r.driller ? ' · drilled by ' + r.driller : ''}${r.serial ? ' · serial ' + r.serial : ''}</div>
+  $('sheet').innerHTML = `${letterhead()}<h1>Drill sheet — ${name}</h1><div>${r.date}${r.driller ? ' · drilled by ' + r.driller : ''}${r.serial ? ' · serial ' + r.serial : ''}</div>
     <h2>Bowler (at time of drilling)</h2>${bowlerHead(name, r.bowler)}
     <h2>Fit card</h2>${fitPrintCard(r.fit, { name, date: r.date, hand: r.bowler.hand, pap: { over: r.bowler.papOver, up: r.bowler.papUp }, ball: r.ball.name, wgt: r.weight, sn: r.serial })}
     <h2>Ball</h2><p><b>${r.ball.name}</b> — ${r.weight || '?'} lb, ${r.ball.core === 'asym' ? 'asymmetric' : 'symmetric'}, ${r.ball.cover}, RG ${r.ball.rg}, diff ${r.ball.diff}${r.ball.core === 'asym' ? ', int. diff ' + r.ball.intdiff : ''}. Surface: ${GRIT_LABEL[r.ball.grit] || r.ball.grit} (recommended ${r.surface}).</p>
@@ -3185,7 +3296,7 @@ function printBallSheet(name, r) {
     <tr><td>${layTxt(r)}</td><td>${vlsTxt(r)}</td><td>${ouTxt(r.pinOU)}</td><td>${ouTxt(r.psaOU)}</td></tr></table>
     <p style="font-size:9pt">Positions measured from the grip center like the PAP. Predicted on ${r.pattern}: breakpoint board ${isFinite(r.pred.bpBoard) ? r.pred.bpBoard.toFixed(1) : '—'} at ${isFinite(r.pred.bpFt) ? r.pred.bpFt.toFixed(0) : '—'} ft, ${isFinite(r.pred.hook) ? r.pred.hook.toFixed(1) : '—'} boards of hook, entry ${isFinite(r.pred.entry) ? r.pred.entry.toFixed(1) : '—'}°.</p>
     ${r.notes ? `<h2>Notes</h2><p>${r.notes}</p>` : ''}
-    <p style="font-size:8.5pt;color:#555">X-ING Pro Shop Lab</p>`;
+    <p style="font-size:8.5pt;color:#555">${madeWith()}</p>`;
   setTimeout(() => window.print(), 50);
 }
 $('arsSpec').addEventListener('click', () => {
@@ -3193,7 +3304,7 @@ $('arsSpec').addEventListener('click', () => {
   const n = curBowler(); if (!n || !last) { alert('Load or save a bowler first.'); return; }
   const p = getAll()[n] || {}, ars = p.arsenal || [], s = last.state, rc = last.rec;
   drawCoverage(ars); const img = $('covChart').toDataURL('image/png');
-  $('sheet').innerHTML = `<h1>Bowler spec sheet — ${n}</h1><div>${new Date().toLocaleDateString()}</div>
+  $('sheet').innerHTML = `${letterhead()}<h1>Bowler spec sheet — ${n}</h1><div>${new Date().toLocaleDateString()}</div>
     <h2>Bowler</h2>${bowlerHead(n, { hand: s.b.hand, style: s.b.style, papOver: s.b.papOver, papUp: s.b.papUp, mph: rc.c.mph, revs: s.b.revs, tilt: rc.tilt.v, rot: rc.rot.v })}
     <p>${rc.c.cls}. ${clsMeaning(rc.c)}</p>
     <h2>Fit card</h2>${fitPrintCard(readFit(), { name: n, date: new Date().toLocaleDateString(), hand: s.b.hand, pap: { over: s.b.papOver, up: s.b.papUp } })}
@@ -3202,7 +3313,7 @@ $('arsSpec').addEventListener('click', () => {
     <table><tr><th>Date</th><th>Ball</th><th>Wt</th><th>Surface</th><th>Dual Angle</th><th>VLS</th><th>Pin</th><th>PSA</th><th>Driller</th><th>Notes</th></tr>
     ${ars.map(r => `<tr><td>${r.date}</td><td>${r.ball.name}</td><td>${r.weight || ''}</td><td>${GRIT_LABEL[r.ball.grit] || r.ball.grit}</td><td>${layTxt(r)}</td><td>${vlsTxt(r)}</td><td>${ouTxt(r.pinOU)}</td><td>${ouTxt(r.psaOU)}</td><td>${r.driller || ''}</td><td>${r.notes || ''}</td></tr>`).join('')}</table>
     <h2>Arsenal coverage — ${s.lane.pat ? s.lane.pat.n : 'generic pattern'}</h2><div class="imgs"><img src="${img}" style="max-height:80mm"></div>
-    <p style="font-size:8.5pt;color:#555">X-ING Pro Shop Lab · coverage is simulated for this bowler from board ${s.lane.laydown}.</p>`;
+    <p style="font-size:8.5pt;color:#555">${madeWith()} · coverage is simulated for this bowler from board ${s.lane.laydown}.</p>`;
   setTimeout(() => window.print(), 50);
 });
 
@@ -3229,7 +3340,8 @@ $('arsImport').addEventListener('change', async e => {
     }
     store.set(BKEY, all);
     if (Array.isArray(data.myBalls)) { const mine = store.get('layoutlab.balls', []); const ids = new Set(mine.map(b => b.id)); store.set('layoutlab.balls', [...mine, ...data.myBalls.filter(b => !ids.has(b.id))]); }
-    fillBowlers(curBowler()); renderArsenal(); alert(`Imported ${nb} new bowler(s) and ${nballs} ball record(s).`);
+    fillBowlers(curBowler()); renderArsenal(); const over = Object.keys(all).length - cloud.limits.bowlers;
+    alert(`Imported ${nb} new bowler(s) and ${nballs} ball record(s).${over > 0 ? ` Your plan edits up to ${cloud.limits.bowlers} bowler${cloud.limits.bowlers > 1 ? 's' : ''}, so ${over} ${over > 1 ? 'are' : 'is'} read-only (nothing was deleted).` : ''}`);
   } catch (err) { alert('That file isn’t an X-ING Pro Shop Lab export.'); }
   e.target.value = '';
 });
@@ -3339,7 +3451,7 @@ function logShot(strike) {
   if (!cloud.require('shotlog')) return; // Pro / Shop plans only
   if (!last) return;
   const n = curBowler(); if (!n) { alert('Enter the bowler’s name (and Save) first.'); $('bName').focus(); return; }
-  if (!getAll()[n]) saveBowler(n);
+  if (getAll()[n] ? !canEditBowler(n) : !saveBowler(n)) return;
   const state = last.state, L = last.res.A.L, ln = screenLine() || {};
   const opt = id => { const v = numOrNull(id); return v != null && isFinite(v) ? v : null; };
   const lay = opt('calLay') ?? ln.lay, target = opt('calArrows') ?? ln.arr;
@@ -3361,6 +3473,7 @@ function logShot(strike) {
   renderShots();
   const what = `${rec.read.label} on ${lineTxt(rec)}.`, move = leaveMove(rec.read, state.b.hand);
   if (rec.bad) { $('calInfo').textContent = `${what} Bad release — lane not changed.`; return; }
+  if (simpleMode()) { $('calInfo').textContent = `${what} ${move}`.trim(); return; } // lane calibration is Advanced
   calibrateFromShot(state, rec, n, what, move);
 }
 /* Retune the lane toward one shot on its real line, then show the move.
@@ -3521,6 +3634,7 @@ function calibUI() {
   const s = readState(), parts = [];
   if (s.lane.calibOil !== 1) parts.push(`oil friction ${Math.round(s.lane.calibOil * 100)}%`);
   if (s.lane.calib !== 1) parts.push(`backend friction ${Math.round(s.lane.calib * 100)}%`);
+  if (simpleMode()) { $('calInfo').textContent = ''; return; }
   $('calInfo').textContent = parts.length ? `Calibrated: ${parts.join(', ')} for this pattern.` : 'Not calibrated (100%, dry-lane physics).';
 }$('patPreset').addEventListener('change', calibUI);
 
@@ -3537,7 +3651,7 @@ $('btnPrint').addEventListener('click', () => {
     <td>${fmtIn(r.L.p2p)} × ${r.geo.psa2pap != null ? fmtIn(r.geo.psa2pap) : 'n/a'} × ${fmtIn(r.geo.buffer)}</td><td>${ou(r.pinOU)}</td><td>${r.psaOU ? ou(r.psaOU) : 'n/a'}</td>
     <td>${surfaceRec(r.s, state.ball).grit}</td><td>BP ${r.stats.bpBoard.toFixed(1)} @ ${r.stats.bpFt.toFixed(0)} ft; entry ${r.stats.entry.toFixed(1)}°</td></tr>`;
   const warns = [...res.A.warns, ...(res.B ? res.B.warns : [])];
-  $('sheet').innerHTML = `
+  $('sheet').innerHTML = `${letterhead()}
     <h1>Drill sheet — ${state.b.name || 'Bowler'}</h1>
     <div>${new Date().toLocaleDateString()} · ${state.ball.name}</div>
     <h2>Bowler</h2>
@@ -3555,7 +3669,7 @@ $('btnPrint').addEventListener('click', () => {
     <p style="font-size:9pt">Positions are measured from the grip center like the PAP (inches over along the midline, then up/down). Surface: ${surfaceRec(res.A.s, state.ball).note}</p>
     ${warns.length ? `<h2>Notes for the driller</h2><ul>${warns.map(w => `<li>${w}</li>`).join('')}</ul>` : ''}
     <div class="imgs">${imgs.map(s => `<img src="${s}">`).join('')}</div>
-    <p style="font-size:8.5pt;color:#555">X-ING Pro Shop Lab predictions are a model. Confirm the PAP and fit in person, and check the manufacturer’s layout chart for this ball.</p>`;
+    <p style="font-size:8.5pt;color:#555">${madeWith()}. Predictions are a model. Confirm the PAP and fit in person, and check the manufacturer’s layout chart for this ball.</p>`;
   setTimeout(() => window.print(), 50);
 });
 
@@ -3572,7 +3686,8 @@ $('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
 fillBallSelect(startBall); loadBall(startBall); fillBowlers(); renderArsenal(); calibUI();
-let m = store.get('layoutlab.mode', 'simple'); if (m === 'driller' && !cloud.can('driller')) m = 'simple'; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+let m = store.get('layoutlab.mode', 'simple'); if (m === 'driller') m = 'advanced'; // "Driller" mode was renamed Advanced
+if (m === 'advanced' && !cloud.can('advanced')) m = 'simple'; document.body.dataset.mode = m; [...$('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === m));
 syncSysInputs('A'); syncSysInputs('B');
 applyRec();
 </script>
