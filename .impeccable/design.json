@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T23:30:00Z",
+  "title": "Design System: X-ING Pro Shop Lab",
+  "extensions": {
+    "colorMeta": {
+      "lane-white": { "role": "neutral", "displayName": "Lane White", "canonical": "#eef0f3", "tonalRamp": ["#1d1f22", "#33363b", "#4c5056", "#6a6e75", "#8e9298", "#b5b9be", "#d6d9de", "#eef0f3"] },
+      "bench-grey": { "role": "neutral", "displayName": "Bench Grey", "canonical": "#e2e5ea", "tonalRamp": ["#1b1d21", "#30333a", "#484c54", "#656a73", "#878c95", "#aeb2b9", "#cdd0d6", "#e2e5ea"] },
+      "pin-black": { "role": "neutral", "displayName": "Pin Black", "canonical": "#0b0c0e", "tonalRamp": ["#0b0c0e", "#1f2125", "#3a3d43", "#585c63", "#7b7f86", "#a1a4aa", "#c8cacd", "#eceef0"] },
+      "slate-muted": { "role": "neutral", "displayName": "Slate Muted", "canonical": "#4b515c", "tonalRamp": ["#15171b", "#262a31", "#3a3f48", "#4b515c", "#6c727d", "#9196a0", "#b9bdc4", "#e0e2e6"] },
+      "cobalt": { "role": "primary", "displayName": "Bench-Lamp Cobalt", "canonical": "#1f2de6", "tonalRamp": ["#0a0f4d", "#111a85", "#1823bd", "#1f2de6", "#4f5bf0", "#8189f5", "#b4b9fa", "#e3e5fd"] },
+      "window-slate": { "role": "neutral", "displayName": "Window Slate", "canonical": "#1b2028", "tonalRamp": ["#0d1014", "#1b2028", "#2b313b", "#3e4550", "#59606b", "#7d838d", "#a7acb3", "#d5d8dc"] },
+      "sky-ground": { "role": "neutral", "displayName": "Sky Ground", "canonical": "#c6d3df", "tonalRamp": ["#1e252c", "#33404c", "#4d5d6c", "#6b7d8e", "#8d9eae", "#aebdcb", "#c6d3df", "#e4ebf1"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero heading and the closing word only." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings." },
+      "title": { "displayName": "Title", "purpose": "Card and plan titles, in the text face." },
+      "lead": { "displayName": "Lead", "purpose": "The sentence under a section heading, in ink." },
+      "body": { "displayName": "Body", "purpose": "Read text, 16px or more in ink." },
+      "label": { "displayName": "Label", "purpose": "Chips, table group rows and sub-labels." },
+      "mono": { "displayName": "Mono", "purpose": "Numbers a driller writes down: speed, revs, distances." }
+    },
+    "shadows": [
+      { "name": "paper", "value": "0 0 0 1px rgb(11 12 14 / 6%), 0 24px 48px -24px rgb(11 12 14 / 28%)", "purpose": "Printed sheets and document captures." },
+      { "name": "capture", "value": "0 1px 2px rgb(11 12 14 / 6%), 0 24px 48px -24px rgb(11 12 14 / 22%)", "purpose": "App screens in the worked example." },
+      { "name": "window", "value": "0 0 0 1px rgb(255 255 255 / .08), 0 30px 60px -30px rgb(11 12 14 / .55)", "purpose": "The hero's dark app window only." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.2, .8, .2, 1)", "purpose": "Default easing for state changes." },
+      { "name": "dur", "value": "180ms", "purpose": "Default duration for hover and press." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "max-width: 639px" },
+      { "name": "tablet", "value": "640px" },
+      { "name": "desktop", "value": "1024px" },
+      { "name": "wide", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The page's one action colour, as a pill with a chevron.",
+      "html": "<button class=\"ds-btn-primary\">Try the app <span class=\"ds-chev\">&#8250;</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 24px; border: 0; border-radius: 999px; background: #1f2de6; color: #fff; font: 500 16px/1 'Host Grotesk', system-ui, sans-serif; cursor: pointer; transition: background-color 180ms cubic-bezier(.2,.8,.2,1); } .ds-btn-primary .ds-chev { transition: transform 180ms cubic-bezier(.2,.8,.2,1); } .ds-btn-primary:hover { background: #1b28c8; } .ds-btn-primary:hover .ds-chev { transform: translateX(3px); } .ds-btn-primary:focus-visible { outline: 2px solid #1f2de6; outline-offset: 3px; } .ds-btn-primary:active { transform: translateY(1px) scale(.985); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Tonal pill, no border.",
+      "html": "<button class=\"ds-btn-secondary\">See the plans</button>",
+      "css": ".ds-btn-secondary { height: 44px; padding: 0 24px; border: 0; border-radius: 999px; background: #dcdee2; color: #0b0c0e; font: 500 16px/1 'Host Grotesk', system-ui, sans-serif; cursor: pointer; transition: background-color 180ms cubic-bezier(.2,.8,.2,1); } .ds-btn-secondary:hover { background: #cfd1d5; } .ds-btn-secondary:focus-visible { outline: 2px solid #1f2de6; outline-offset: 3px; }"
+    },
+    {
+      "name": "Audience Chip",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Small pill naming an audience or a fact.",
+      "html": "<span class=\"ds-pill\">For pro shops</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgb(11 12 14 / 11%); background: #e2e5ea; color: #0b0c0e; font: 400 13px/1 'Host Grotesk', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Feature Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Bench-grey card with a hairline border and no shadow.",
+      "html": "<div class=\"ds-card\"><h3>Explains its reasons</h3><p>Every layout comes with the why, in Dual Angle and VLS terms.</p></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 8px; max-width: 320px; padding: 24px; border-radius: 20px; border: 1px solid rgb(11 12 14 / 11%); background: #e2e5ea; color: #0b0c0e; font-family: 'Host Grotesk', system-ui, sans-serif; } .ds-card h3 { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; } .ds-card p { margin: 0; font-size: 16px; line-height: 1.55; }"
+    },
+    {
+      "name": "Featured Plan Card",
+      "kind": "card",
+      "refersTo": "card-plan-featured",
+      "description": "The Pro plan, outlined in cobalt.",
+      "html": "<div class=\"ds-plan\"><h3>Pro</h3><p class=\"ds-soon\">Price at checkout</p><ul><li>Lane simulation</li><li>Shot logging</li></ul></div>",
+      "css": ".ds-plan { max-width: 280px; padding: 24px; border-radius: 20px; border: 1px solid #1f2de6; box-shadow: inset 0 0 0 1px #1f2de6; background: #e2e5ea; color: #0b0c0e; font-family: 'Host Grotesk', system-ui, sans-serif; display: grid; gap: 16px; } .ds-plan h3 { margin: 0; font-size: 20px; font-weight: 500; } .ds-soon { margin: 0; color: #4b515c; font-weight: 500; } .ds-plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; } .ds-plan li { position: relative; padding-left: 24px; } .ds-plan li::before { content: ''; position: absolute; left: 3px; top: .5em; width: 10px; height: 5px; border-left: 2px solid #1f2de6; border-bottom: 2px solid #1f2de6; transform: rotate(-45deg); }"
+    },
+    {
+      "name": "App Window",
+      "kind": "custom",
+      "refersTo": "app-window",
+      "description": "The hero's dark window around the app's ball view.",
+      "html": "<div class=\"ds-win\"><div class=\"ds-win__bar\"><span class=\"ds-dots\"><i></i><i></i><i></i></span><b>Layout A</b><span>Pin 4 in, PAP 5 3/8</span></div><div class=\"ds-win__body\"></div></div>",
+      "css": ".ds-win { width: 360px; border-radius: 20px; overflow: hidden; background: #1b2028; color: #eceef0; box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 30px 60px -30px rgb(11 12 14 / .55); font-family: 'Host Grotesk', system-ui, sans-serif; } .ds-win__bar { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; border-bottom: 1px solid rgb(255 255 255 / .07); font-size: 13px; color: #a7adb5; } .ds-win__bar b { font-weight: 500; color: #eceef0; } .ds-dots { display: flex; gap: 6px; } .ds-dots i { width: 10px; height: 10px; border-radius: 50%; background: #3a3e43; } .ds-win__body { height: 200px; }"
+    },
+    {
+      "name": "Drill Sheet",
+      "kind": "custom",
+      "refersTo": "drill-sheet",
+      "description": "A printed sheet shown whole as paper.",
+      "html": "<figure class=\"ds-sheet\"><div class=\"ds-sheet__paper\">Drill sheet</div><figcaption>Printed from the app with the shop's letterhead.</figcaption></figure>",
+      "css": ".ds-sheet { margin: 0; display: grid; gap: 12px; justify-items: center; font-family: 'Host Grotesk', system-ui, sans-serif; } .ds-sheet__paper { width: 280px; height: 180px; padding: 16px; background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px rgb(11 12 14 / 6%), 0 24px 48px -24px rgb(11 12 14 / 28%); } .ds-sheet figcaption { font-size: 14px; color: #4b515c; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lit Lane",
+    "overview": "The page is a lane under bright, even light: a cool off-white ground, near-black ink, and a single cobalt mark that works like the bench lamp over a drill press. The light shows you exactly where to look. Everything else stays quiet and exact, so the numbers (PAP, speed, revs, pin-to-PAP, VAL angle) and the app's own screens carry the page.\n\nDensity is comfortable, not airy. Sections pair a short heading with real proof: a captured app screen, a printed drill sheet, a worked example, a ruled comparison. Depth comes from tone (ground, bench grey, white paper, one dark app window) rather than from shadows. The hero's dark window, the drilled ball over a lane seen from above, is the one heavy object on the page and the reason the rest can stay light.\n\nThe tone is a driller's: exact terms a pro shop trusts, plain words a bowler can follow. No decoration that doesn't explain something.",
+    "keyCharacteristics": [
+      "Cool off-white ground (#eef0f3) with one cobalt accent (#1f2de6), used sparingly.",
+      "Host Grotesk throughout, medium weight with tight tracking for headings; JetBrains Mono for numbers and specs.",
+      "Soft corners (12–20px) on panels and cards; pill buttons and chips.",
+      "Flat at rest; hairline lines (ink at 11% / 20%) do the structuring.",
+      "Real app screens and printed sheets as the imagery, never stock or illustration."
+    ],
+    "rules": [
+      { "name": "The One Lamp Rule", "body": "Cobalt is the only saturated colour on the page. It marks action, selection or \"yours\", never decoration, and covers a small share of any screen.", "section": "colors" },
+      { "name": "The Ink Floor Rule", "body": "Text people read is 16px or more in Pin Black. Slate Muted is for captions and labels, never for paragraphs.", "section": "colors" },
+      { "name": "The No Lone Word Rule", "body": "Read text uses text-wrap: pretty; headings break by sense, not by width.", "section": "typography" },
+      { "name": "The Real Object Rule", "body": "Only things that exist off the page (paper, a screen, a window) cast a shadow. Cards and panels never do.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Bench-Lamp Cobalt (#1f2de6) only for action, selection and \"yours\".",
+      "Do show the real app and real printed sheets as the page's imagery, cropped so each ends on whole content.",
+      "Do keep read text at 16px or more in Pin Black, with text-wrap: pretty.",
+      "Do put numbers a driller would write down in JetBrains Mono.",
+      "Do structure with 1px hairlines and tonal surfaces before reaching for shadows."
+    ],
+    "donts": [
+      "Don't add a second saturated colour or a gradient accent.",
+      "Don't put shadows on cards or panels; only paper, captures and the hero window cast one.",
+      "Don't set paragraphs in Slate Muted.",
+      "Don't use stock photos or illustration where an app screen or sheet can show the real thing."
+    ]
+  }
+}
