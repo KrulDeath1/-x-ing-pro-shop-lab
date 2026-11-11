@@ -289,13 +289,12 @@ dialog.xd::backdrop { background:rgba(0,0,0,.55); }
 .locked[data-badge] { opacity:.6; white-space:nowrap; }
 .locked[data-badge]:hover { opacity:.85; }
 .plan-lock { display:inline-flex; gap:6px; align-items:center; }
-/* Signed out: the inputs and header tools are dimmed and locked; the results stay at full strength as a worked example,
-   with their own controls muted so nothing there looks clickable. "Create free account" is the one primary action. */
+/* Signed out: the page reads as a worked example. Text stays at full contrast and readable by screen readers; every
+   control in it is disabled (still announced with its value, just not changeable), and the header tools are dimmed.
+   "Create free account" is the one primary action. */
 .guest-dim { opacity:.45; filter:grayscale(.4); user-select:none; }
-body.guest-locked main.guest-dim { opacity:1; filter:none; }
-body.guest-locked main .form { opacity:.45; filter:grayscale(.4); }
-body.guest-locked main .out :is(input, select, button, label.tog, label.btn, .seg, .sys, details > summary) { opacity:.5; }
-body.guest-locked :is(.guest-dim .btn.primary, .btn.primary.guest-dim) { background:transparent; color:var(--ink-2); border-color:var(--line); font-weight:500; }
+body.guest-locked main :is(input, select, textarea, button):disabled { opacity:.75; cursor:not-allowed; }
+body.guest-locked :is(.guest-dim .btn.primary, .btn.primary.guest-dim, main .btn.primary) { background:transparent; color:var(--ink-2); border-color:var(--line); font-weight:500; }
 .guest-banner { background:var(--panel-2); color:var(--ink); padding:12px 16px; gap:8px 16px; }
 .guest-banner .gb-text { flex:1 1 420px; display:grid; gap:2px; }
 .guest-banner .gb-text b { font:700 18px/1.2 var(--font-shop, system-ui); text-transform:uppercase; letter-spacing:.04em; }
@@ -311,7 +310,7 @@ function mount() {
   document.head.appendChild(el('style', {}, css));
   const hg = document.querySelector('header .hgroup');
   const box = el('div', { className: 'acct' });
-  hg.appendChild(box);
+  hg.after(box);   // its own spot in the header, so phones can keep it on the first row
   const render = () => {
     if (!user) {
       box.innerHTML = `<button class="btn" type="button" data-a="signin">Sign in</button>`;
@@ -339,12 +338,21 @@ function mount() {
   }
 }
 
-// Signed out: the app stays visible but nothing can be clicked or typed until the visitor signs in.
-// `inert` blocks mouse, keyboard and focus, so this can't be tabbed around.
+// Signed out: the app stays visible as a worked example, but nothing can be changed until the visitor signs in
+// (signing in reloads the page). The header tools are `inert`. In the page itself every form control is disabled
+// rather than inert, so a screen reader can still read the example and its values; controls the app draws later
+// (re-rendered cards, tables) are caught by the observer, which also undoes any code that re-enables one.
 function lockForGuests(hg, box) {
   document.body.classList.add('guest-locked');
-  const targets = [document.querySelector('main'), ...[...hg.children].filter(c => c !== box)].filter(Boolean);
-  targets.forEach(t => { t.inert = true; t.classList.add('guest-dim'); });
+  [...hg.children].filter(c => c !== box).forEach(t => { t.inert = true; t.classList.add('guest-dim'); });
+  const main = document.querySelector('main');
+  if (main) {
+    const CTL = 'input, select, textarea, button';
+    const lock = root => { if (root.matches?.(CTL) && !root.disabled) root.disabled = true; root.querySelectorAll?.(CTL).forEach(c => { if (!c.disabled) c.disabled = true; }); };
+    lock(main);
+    new MutationObserver(recs => recs.forEach(r => r.type === 'attributes' ? lock(r.target) : r.addedNodes.forEach(lock)))
+      .observe(main, { subtree: true, childList: true, attributes: true, attributeFilter: ['disabled'] });
+  }
   const b = el('section', { className: 'import-banner guest-banner', ariaLabel: 'Get started' },
     `<div class="gb-text"><b>This is a worked example</b>
        <span>The layout, the ball view and the ball motion below come from the example numbers on the left. Create a free account to enter your own bowler. Everything you enter is saved to your account.</span></div>
