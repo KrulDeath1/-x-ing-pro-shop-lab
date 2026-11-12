@@ -5,6 +5,7 @@ assets/app/ex-inputs.png
 assets/app/ex-layout.png
 assets/app/lane-2d.png
 assets/app/lane-3d.png
+assets/app/lane-3d-chase.webm
 assets/app/log-crop.png
 assets/app/sheet-fit.png
 assets/app/sheet-head.png

@@ -21,8 +21,9 @@ const crops = {
   'sheet-head': { src: 'drill-sheet.png', pad: 0, rects: [[60, 50, 790, 300]] },
   // the pro shop view of the sheet: the letterhead, then the fit card down to the grip and ball box
   'sheet-fit': { src: 'drill-sheet.png', pad: 0, rects: [[60, 50, 1400, 190], [60, 780, 1400, 1608]] },
-  // Compare A and B: the top of each ball, where the two layouts differ (DA 55° vs 65°, 5" vs 5 1/2", VAL 45° vs 55°)
-  'compare-crop': { src: 'compare-balls.png', pad: 0, rects: [[240, 20, 580, 215], [1230, 20, 580, 215]] },
+  // Compare A and B (tools/compare-shot.mjs): the top of each ball, where the two layouts differ
+  // (DA 55° vs 65°, pin-to-PAP 3 1/2" vs 5", VAL 45° vs 55°)
+  'compare-crop': { src: 'compare-balls.png', pad: 0, rects: [[240, 20, 580, 240], [1230, 20, 580, 240]] },
   // the shot log, narrow: the pin deck to tap, then the log's last shots and strike rate
   'log-crop': { src: 'log-a-shot.png', pad: 0, rects: [[0, 112, 410, 420], [0, 742, 410, 146]] },
   // the coverage chart around the three balls (40 to 44 ft), so the points and their names stay whole
@@ -41,7 +42,9 @@ const crops = {
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xing-crops-'));
 try {
+  const only = process.argv.slice(2);   // node tools/crops.mjs compare-crop  re-cuts only the named crops
   for (const [name, c] of Object.entries(crops)) {
+    if (only.length && !only.includes(name)) continue;
     const W = Math.max(...c.rects.map(r => r[2])) + 2 * c.pad;
     const H = c.rects.reduce((s, r) => s + r[3], 0) + 2 * c.pad;
     const src = pathToFileURL(path.join(APP, c.src)).href;
