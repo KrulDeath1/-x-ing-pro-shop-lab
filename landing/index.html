@@ -163,8 +163,9 @@
   .ex-fit__pap { display: flex; justify-content: space-between; gap: var(--s-3); font-weight: 500; }
   .ex-fit__pap span { font: 500 16px/1.3 var(--font-mono); }
   #ex-shop .ex-key { grid-template-columns: repeat(2, minmax(0, max-content)); }
-  #ex-shop .ex-key dd { font-size: clamp(22px, .8vw + 14px, 30px); white-space: nowrap; }
+  #ex-shop .ex-key dd { font-size: clamp(20px, 1vw + 12px, 30px); white-space: nowrap; }
   #ex-shop .ex-out .ex__shot img { width: 648px; }
+  @media (max-width: 639px) { #ex-shop .ex-key { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); } .ex-fit { width: 100%; } }
   @media (max-width: 1023px) {
     .ex-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
     .ex-flow { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
@@ -204,8 +205,6 @@
   .lane-clip { overflow: hidden; background: #17181a; }
   .lane-clip > video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
   #arsenal, #log { scroll-margin-top: calc(var(--nav) + var(--s-5)); }
-  /* the shot log is a tall phone screen: kept narrow so the row stays about as tall as its neighbours */
-  #features .spec-row--log > .panel { max-width: 300px; }
   @media (max-width: 1023px) { .spec-row--lane > .lane-clip { --p-h: 440px; } }
   @media (max-width: 639px) { .spec-row--lane > .lane-clip { --p-h: 320px; } }
   .spec-list { display: grid; margin-top: var(--s-4); }
@@ -218,6 +217,8 @@
   /* each picture fills its panel edge to edge at its own shape, never cropped */
   #features .spec-row:not(.spec-row--lane) > .panel { --p-h: 0px; min-height: 0; display: block; padding: 0; width: 100%; max-width: 500px; justify-self: center; border-radius: var(--r-lg); }
   #features .spec-row:not(.spec-row--lane) > .panel > img { position: relative; z-index: 1; inset: auto; display: block; width: 100%; max-width: none; height: auto; max-height: none; object-fit: initial; border-radius: 0; box-shadow: none; }
+  /* the shot log is a tall phone screen: kept narrow so the row stays about as tall as its neighbours */
+  #features .spec-row.spec-row--log > .panel { max-width: 300px; }
   @media (max-width: 767px) {
     .spec-row { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
     .spec-row:nth-child(even) > .spec-words { order: 0; }
