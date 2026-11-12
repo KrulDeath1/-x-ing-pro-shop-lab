@@ -24,9 +24,10 @@
   - peek: [data-peek] holds rows [data-peek-to="key"] and photographs [data-peek-for="key"] (all but
     the first hidden); the photograph changes at once (MO-07) to the row under the pointer, the
     keyboard focus or a tap. A place's or a service's one moment (references/sections.md).
-  - phone action bar: body > nav.actionbar shows (data-bar="shown") once the hero's main button has
-    scrolled off the top, and hides (data-bar="hidden", inert) while that button, or a link or button
-    that does what one of the bar's does (the same address, or the same words), is on the screen;
+  - phone action bar: body > nav.actionbar shows (data-bar="shown") once the hero's main button is
+    off the screen, and hides (data-bar="hidden", inert) while that button, or a link or button
+    that does what one of the bar's does (the same address, or the same words), or a region marked
+    data-actionbar="off", is on the screen;
     never while the focus is in it (references/system.md, Nav).
   - visuals (assets/effects/fx.js and assets/ui/ui.js are loaded only when the page has any):
     * mounts every [data-fx] ground; only a ground inside the hero (.hero) moves, and not when its frame
@@ -336,8 +337,8 @@ function peek() {
 }
 
 /* ------------------------------------------------------------------ phone action bar
-   The bar repeats the page's main actions at a phone's foot, so it waits until the hero's main button has
-   scrolled off the top, and steps away while a link or button on the screen does what one of its own does (the
+   The bar repeats the page's main actions at a phone's foot, so it waits until the hero's main button is
+   off the screen (scrolled past, or below the first screen), and steps away while a link or button on the screen does what one of its own does (the
    same address, or the same words): one screen never shows one action twice. Hidden it is inert (nothing in it
    takes the focus or is read), and it never hides while the focus is in it. Without script it is always there,
    and every section pads for it (system.css, --bar). */
@@ -357,6 +358,8 @@ function actionbar() {
   const hrefs = new Set(own.filter(a => a.tagName === 'A').map(a => a.href));
   const labels = new Set(own.map(words).filter(Boolean));
   const twins = [...document.querySelectorAll('a[href], button')].filter(el => !bar.contains(el) && ((el.tagName === 'A' && hrefs.has(el.href)) || labels.has(words(el))));
+  // a region marked data-actionbar="off" (its own choices, such as the plan cards) keeps the bar away while it is on the screen
+  twins.push(...document.querySelectorAll('[data-actionbar="off"]'));
   const hero = document.querySelector('main > :is(.hero, .section--hero)');
   const lead = hero ? hero.querySelector('.btn--primary') || hero.querySelector('.btn') || hero : null;
   let past = !lead; // no hero: only the twins on the screen decide
@@ -367,7 +370,7 @@ function actionbar() {
     set(show);
   };
   if (lead) new IntersectionObserver(es => {
-    for (const e of es) past = !e.isIntersecting && e.boundingClientRect.top < 0;
+    for (const e of es) past = !e.isIntersecting; // off the screen either way: above, or below a phone hero that puts its proof first
     update();
   }).observe(lead);
   // a twin under the bar's own strip is hidden by it, so it counts once it is above the strip
