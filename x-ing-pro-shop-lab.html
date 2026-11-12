@@ -445,11 +445,13 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <div class="legend">
         <span><i style="background:#3ddc84"></i>PAP</span><span><i style="background:#ffd23f"></i>Pin</span>
         <span><i style="background:#ff4d4d"></i>PSA (mass bias side)</span><span><i style="background:#ffffff;border:1px solid #888"></i>Release track (first oil line)</span><span><i style="background:#8fd3ff"></i>Flare rings (simulated)</span><span><i style="background:#c58bff"></i>Pin-to-spin line; the ring is where the axis crosses it and the ball revs up</span>
-        <span><i style="background:#c7cdd4"></i>Midlines (grip / through PAP)</span><span><i style="background:#56e0e0"></i>VAL + VAL angle</span>
+        <span data-sys="dual"><i style="background:#c7cdd4"></i>Midlines (grip / through PAP)</span><span data-sys="dual"><i style="background:#56e0e0"></i>VAL + VAL angle</span>
+        <span data-sys="vls" class="hidden"><i style="background:#c7cdd4"></i>Grip midline</span><span data-sys="vls" class="hidden"><i style="background:#ffd23f"></i>Pin-to-PAP</span><span data-sys="vls" class="hidden"><i style="background:#56e0e0"></i>VAL + pin buffer (pin square to the VAL)</span>
         <span id="rgLegend" class="hidden"><i style="width:56px;border-radius:3px;background:linear-gradient(90deg,#2b4cff,#22c3e6,#3ddc84,#ffd23f,#ff4d4d)"></i><span id="rgLegendTxt"></span></span>
-        <span><i style="background:#ff6b6b"></i>Pin–PSA (pin-to-spin) line + drilling angle</span>
+        <span data-sys="dual"><i style="background:#ff6b6b"></i>Pin–PSA (pin-to-spin) line + drilling angle</span><span data-sys="vls" class="hidden"><i style="background:#ff6b6b"></i>PSA-to-PAP</span>
       </div>
-      <div class="hint">Dual Angle: draw pin→PSA (6 3/4" from the pin), turn the drilling angle to get the pin→PAP line, mark the PAP at the pin-to-PAP distance, turn the VAL angle at the PAP to draw the VAL, then the midline square to the VAL, then measure back to the grip center.
+      <div class="hint hidden" data-sys="vls">VLS: measure the pin-to-PAP distance, the PSA-to-PAP distance, and the pin buffer (the pin's distance from the VAL, measured square to it).</div>
+      <div class="hint" data-sys="dual">Dual Angle: draw pin→PSA (6 3/4" from the pin), turn the drilling angle to get the pin→PAP line, mark the PAP at the pin-to-PAP distance, turn the VAL angle at the PAP to draw the VAL, then the midline square to the VAL, then measure back to the grip center.
       </div>
     </div>
 
@@ -1559,7 +1561,7 @@ function impactVerdict(im) {
 function layoutCardHTML(X) {
   return `
   <h2>Layout <span class="tag tag${X}">${X}</span></h2>
-  <div class="sys"><label><input type="radio" name="${X}_sys" value="dual" checked> Dual Angle</label><label><input type="radio" name="${X}_sys" value="vls"> VLS / Pin Buffer</label></div>
+  <div class="sys"><label><input type="radio" name="${X}_sys" value="dual" checked> Dual Angle</label><label><input type="radio" name="${X}_sys" value="vls"> VLS</label></div>
   <fieldset id="${X}_dual"><div class="grid3">
     <label class="f"><span>Drilling angle °</span><input id="${X}_da" type="number" step="5" value="50"></label>
     <label class="f"><span>Pin-to-PAP (in)</span><input id="${X}_p2p" value="4 1/2"></label>
@@ -1889,6 +1891,19 @@ class BallView {
       const up = tangent(P, llToV({ lat: d.geo.pap.lat + 0.3, lon: d.geo.pap.lon }));
       line(gc(P, up, -80 * D2R, 80 * D2R), 0x56e0e0, 0.95);
       label('VAL', '#56e0e0', V.add(V.sc(P, Math.cos(1.25)), V.sc(up, Math.sin(1.25))), 0.9);
+      if (d.L.sys === 'vls') {
+        // VLS: three distances. Pin-to-PAP, PSA-to-PAP, and the pin buffer (pin square to the VAL).
+        line(arc(N, P), 0xffd23f, 1, R + 0.035);
+        label(`P2P ${fmtIn(d.L.p2p)}`, '#ffd23f', V.norm(V.add(N, P)), 0.9);
+        if (d.geo.psa) {
+          const S = llToV(d.geo.psa);
+          line(arc(S, P), 0xff4d4d, 0.95, R + 0.035);
+          label(`PSA ${fmtIn(d.geo.psa2pap)}`, '#ff6b6b', V.norm(V.add(S, P)), 0.9);
+        }
+        const pole = V.norm(V.cross(P, up)), F = V.norm(V.sub(N, V.sc(pole, V.dot(N, pole))));
+        line(arc(N, F), 0x56e0e0, 1, R + 0.04, true);
+        label(`Buffer ${fmtIn(d.geo.buffer)}`, '#56e0e0', V.norm(V.add(N, F)), 0.9);
+      } else {
       // 3) Dual Angle midline through the PAP, perpendicular to the VAL (Pinel step 5)
       const east = V.norm(V.cross([0, 1, 0], P));
       line(gc(P, east, -100 * D2R, 50 * D2R), 0xc7cdd4, 0.9, R + 0.03, true);
@@ -1903,6 +1918,7 @@ class BallView {
         const S = llToV(d.geo.psa);
         line(arc(N, S), 0xff4d4d, 0.95, R + 0.035, true);
         angleArc(N, S, P, 1.0, 0xff6b6b, `DA ${Math.round(d.L.da)}°`);
+      }
       }
     }
     if (d.showRings && d.run) {
@@ -1927,7 +1943,7 @@ class BallView {
       // where the axis path crosses it -- where the ball revs up
       if (d.inert?.eLow && d.inert?.eHigh) {
         // with Lines on, the red pin->PSA line already is this line; otherwise draw it (a little past the pin and the PSA)
-        if (!d.showLines) {
+        if (!d.showLines || d.L.sys === 'vls') {
           const pl = []; for (let a = -25; a <= 115; a += 3) pl.push(W(V.add(V.sc(d.inert.eLow, Math.cos(a * D2R)), V.sc(d.inert.eHigh, Math.sin(a * D2R))), R + 0.04));
           const g = new THREE.BufferGeometry().setFromPoints(pl), m = new THREE.LineDashedMaterial({ color: 0xc58bff, dashSize: 0.3, gapSize: 0.18 });
           const l = new THREE.Line(g, m); l.computeLineDistances(); this.group.add(l);
@@ -2355,6 +2371,7 @@ function compute() {
   renderLayout(state, res);
   renderStats(state, res);
   if (THREE) {
+    { const vlsA = res.A?.L.sys === 'vls'; document.querySelectorAll('[data-sys]').forEach(e => e.classList.toggle('hidden', (e.dataset.sys === 'vls') !== vlsA)); }
     for (const X of ['A', 'B']) if (res[X]) views[X].update({ hand: state.b.hand, ball: res[X].ball, geo: res[X].geo, fl: res[X].fl, L: res[X].L, run: res[X].run, tilt: rec.tilt.both ? rec.tilt.both.tDiam : rec.tilt.v, ringPap: rec.tilt.both && Math.abs(rec.tilt.both.papShift) > 0.05 ? rec.tilt.both.papFix : null, showRings: $('showRings').checked, showLines: $('showLines').checked, showContours: $('showContours').checked, inertI: res[X].cfg.inert.I, inert: res[X].cfg.inert });
     const vA = views.A && views.A.rgRange, onC = $('showContours').checked;
     $('rgLegend').classList.toggle('hidden', !onC);
@@ -2416,7 +2433,7 @@ function layoutBlock(state, X, r) {
       ${psa ? `<div><span>${r.psaOU ? 'PSA' : 'PSA after drilling'}</span><b>${mark(psa)}</b>${r.psaOU ? '' : '<small>symmetric ball: 1" from the center of the thumb toward the PAP side</small>'}</div>` : ''}
     </div>
     <dl class="kv">
-      <dt>VLS / Pin Buffer</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
+      <dt>VLS</dt><dd>${fmtIn(L.p2p)} × ${g.psa2pap != null ? fmtIn(g.psa2pap) : 'n/a'} × ${fmtIn(g.buffer)}</dd>
       <dt>Revs up</dt><dd>${!r.stats.cross ? 'no — the axis doesn’t reach the pin-to-spin line before the pins' : r.stats.cross.onLine ? 'right away — the PAP sits on the pin-to-spin line' : `at ${r.stats.cross.py.toFixed(0)} ft, board ${r.stats.cross.b.toFixed(1)} <span class="hint" style="margin:0">(axis crosses the pin-to-spin line ${r.stats.cross.oil > 0.5 ? 'in the oil, so it mostly keeps skidding' : r.stats.cross.oil > 0.1 ? 'where the oil runs out' : 'on dry boards, so it grabs'})</span>`}</dd>
       <dt>Track flare (simulated)</dt><dd>${r.stats.flareSim.toFixed(1)}" <span class="hint" style="margin:0">(${r.stats.flareOil.toFixed(1)}" in oil + ${r.stats.flareDry.toFixed(1)}" dry)</span></dd>
       <dt>RG at the PAP</dt><dd>${r.stats.rgPap.toFixed(3)} <span class="hint">(${Math.round(clamp((r.stats.rgPap - r.stats.rgLow) / Math.max(1e-6, r.stats.rgHigh - r.stats.rgLow), 0, 1) * 100)}% of the way from low RG ${r.stats.rgLow.toFixed(3)} to high RG ${r.stats.rgHigh.toFixed(3)}${isFinite(r.stats.rgPins) ? `; ${r.stats.rgPins.toFixed(3)} about the axis by the pins` : ''})</span></dd>
