@@ -120,11 +120,15 @@ if (user) {
    Table public.balls: everyone reads, only an admin writes (enforced by the database). Loaded before the app starts
    and cached on this device, so the list still works offline. */
 const CATALOG_CACHE = 'xing.catalogCache';
-const BALL_COLS = 'id,brand,name,rg,diff,mb_diff,coverstock,cover_type,core,core_type,finish,weights,released,discontinued,updated_at';
+// oil_absorb comes from migration 20261112_ball_oil_absorb; until that's applied the read falls back to the old columns
+const BALL_COLS_OLD = 'id,brand,name,rg,diff,mb_diff,coverstock,cover_type,core,core_type,finish,weights,released,discontinued,updated_at';
+let BALL_COLS = BALL_COLS_OLD + ',oil_absorb';
 export let catalog = parse(ls.get(CATALOG_CACHE), []);
 if (sb) {
   try {
-    const { data, error } = await withTimeout(sb.from('balls').select(BALL_COLS).order('brand').order('name'), 6000);
+    const get = () => withTimeout(sb.from('balls').select(BALL_COLS).order('brand').order('name'), 6000);
+    let { data, error } = await get();
+    if (error?.code === '42703') { BALL_COLS = BALL_COLS_OLD; ({ data, error } = await get()); } // column not there yet
     if (error) throw error;
     catalog = data; ls.set(CATALOG_CACHE, JSON.stringify(data));
   } catch (e) { console.warn('[cloud] ball catalog not loaded, using this device’s copy', e?.message || e); }
@@ -136,6 +140,7 @@ export const ballAdmin = {
   async save(row) {
     if (!sb || !user) throw new Error('Sign in first.');
     try {
+      if (!BALL_COLS.includes('oil_absorb')) delete row.oil_absorb; // database not migrated yet
       const q = row.id ? sb.from('balls').update(row).eq('id', row.id) : sb.from('balls').insert(row);
       const { data, error } = await withTimeout(q.select(BALL_COLS).single(), 10000); if (error) throw error;
       catalog = [...catalog.filter(b => b.id !== data.id), data]; ls.set(CATALOG_CACHE, JSON.stringify(catalog)); return data;
