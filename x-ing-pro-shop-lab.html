@@ -72,7 +72,7 @@ header label.tog { white-space: nowrap; }
 .jump a.jsum b { font: 700 var(--fs-meta)/1 var(--font-ui); margin-right: 6px; color: var(--ink-2); }
 @media (min-width: 901px) { .jump { margin: 0; padding: 0; } .jump a { min-height: 28px; } }
 @media (min-width: 901px) and (max-width: 1360px) { .brand small { display: none; } }
-:is(#bowlerCard, #layCard, #motionCard, #logBox, #arsCard) { scroll-margin-top: calc(var(--hdr, 58px) + 10px); }
+:is(#bowlerCard, #ballCard, #layCard, #viewCard, #motionCard, #logBox, #arsCard) { scroll-margin-top: calc(var(--hdr, 58px) + 10px); }
 /* single column (tablets, phones): the name and the account on the first row; the header tools on one row that scrolls
    sideways (mode first, then Recommend and Print); then the jump chips. Phones also shorten the name to X-ING. */
 @media (max-width: 900px) {
@@ -318,7 +318,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
     <button class="btn primary" id="btnRec">Recommend layout</button>
     <button class="btn" id="btnPrint" data-plan="print">Print drill sheet</button>
   </div>
-  <nav class="jump" aria-label="Jump to"><a href="#bowlerCard">Bowler</a><a href="#layCard" class="jsum" id="jumpSum">Layout</a><a href="#motionCard">Motion</a><a href="#logBox">Log</a><a href="#arsCard">Arsenal</a></nav>
+  <nav class="jump" aria-label="Jump to"><a href="#bowlerCard">Bowler</a><a href="#layCard" class="jsum" id="jumpSum">Layout</a><a href="#ballCard">Ball</a><a href="#viewCard">Ball view</a><a href="#motionCard">Motion</a><a href="#logBox">Log</a><a href="#arsCard">Arsenal</a></nav>
 </header>
 
 <main>
@@ -381,7 +381,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <p class="hint simple-only">PAP = the spot on the ball that doesn't spin, measured from the center of the grip. A pro shop can measure it in a few shots.</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="ballCard">
       <h2>Ball</h2>
       <div class="grid2">
         <label class="f full"><span>Search all balls</span><span class="bs-wrap"><input id="ballSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ballSearchList" placeholder="Type a ball, brand, core, cover or year — e.g. phaze, hammer pearl, 2024"><div id="ballSearchList" class="bs-list" role="listbox" hidden></div></span></label>
@@ -433,7 +433,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="viewCard">
       <h2>Ball view <span style="text-transform:none;letter-spacing:0;font-weight:400">— drag to rotate, scroll to zoom</span></h2>
       <div class="ctl">
         <label class="tog"><input type="checkbox" id="showRings" checked> Flare rings</label>
