@@ -72,7 +72,7 @@ header label.tog { white-space: nowrap; }
 .jump a.jsum b { font: 700 var(--fs-meta)/1 var(--font-ui); margin-right: 6px; color: var(--ink-2); }
 @media (min-width: 901px) { .jump { margin: 0; padding: 0; } .jump a { min-height: 28px; } }
 @media (min-width: 901px) and (max-width: 1360px) { .brand small { display: none; } }
-:is(#bowlerCard, #layCard, #motionCard, #logBox, #arsCard) { scroll-margin-top: calc(var(--hdr, 58px) + 10px); }
+:is(#bowlerCard, #ballCard, #layCard, #viewCard, #motionCard, #logBox, #arsCard) { scroll-margin-top: calc(var(--hdr, 58px) + 10px); }
 /* single column (tablets, phones): the name and the account on the first row; the header tools on one row that scrolls
    sideways (mode first, then Recommend and Print); then the jump chips. Phones also shorten the name to X-ING. */
 @media (max-width: 900px) {
@@ -156,6 +156,81 @@ dialog.cust { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48
 .balladm .tabs .on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
 .balladm .tag { font-size: var(--fs-meta); padding: 1px 7px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-left: 6px; }
 @media (max-width: 520px) { .cust-form { grid-template-columns: 1fr; } .cust-row { flex-wrap: wrap; } .cust-row .acts { width: 100%; justify-content: flex-end; } }
+/* Shop: plug colors card. Numbered steps, swatches as the only colour, recipes lettered in the shop face. */
+.pc-lead { margin: 0 0 4px; max-width: 68ch; text-wrap: pretty; }
+.pc-step { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; display: grid; gap: 8px; }
+.pc-step h3 { margin: 0; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 8px; }
+.pc-step h3 b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--panel); font: 700 13px/1 var(--font-ui); }
+.pc-count { font: 400 var(--fs-meta)/1 var(--font-ui); text-transform: none; letter-spacing: 0; color: var(--ink-2); }
+.pc-sw { display: inline-block; width: 22px; height: 22px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); vertical-align: middle; flex: none; }
+.pc-sw.lg { width: 100%; height: 64px; border-radius: 10px; display: block; }
+.pc-sw.md { width: 36px; height: 36px; border-radius: 8px; }
+.pc-covers { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pc-cover { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: var(--fs-meta); cursor: pointer; min-height: 32px; }
+.pc-cover:hover { border-color: var(--ink-2); }
+.pc-cover .pc-sw { width: 24px; height: 24px; border-radius: 50%; }
+.pc-chosen { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.pc-chosen b { font-weight: 600; }
+.pc-photo { position: relative; }
+.pc-empty { border: 1px dashed var(--line); border-radius: 10px; padding: 22px 14px; text-align: center; color: var(--ink-2); font-size: var(--fs-meta); background: var(--panel-2); }
+.pc-box { position: relative; margin: 0 auto; }
+.pc-box canvas.pc-cv { display: block; border-radius: 8px; touch-action: none; cursor: crosshair; }
+.pc-loupe { position: absolute; width: 112px; height: 112px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,.4); pointer-events: none; }
+.pc-ptools { margin-top: 8px; display: grid; gap: 8px; }
+.pc-ptools[hidden] { display: none; }
+.pc-chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 99px; padding: 4px 12px; font: inherit; font-size: var(--fs-meta); font-weight: 600; cursor: pointer; min-height: 32px; }
+.pc-chip.on { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.pc-err { color: #c0392b; font-size: var(--fs-meta); margin: 4px 0 0; }
+.pc-targets { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pc-target { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.pc-target .pc-sw.lg { height: 48px; }
+.pc-target .row { justify-content: space-between; flex-wrap: nowrap; }
+.pc-target input[type=color] { width: 40px; height: 32px; padding: 2px; flex: none; }
+.pc-mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.pc-res { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 12px; display: grid; gap: 8px; background: var(--panel-2); }
+.pc-res-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pc-res-h h3 { margin: 0; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; }
+.pc-q { font-size: var(--fs-meta); font-weight: 700; padding: 2px 9px; border-radius: 99px; background: var(--chip); }
+.pc-q.great { background: color-mix(in srgb, var(--good) 18%, var(--panel)); color: var(--good); }
+.pc-q.rough { background: var(--warn-bg); color: var(--warn-ink); }
+.pc-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pc-cmp figure { margin: 0; display: grid; gap: 3px; }
+.pc-cmp figcaption { font-size: var(--fs-meta); color: var(--ink-2); }
+.pc-recipe { margin: 0; font: 700 22px/1.2 var(--font-shop); letter-spacing: .01em; font-variant-numeric: tabular-nums; text-wrap: balance; }
+.pc-pearl { margin: 0; font-weight: 600; }
+.pc-pearl small { font-weight: 400; color: var(--ink-2); }
+.pc-adj { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
+.pc-stp { display: flex; align-items: center; gap: 6px; }
+.pc-stp > span { flex: 1; display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pc-stp .pc-sw { width: 16px; height: 16px; border-radius: 4px; }
+.pc-stp output { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pc-stp .btn { width: 32px; padding: 0; }
+.pc-tip { margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--chip); max-width: 68ch; }
+.pc-save { display: grid; gap: 8px; padding: 12px; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.pc-save textarea, .pc-rec textarea { width: 100%; min-height: 56px; resize: vertical; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
+.pc-stars { display: inline-flex; gap: 2px; }
+.pc-stars button { border: 0; background: none; padding: 0 3px; font-size: 22px; line-height: 1; color: var(--line); cursor: pointer; min-height: 32px; }
+.pc-stars button.on, .pc-stars span.on { color: #d99a00; }
+.pc-stars span { color: var(--line); font-size: 15px; }
+.pc-recs { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.pc-rec { display: flex; gap: 10px; align-items: flex-start; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+.pc-rec img, .pc-rec .ph { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: none; background: var(--panel-2); border: 1px solid var(--line); }
+.pc-rec .who { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pc-rec .who b { font-weight: 600; overflow-wrap: anywhere; }
+.pc-rec .who small { color: var(--ink-2); font-size: 12px; }
+.pc-rec .who .pc-mono { overflow-wrap: anywhere; }
+.pc-rec .acts { display: flex; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+.pc-rec .sws { display: flex; gap: 3px; }
+.pc-none { padding: 14px 4px; color: var(--ink-2); font-size: var(--fs-meta); }
+.pc-kit { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 10px; }
+.pc-kit summary { cursor: pointer; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; min-height: 32px; display: flex; align-items: center; }
+.pc-tints { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 2px; }
+.pc-tints li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.pc-tints li > span { flex: 1 1 140px; min-width: 0; display: grid; }
+.pc-tints li small { color: var(--ink-2); font-size: 12px; }
+dialog.xd.pc-cal { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
+.pc-cal ol { margin: 0; padding-left: 18px; font-size: 13px; }
+@media (max-width: 520px) { .pc-rec { flex-wrap: wrap; } .pc-rec .acts { width: 100%; } .pc-recipe { font-size: 20px; } }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
 /* One focus ring for every control, shown for keyboard focus (and on every text field, where the browser shows it on click too). */
@@ -318,7 +393,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
     <button class="btn primary" id="btnRec">Recommend layout</button>
     <button class="btn" id="btnPrint" data-plan="print">Print drill sheet</button>
   </div>
-  <nav class="jump" aria-label="Jump to"><a href="#bowlerCard">Bowler</a><a href="#layCard" class="jsum" id="jumpSum">Layout</a><a href="#motionCard">Motion</a><a href="#logBox">Log</a><a href="#arsCard">Arsenal</a></nav>
+  <nav class="jump" aria-label="Jump to"><a href="#bowlerCard">Bowler</a><a href="#layCard" class="jsum" id="jumpSum">Layout</a><a href="#ballCard">Ball</a><a href="#viewCard">Ball view</a><a href="#motionCard">Motion</a><a href="#logBox">Log</a><a href="#arsCard">Arsenal</a></nav>
 </header>
 
 <main>
@@ -381,7 +456,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <p class="hint simple-only">PAP = the spot on the ball that doesn't spin, measured from the center of the grip. A pro shop can measure it in a few shots.</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="ballCard">
       <h2>Ball</h2>
       <div class="grid2">
         <label class="f full"><span>Search all balls</span><span class="bs-wrap"><input id="ballSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ballSearchList" placeholder="Type a ball, brand, core, cover or year — e.g. phaze, hammer pearl, 2024"><div id="ballSearchList" class="bs-list" role="listbox" hidden></div></span></label>
@@ -393,10 +468,15 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
         <label class="f full adv"><span>Name</span><input id="ballName"></label>
         <label class="f"><span>Core</span><select id="core"><option value="asym">Asymmetric</option><option value="sym">Symmetric</option></select></label>
         <label class="f"><span>Cover</span><select id="cover"><option value="solid">Solid reactive</option><option value="hybrid">Hybrid reactive</option><option value="pearl">Pearl reactive</option><option value="urethane">Urethane</option><option value="plastic">Plastic</option></select></label>
+        <label class="f adv" title="How fast the cover soaks up the oil it picks up. USBC times one drop of oil on the cover: new balls must take at least 2:15, and 90 min or longer counts as slow. Auto uses the usual rate for the cover type."><span>Oil absorption</span><select id="absorb"><option value="">Auto (from cover)</option><option value="fast">Fast</option><option value="med">Medium</option><option value="slow">Slow</option></select></label>
+        <label class="f adv" title="Games bowled since the cover was last resurfaced or had the oil extracted. Oil soaks in over time and the cover loses grip, faster on a fast-absorbing cover. 0 = fresh."><span>Games since resurface</span><input id="wearGames" type="number" min="0" step="1" value="0"></label>
         <label class="f adv"><span>RG</span><input id="rg" type="number" step="0.001"></label>
         <label class="f adv"><span>Differential</span><input id="diff" type="number" step="0.001"></label>
         <label class="f adv"><span>Int. differential</span><input id="intdiff" type="number" step="0.001"></label>
         <label class="f adv"><span>Pin-to-PSA (in, Dual Angle = 6 3/4)</span><input id="pin2psa" value="6 3/4"></label>
+        <label class="f adv" title="Static weight after drilling, from the scale. + = top (label / grip side), − = bottom."><span>Static top (+) / bottom (−), oz</span><input id="stTop" type="number" step="0.25" value="0"></label>
+        <label class="f adv" title="+ = positive side (the PAP side of the grip), − = negative side."><span>Static side: PAP (+) / other (−), oz</span><input id="stSide" type="number" step="0.25" value="0"></label>
+        <label class="f adv" title="+ = finger weight, − = thumb weight."><span>Static finger (+) / thumb (−), oz</span><input id="stFing" type="number" step="0.25" value="0"></label>
         <label class="f"><span>Surface</span><select id="grit">
           <option value="360">360 grit</option><option value="500">500</option><option value="1000">1000</option><option value="1500">1500</option>
           <option value="2000">2000</option><option value="3000">3000</option><option value="4000">4000</option>
@@ -428,12 +508,13 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="viewCard">
       <h2>Ball view <span style="text-transform:none;letter-spacing:0;font-weight:400">— drag to rotate, scroll to zoom</span></h2>
       <div class="ctl">
         <label class="tog"><input type="checkbox" id="showRings" checked> Flare rings</label>
         <label class="tog"><input type="checkbox" id="showLines" checked> Layout lines</label>
         <label class="tog" title="Color the cover by the drilled ball's RG about each point: blue = low RG (the pin), red = high RG (PSA side). The spin axis migrates along these contours."><input type="checkbox" id="showContours"> RG contours</label>
+        <label class="tog" title="See the core through the cover, its long axis at the pin. Where we have the maker's core picture the shape is our own simplified model of it; otherwise it's a generic shape from the ball's RG and differentials."><input type="checkbox" id="showCore"> Core</label>
         <button class="btn sm" id="viewLayout">Whole layout</button>
         <button class="btn sm" id="viewGrip">Face grip</button>
         <button class="btn sm" id="viewPap">Face PAP</button>
@@ -477,6 +558,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <div id="laneSet" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
       <h2>Lane</h2>
       <div class="grid2">
+        <label class="f full"><span>Search patterns</span><span class="bs-wrap"><input id="patSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="patSearchList" placeholder="Type a name, length or ratio — e.g. shark, 2026, 41 ft, sport"><div id="patSearchList" class="bs-list" role="listbox" hidden></div></span></label>
         <label class="f full"><span>Pattern</span><select id="patPreset"></select></label>
         <p class="hint f full" id="patInfo" style="margin:0"></p>
         <label class="f adv"><span>Length (ft)</span><input id="patLen" type="number" value="40"></label>
@@ -564,6 +646,34 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <h2 style="margin-top:14px" data-plan="coverage">Arsenal coverage <span id="covWhere" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
       <canvas id="covChart" role="img" aria-label="Arsenal coverage chart" style="width:100%;height:320px;display:block;border-radius:10px;background:var(--panel-2)"></canvas>
       <p class="hint">Each ball is simulated for this bowler on the selected pattern (on its own best line when Auto line is on, otherwise from the laydown board). Right = more length (later breakpoint), up = more hook. Gaps on the chart are where the next ball should go. The hollow ring is the ball and layout currently on screen.</p>
+    </div>
+
+    <!-- Shop only: hidden (not shown locked) for guests, Free and Pro. Filled in by the plug color code near the end of the script. -->
+    <div class="card adv hidden" id="plugCard" aria-labelledby="plugTitle">
+      <h2 id="plugTitle">Plug colors <span>— drop recipes to match a cover</span></h2>
+      <p class="pc-lead">Pick the ball or photograph it, tap the colors you want the plug to match, and get drop recipes for your tint kit. A recipe is a starting point: test-mix a small batch before you plug the ball.</p>
+      <div class="pc-step"><h3><b>1</b> Ball</h3>
+        <label class="f"><span>Find the ball (optional)</span><span class="bs-wrap"><input id="pcBall" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pcBallList" placeholder="Brand or ball name"><span class="bs-list" id="pcBallList" role="listbox" aria-label="Matching balls" hidden></span></span></label>
+        <div id="pcBallInfo"></div>
+      </div>
+      <div class="pc-step"><h3><b>2</b> Photo</h3><div id="pcPicker"></div></div>
+      <div class="pc-step"><h3><b>3</b> Colors to match</h3>
+        <div id="pcTargets"></div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="pcGo" disabled>Get recipes</button></div>
+      </div>
+      <div id="pcResults" aria-live="polite"></div>
+      <div class="pc-step"><h3>Saved recipes <span class="pc-count" id="pcCount"></span></h3>
+        <div class="row pc-filter"><input id="pcSearch" type="search" autocomplete="off" placeholder="Search ball, notes or tints" aria-label="Search saved recipes" style="flex:1 1 220px;width:auto">
+          <div class="seg" id="pcMin" role="group" aria-label="Show recipes rated"><button type="button" data-min="0" class="on">All</button><button type="button" data-min="4">4★ and up</button><button type="button" data-min="5">5★</button></div></div>
+        <ul class="pc-recs" id="pcRecs"></ul>
+      </div>
+      <details class="pc-kit" id="pcKit"><summary>Tints and batch size</summary>
+        <p class="hint">Tech-Line HD plug material with the kit’s 12 tints, measured in drops per batch. The tint colors start as rough guesses. Calibrate a tint by photographing a small cured puck of it, and every recipe after that uses your kit’s real color.</p>
+        <div class="grid2" style="margin-top:10px"><label class="f"><span>Batch name</span><input id="pcBatchName" maxlength="40"></label><label class="f"><span>Batch size (1 = one standard cup)</span><input id="pcBatchSize" type="number" min="0.25" max="4" step="0.25" inputmode="decimal"></label></div>
+        <p class="hint">Double the batch and each drop is half as strong. Calibrate again after you change the size.</p>
+        <ul class="pc-tints" id="pcTints"></ul>
+        <div class="row"><button class="btn sm" type="button" id="pcResetCal">Reset all calibrations</button></div>
+      </details>
     </div>
 
     <div class="card" id="spareCard">
@@ -695,6 +805,25 @@ const ballKey = x => { let id = 'db-' + ballSlug(`${x.b} ${x.n}${x.i ? ' intl' :
 const nameHash = s => [...String(s)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
 /* Admin-entered balls (shared catalog in the database, see js/cloud.js) merged into the built-in list: the same brand +
    name corrects the built-in ball, anything else is added. Retired balls are dropped KEEP_YEARS after their release. */
+/* Cover oil absorption per ball (slow / med / fast). The classes follow USBC's test (SOP-BALL-17: one drop of oil, timed
+   until it disappears; new balls must take at least 2:15 since Aug 2020, 90 min or longer is "slow"). USBC doesn't publish
+   the times per ball, and drop time isn't the same thing as how fast a track's oil film drains on the lane, so these
+   multipliers on the cover type's rate (COVER_OIL) are rough estimates, not measurements. Auto = the cover type's usual
+   class (reactive med, urethane / plastic slow), which keeps the old per-cover rate. */
+const ABSORB_RATE = { fast: 1.5, med: 1, slow: 0.55 };
+const absorbAuto = cover => cover === 'urethane' || cover === 'plastic' ? 'slow' : 'med';
+const absorbOf = ball => ABSORB_RATE[ball.absorb] ? ball.absorb : absorbAuto(ball.cover);
+const ABSORB_LABEL = { fast: 'fast', med: 'medium', slow: 'slow' };
+/* Cover wear: oil soaks into the cover over the games since it was last resurfaced / had the oil extracted, and the
+   cover grips less (on dry boards and in the oil). Anchor: the makers' usual advice to resurface about every 60-80
+   games. The curve itself is an estimate: grip loss = WEAR_MAX * (1 - e^(-games * rate / WEAR_G)), where rate is the
+   cover's oil absorption next to a medium solid reactive (so a fast cover dies sooner and urethane / plastic, which
+   barely absorb, hardly change). A medium solid at 70 games loses ~6% of its grip; the curve flattens out at WEAR_MAX. */
+const WEAR_G = 70, WEAR_MAX = 0.10;
+function coverWear(ball, absorb) {
+  const g = Math.max(0, +ball.games || 0); if (!g) return 1;
+  return 1 - WEAR_MAX * (1 - Math.exp(-g * (absorb / COVER_OIL.solid.absorb) / WEAR_G));
+}
 const KEEP_YEARS = 7, MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const coverKeyOf = t => { t = (t || '').toLowerCase(); return /urethane|microcell/.test(t) ? 'urethane' : /polyester|plastic|rubber/.test(t) ? 'plastic' : /pearl/.test(t) ? 'pearl' : /hybrid/.test(t) ? 'hybrid' : 'solid'; };
 const gritKeyOf = f => { const s = (f || '').toLowerCase(), n = (s.match(/\d{3,5}/g) || []).map(Number), top = n.length ? Math.max(...n) : 2000;
@@ -704,6 +833,7 @@ const catalogToDb = c => {
   const r = c.released ? new Date(c.released + 'T00:00:00') : null, w = c.weights && Object.keys(c.weights).length ? c.weights : { 15: [+c.rg, +c.diff, +c.mb_diff || 0] }, m = w[15] || Object.values(w)[0];
   return { b: c.brand, n: c.name, d: r ? `${MONTHS[r.getMonth()]} ${r.getFullYear()}` : '', cv: c.coverstock || '', ct: c.cover_type || '', c: coverKeyOf(c.cover_type || c.coverstock),
     f: c.finish || '', g: gritKeyOf(c.finish), k: c.core || '', s: c.core_type === 'asym' ? 'asym' : 'sym', rg: +m[0], df: +m[1], mb: c.core_type === 'asym' ? +m[2] || 0 : 0, i: 0, w,
+    ...(ABSORB_RATE[c.oil_absorb] ? { ab: c.oil_absorb } : {}),
     ...(c.discontinued ? { x: 1 } : {}), cat: c.id };
 };
 const relOf = x => { const m = String(x.d || '').match(/([A-Za-z]{3})[a-z]*\.?\s+(\d{4})/); const k = m ? MONTHS.findIndex(s => s.toLowerCase() === m[1].toLowerCase()) : -1; return k >= 0 ? new Date(+m[2], k, 1) : null; };
@@ -715,7 +845,7 @@ const ALL_DB = (() => {
   return merged.filter(x => { const d = relOf(x); return !x.x || !d || d >= cut; });
 })();
 const DB_BALLS = ALL_DB.map((x, i) => ({
-  id: ballKey(x), brand: x.b, name: x.n, label: x.n + (x.i ? ' (intl)' : '') + (x.x ? ' (disc.)' : ''), disc: !!x.x, core: x.s, rg: x.rg, diff: x.df, intdiff: x.mb, cover: x.c, grit: x.g, pin2psa: '6 3/4',
+  id: ballKey(x), brand: x.b, name: x.n, label: x.n + (x.i ? ' (intl)' : '') + (x.x ? ' (disc.)' : ''), disc: !!x.x, core: x.s, rg: x.rg, diff: x.df, intdiff: x.mb, cover: x.c, absorb: x.ab || '', grit: x.g, pin2psa: '6 3/4',
   w: x.w || { 15: [x.rg, x.df, x.mb] }, info: x,
   color: BRAND_COLORS[nameHash(x.b + x.n) % BRAND_COLORS.length],
   note: `Pin-to-PSA uses the Dual Angle standard 6 3/4" — confirm on the ball.`,
@@ -1131,16 +1261,32 @@ function rart(Rm, A) { // R A R^T
 }
 function qFromTo(a, b) { const c = V.cross(a, b), d = V.dot(a, b); if (d < -0.9999) return qAxis(Math.abs(a[0]) < 0.9 ? V.cross(a, [1, 0, 0]) : V.cross(a, [0, 1, 0]), Math.PI); return qNorm([c[0], c[1], c[2], 1 + d]); }
 
-function modelSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" from PAP), interpolated on the angle to the VAL
+/* Drilled RG: Pinel CAD study (50 deg drilling, pin 5" from PAP), interpolated on the angle to the VAL.
+   Drilled diff and int. diff: fitted to the 38 rows of the manufacturer charts below (5 symmetric, 3 asymmetric balls;
+   refit 2026-11-12 when the No Doubt, Rattler and Revenge charts came in).
+   The old VAL-only table (Pinel / Blueprint) missed the drilling angle, which the charts show is the biggest lever:
+   - the gripping holes take mass out between the pin and the PSA. With the PSA ~75 deg from the pin->PAP line the holes
+     sit beside the core and pull the intermediate axis apart: asym int. diff goes from ~0.8x (20 deg) to ~2x (70-75 deg)
+     the box value. A SYMMETRIC core picks up ~0.008 (20 deg) to ~0.016 (75 deg) int. diff. That gain barely follows
+     the core's total diff (No Doubt, diff 0.051, gets less than Rattler, diff 0.035): it depends on the core's shape
+     where the holes cut it, which the box numbers don't capture. Per core the charts spread +-0.004 around the fit;
+     a ball with its own chart gets corrected to it (drilledSpecs). Int. diff is capped at 60% of the drilled diff (the
+     most any chart shows is 56%), since it can never pass the total diff;
+   - the same drilling with a low VAL angle raises total diff up to ~25%, and high VAL angles lose diff (~0.4% per deg);
+   - a pin closer than 3 1/2" to the PAP puts the holes over the pin, so the drilling-angle effect fades.
+   RMS error vs all 38 rows (old VAL-only table -> this fit): diff 0.0063 -> 0.0033, int. diff 0.0092 -> 0.0036 (sym
+   rows 0.0036, asym 0.0038). Weakest spot: asym at 90 deg with a 2 1/4" pin (PSA in the track), ~0.009 high. */
+function modelSpecs(ball, L) {
   const t = (clamp(L.val, 20, 70) - 20) / 50, l3 = (a, b, c) => t < 0.5 ? a + (b - a) * t * 2 : b + (c - b) * (t - 0.5) * 2;
   const asym = ball.core === 'asym';
-  // Blueprint's drilled-mass tables (Track Flare Explained, 2012, VAL 30): relative to a 5" pin, shorter pin-to-PAP
-  // keeps more differential (finger/thumb holes miss the core's sides): ~+17% at 1 1/8", +8% at 2 1/4", +3% at 3 3/8"
-  const pinK = 1 + 0.011 * Math.max(0, 5 - clamp(L.p2p ?? 5, 0, 6.75)) ** 2;
+  const da = isFinite(L.da) ? L.da : 45, p2p = clamp(L.p2p ?? 5, 0, 6.75), val = clamp(isFinite(L.val) ? L.val : 45, 20, 80);
+  const s = Math.sin(clamp((da - 20) / 55, 0, 1.4) * Math.PI / 2) ** 2; // 0 at 20 deg, 1 at 75 deg
+  const pf = Math.min(1, p2p / 3.5);
+  const diff = ball.diff * (1 + 0.25 * s * (1 - (val - 20) / 25) * pf - 0.004 * (val - 20));
+  const intdiff = asym ? ball.intdiff * (0.8 + 1.2 * s * pf ** 1.5) : (0.19 + 0.20 * s * pf ** 2) * (0.2 * ball.diff + 0.032);
   return {
     rg: ball.rg + (asym ? l3(0.005, 0.010, 0.012) : l3(0.006, 0.010, 0.012)),
-    diff: ball.diff * (asym ? l3(1.06, 0.85, 0.81) : l3(1.02, 0.86, 0.82)) * pinK,
-    intdiff: asym ? ball.intdiff * l3(1.27, 1.17, 1.10) : l3(0.008, 0.004, 0.004),
+    diff, intdiff: Math.min(intdiff, 0.6 * diff),
   };
 }
 /* Manufacturer drilling charts: drilled int. diff, total diff and RG about the PAP for each suggested layout
@@ -1149,9 +1295,14 @@ function modelSpecs(ball, L) { // Pinel CAD study (50 deg drilling, pin 5" from 
    rows are pin up here. und = undrilled [low RG, total diff, int. diff].
    Sources: Radical drilling instructions, 2026 — Evil Eye Pearl (#0302-26), Guru Oracle Pearl (#1209-25),
    Outer Limits Black Hole (#0804-25), Intel Recon Hybrid (#0630-26), Vexed Variant (#0416-26).
-   Vexed Variant rows E and F are partly blacked out on the printed chart; the values come from the PDF's text layer. */
+   Vexed Variant rows E and F are partly blacked out on the printed chart; the values come from the PDF's text layer.
+   Added 2026-11-12 (symmetric): No Doubt Hybrid (#60-900337-668), Rattler Big Bite (#60-900337-651), Revenge Solid
+   (#60-900337-667). Their layout pages draw C at 85 deg; the chart table says 80, used here. Revenge Solid's RG-at-PAP
+   column (2.491-2.514) sits BELOW its published undrilled low RG (2.544), which drilling at the PAP can't do, so that
+   chart is used for diff / int. diff only (rgOk: false) and its RG at PAP isn't shown.
+   alias: other balls with the same core and the same undrilled specs (the cover doesn't change the core's numbers). */
 const DRILL_CHARTS = {
-  'Radical Evil Eye Pearl': { src: 'Radical drilling chart #0302-26', core: 'sym', und: [2.493, 0.045, 0], rows: [
+  'Radical Evil Eye Pearl': { src: 'Radical drilling chart #0302-26', core: 'sym', und: [2.493, 0.045, 0], alias: ['Radical Evil Eye'], rows: [
     ['A', 'Maximum Performance', 70, 3.5, 20, 0.022, 0.057, 2.513], ['B', 'Strong Performance', 75, 4, 30, 0.023, 0.053, 2.518],
     ['C', 'Strong Control', 80, 4.5, 40, 0.021, 0.046, 2.521], ['D', 'Maximum Control', 90, 2.25, 45, 0.014, 0.044, 2.502],
     ['E', 'Strong Continuous', 20, 3.5, 20, 0.007, 0.047, 2.512], ['F', 'Versatile Continuous', 20, 5, 30, 0.009, 0.043, 2.527]] },
@@ -1163,9 +1314,18 @@ const DRILL_CHARTS = {
     ['A', 'Maximum Flip', 70, 3.5, 20, 0.026, 0.059, 2.520], ['B', 'Most Versatile', 45, 4, 35, 0.018, 0.050, 2.528],
     ['C', 'Smoother Motion', 20, 4.5, 40, 0.012, 0.045, 2.538], ['D', 'Midlane Hook', 40, 4.25, 75, 0.013, 0.040, 2.532],
     ['E', 'Smaller Hook', 90, 2.25, 45, 0.009, 0.039, 2.509]] },
-  'Radical Intel Recon Hybrid': { src: 'Radical drilling chart #0630-26', core: 'sym', und: [2.481, 0.032, 0], rows: [
+  'Radical Intel Recon Hybrid': { src: 'Radical drilling chart #0630-26', core: 'sym', und: [2.481, 0.032, 0], alias: ['Radical Intel Recon', 'Radical Intel Tour'], rows: [
     ['A', 'Maximum Flip', 70, 3.5, 20, 0.017, 0.041, 2.496], ['B', 'Most Versatile', 75, 4, 30, 0.018, 0.039, 2.499],
     ['C', 'Smoother Motion', 80, 4.5, 40, 0.018, 0.035, 2.502], ['D', 'Smaller Hook', 90, 2.25, 45, 0.013, 0.026, 2.488]] },
+  'Radical No Doubt Hybrid': { src: 'Radical drilling chart #60-900337-668', core: 'sym', und: [2.485, 0.051, 0], alias: ['Radical No Doubt', 'Radical No Doubt Solid'], rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.014, 0.059, 2.512], ['B', 'Most Versatile', 75, 4, 30, 0.013, 0.056, 2.518],
+    ['C', 'Smoother Motion', 80, 4.5, 40, 0.012, 0.053, 2.523], ['D', 'Smaller Hook', 90, 2.25, 45, 0.010, 0.049, 2.498]] },
+  'Radical Rattler Big Bite': { src: 'Radical drilling chart #60-900337-651', core: 'sym', und: [2.480, 0.035, 0], alias: ['Radical Rattler', 'Radical Rattler NU'], rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.016, 0.043, 2.498], ['B', 'Most Versatile', 75, 4, 30, 0.015, 0.039, 2.501],
+    ['C', 'Smoother Motion', 80, 4.5, 40, 0.012, 0.033, 2.503], ['D', 'Smaller Hook', 90, 2.25, 45, 0.007, 0.029, 2.488]] },
+  'Radical Revenge Solid': { src: 'Radical drilling chart #60-900337-667', core: 'sym', und: [2.544, 0.036, 0], alias: ['Radical Revenge Pearl'], rgOk: false, rows: [
+    ['A', 'Maximum Flip', 70, 3.5, 20, 0.012, 0.043, 2.504], ['B', 'Most Versatile', 75, 4, 30, 0.011, 0.040, 2.509],
+    ['C', 'Smoother Motion', 80, 4.5, 40, 0.010, 0.036, 2.514], ['D', 'Smaller Hook', 90, 2.25, 45, 0.007, 0.032, 2.491]] },
   'Radical Vexed Variant': { src: 'Radical drilling chart #0416-26', core: 'asym', und: [2.490, 0.045, 0.015], rows: [
     ['A', 'Maximum Performance', 70, 3.5, 20, 0.032, 0.058, 2.502], ['B', 'Strong Performance', 75, 4, 30, 0.033, 0.054, 2.505],
     ['C', 'Strong Control', 45, 4, 35, 0.020, 0.044, 2.508], ['D', 'Moderate Control', 90, 2.25, 45, 0.016, 0.042, 2.493],
@@ -1180,7 +1340,7 @@ const TWO_HAND_LAYOUTS = [
   ['2H-1', 'Two-handed: more flare', { da: 45, p2p: 4.5, val: 45, pin: 'up' }, 'pin 3 3/4"–5 1/4" from the PAP: more flare, more hook'],
   ['2H-2', 'Two-handed: less flare (control)', { da: 60, p2p: 2, val: 45, pin: 'up' }, 'pin 3/4"–2 1/2" from the PAP: less flare, a direct, controllable line'],
 ];
-const chartFor = ball => DRILL_CHARTS[(ball.name || '').trim()] || null;
+const chartFor = ball => { const n = (ball.name || '').trim(); return DRILL_CHARTS[n] || Object.values(DRILL_CHARTS).find(c => c.alias?.includes(n)) || null; };
 const CHART_GRIP = { span: 4.75, fspace: 1.25 };
 const CHART_PAP = { papOver: 5, papUp: 0.5, style: '1H' };
 // the drilled ball's high-RG direction: the PSA for an asymmetric core; for a symmetric core the drilling makes one
@@ -1202,7 +1362,8 @@ function chartCorrections(ch, ball) {
     const psa = drilledPsa(und, geo);
     let lo = 2.2, hi = 2.9;
     for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2; if (rgAbout({ rg: mid, diff: df, intdiff: idf, psa }, geo, geo.pap) < rgPap) lo = mid; else hi = mid; }
-    return { id, name, L, rgLow: (lo + hi) / 2, kDiff: df / m.diff, kInt: idf / Math.max(1e-4, m.intdiff), dRg: (lo + hi) / 2 - m.rg, row: { idf, df, rgPap } };
+    const rgLow = ch.rgOk === false ? m.rg : (lo + hi) / 2;
+    return { id, name, L, rgLow, kDiff: df / m.diff, kInt: idf / Math.max(1e-4, m.intdiff), dRg: rgLow - m.rg, row: { idf, df, rgPap } };
   });
   chartCache.set(ch, out); return out;
 }
@@ -1212,14 +1373,23 @@ const layoutDist = (a, b) => Math.hypot((a.da - b.da) / 30, (a.p2p - b.p2p) / 1,
    (diff and int. diff as ratios, low RG as an offset) is blended by inverse distance in layout space, so a chart layout
    reproduces the chart exactly (at the chart's weight) and other layouts follow the nearest rows. Other weights keep the
    chart's corrections on top of that weight's own specs. */
+/* Static weights after drilling -> center of mass offset, ball-local, in feet (null when level). A static scale reads the
+   imbalance as weight at the ball's surface, so the offset is (oz / ball oz) x radius: 1 oz on a 15 lb ball = 0.018".
+   Axes as on the layout: +z top (grip center / label side), +x positive side (toward the PAP), +y finger (- = thumb). */
+const STATIC_MAX = 3; // USBC since Aug 2020 (no balance holes): up to 3 oz top/bottom and 3 oz side, finger or thumb
+function cgOffset(ball) {
+  const st = ball.stat; if (!st || !(st.top || st.side || st.fing)) return null;
+  const k = R / 12 / ((ball.weight || 15) * 16);
+  return [(st.side || 0) * k, (st.fing || 0) * k, (st.top || 0) * k];
+}
 function drilledSpecs(ball, L, geo) {
-  const m = modelSpecs(ball, L), ch = chartFor(ball);
-  if (!ch) return { ...m, psa: geo ? drilledPsa(ball, geo) : null };
+  const m = modelSpecs(ball, L), ch = chartFor(ball), cg = cgOffset(ball);
+  if (!ch) return { ...m, cg, psa: geo ? drilledPsa(ball, geo) : null };
   const rows = chartCorrections(ch, ball);
   let sw = 0, kD = 0, kI = 0, dR = 0, near = null;
   for (const r of rows) { const d = layoutDist(L, r.L), w = 1 / (d * d + 0.0025); sw += w; kD += w * r.kDiff; kI += w * r.kInt; dR += w * r.dRg; if (!near || d < near.d) near = { id: r.id, name: r.name, d }; }
   kD /= sw; kI /= sw; dR /= sw;
-  return { rg: m.rg + dR, diff: m.diff * clamp(kD, 0.5, 2), intdiff: Math.max(0, m.intdiff * clamp(kI, 0.2, 8)),
+  return { rg: m.rg + dR, diff: m.diff * clamp(kD, 0.5, 2), intdiff: Math.max(0, m.intdiff * clamp(kI, 0.2, 8)), cg,
     psa: geo ? drilledPsa(ball, geo) : null, chart: { src: ch.src, near: near.d < 0.12 ? near : null, closest: near } };
 }
 /* Core imbalance scale. Was 0.6 (tuned to the "5-6 in max" folklore while flare was measured release -> roll point).
@@ -1240,7 +1410,7 @@ function inertia(spec, geo) { // per unit mass, ft^2, in the ball's local (layou
   const I = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], Inv = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   for (const [e, k] of ks) for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { I[i][j] += k * k * e[i] * e[j]; Inv[i][j] += e[i] * e[j] / (k * k); }
   // the pin-to-spin line (pin -> drilled PSA) is the great circle in the low/high RG plane; eInt is its normal
-  return { I, Inv, eLow, eHigh, eInt };
+  return { I, Inv, eLow, eHigh, eInt, cg: spec.cg || null };
 }
 /* Pin-to-spin line rev-up (driller lore, Mo Pinel): when the migrating axis crosses the line from the pin to the drilled
    PSA, the ball revs up. Modelled as extra grip after the crossing, ramped in over one revolution and multiplied into
@@ -1270,21 +1440,26 @@ const TRACK_PEN = 0.9;
    30 to 160 at 17 mph / 330 rpm, so the sum term is small; together with the rev-up the spread is ~9-10 ft. */
 const DA_SUM = 0.03, DA_RATIO_PRE = 0.08, DA_RATIO_REV = 0.8;
 // "Rule of the N" (Pinel / Radical): pin->PSA, pin->PAP and the VAL draw an N; its width is the angle sum (narrow < 85,
-// neutral 85-105, wide > 105). It only applies to asymmetric cores: a symmetric ball has no mass bias to place, so its
-// drilling angle and N don't change the motion (pin-to-PAP and the VAL angle do, through flare and the drilled specs).
-const N_NARROW = 85, N_WIDE = 105;
-function dualTiming(L, core) {
-  if (core !== 'asym' || !L || !isFinite(L.da) || !isFinite(L.val)) return { oil: 1, pre: 1, rev: 1 };
+// neutral 85-105, wide > 105). Full strength on asymmetric cores. A symmetric core has no box mass bias, but the drilling
+// makes one: the makers' charts give drilled symmetric balls 0.007-0.023 int. diff depending on the drilling angle (see
+// modelSpecs). So a symmetric ball gets the same timing, scaled by how asymmetric the drilling made it: full strength
+// at SYM_N_FULL drilled int. diff (a typical drilled asymmetric), none at 0.
+const N_NARROW = 85, N_WIDE = 105, SYM_N_FULL = 0.018;
+function dualTiming(L, core, drilledInt) {
+  if (!L || !isFinite(L.da) || !isFinite(L.val)) return { oil: 1, pre: 1, rev: 1 };
+  const w = core === 'asym' ? 1 : clamp((drilledInt || 0) / SYM_N_FULL, 0, 1);
+  if (!w) return { oil: 1, pre: 1, rev: 1 };
   const da = clamp(L.da, 10, 90), val = clamp(L.val, 20, 70), sN = (95 - clamp(da + val, 30, 160)) / 65, rN = (da - val) / (da + val);
-  return { oil: 1 + DA_SUM * sN, pre: 1 - DA_RATIO_PRE * rN, rev: Math.max(0.2, 1 + DA_RATIO_REV * rN) };
+  return { oil: 1 + w * DA_SUM * sN, pre: 1 - w * DA_RATIO_PRE * rN, rev: Math.max(0.2, 1 + w * DA_RATIO_REV * rN) };
 }
-function makeFriction(lane, ball, L) {
+function makeFriction(lane, ball, L, spec) {
   const g = GRIT[ball.grit] || 1, cov = COVER[ball.cover] || COVER.solid;
-  const da = dualTiming(L, ball.core);
+  const da = dualTiming(L, ball.core, spec?.intdiff);
   // calibOil: oil friction from a calibration shot that also gave the pin hit (1 = physics default)
-  const muO = 0.04 * cov.oil * da.oil * (lane.calibOil || 1), muD = 0.20 * cov.dry * (1 - (g - 1) * 0.15) * (lane.calib || 1);
+  const absorb = (COVER_OIL[ball.cover] || COVER_OIL.solid).absorb * ABSORB_RATE[absorbOf(ball)] / ABSORB_RATE[absorbAuto(ball.cover)], wear = coverWear(ball, absorb);
+  const muO = 0.04 * cov.oil * da.oil * wear * (lane.calibOil || 1), muD = 0.20 * cov.dry * wear * (1 - (g - 1) * 0.15) * (lane.calib || 1);
   return {
-    muO: muO * g, muD, absorb: (COVER_OIL[ball.cover] || COVER_OIL.solid).absorb, trackPen: TRACK_PEN, pre: da.pre, rev: da.rev,
+    muO: muO * g, muD, absorb, wear, trackPen: TRACK_PEN, pre: da.pre, rev: da.rev,
     // oil film is thickest in the heads and thins toward the end of the pattern, so friction in the oil rises downlane
     at(y, b) { const o = laneOil(lane, y, b); let d = muD; if (lane.cond === 'trans' && y > lane.len && y < lane.len + 8) d *= 0.88; // real pattern: friction in the oil depends on how thick the oil is there (thin = grippier); generic: thins toward the end
       const ul = laneOilUL(lane, y, b);
@@ -1317,6 +1492,7 @@ function simulate(cfg, alphaDeg, record = false) {
   // pin-to-spin line: side of the line the (revolution-averaged) axis starts on, and where it crosses
   const eInt = cfg.inert.eInt, revT = 60 / Math.max(60, cfg.rpm);
   let axAvg = null, side0 = 0, cross = null;
+  const cgL = cfg.inert.cg;
   while (py < 60 && t < 6) {
     Rm = qToM(q);
     const Iinv = rart(Rm, cfg.inert.Inv), om = mv(Iinv, Lw);
@@ -1343,9 +1519,20 @@ function simulate(cfg, alphaDeg, record = false) {
     else ballOil[bin] = bo * 0.96;
     if (i % 50 === 0) for (let k = 0; k < ballOil.length; k++) ballOil[k] *= absorbStep;
     // contact slip and exact Coulomb friction (stick if the needed impulse is within the friction cone)
-    const sx = vx - Rf * om[1], sy = vy + Rf * om[0], s = Math.hypot(sx, sy);
-    const K00 = 1 + Rf2 * Iinv[1][1], K01 = -Rf2 * Iinv[1][0], K10 = -Rf2 * Iinv[0][1], K11 = 1 + Rf2 * Iinv[0][0];
-    const det = K00 * K11 - K01 * K10;
+    // r = contact point from the center of mass. Level ball: straight down one radius. With static weight the center of
+    // mass sits off the ball's center and turns with the ball, so r changes every revolution: the normal force then has
+    // a lever arm too (the wobble), and slip and the friction response use the true r.
+    let r = null, sx, sy, K00, K01, K10, K11;
+    if (cgL) {
+      const c = mv(Rm, cgL); r = [-c[0], -c[1], -Rf - c[2]];
+      const vc = V.add([vx, vy, 0], V.cross(om, r)); sx = vc[0]; sy = vc[1];
+      const col = e => V.add(e, V.cross(mv(Iinv, V.cross(r, e)), r)), kx = col([1, 0, 0]), ky = col([0, 1, 0]);
+      K00 = kx[0]; K10 = kx[1]; K01 = ky[0]; K11 = ky[1];
+    } else {
+      sx = vx - Rf * om[1]; sy = vy + Rf * om[0];
+      K00 = 1 + Rf2 * Iinv[1][1]; K01 = -Rf2 * Iinv[1][0]; K10 = -Rf2 * Iinv[0][1]; K11 = 1 + Rf2 * Iinv[0][0];
+    }
+    const s = Math.hypot(sx, sy), det = K00 * K11 - K01 * K10;
     let jx = -(K11 * sx - K01 * sy) / det, jy = -(-K10 * sx + K00 * sy) / det;
     const jmax = mu * g * dt;
     rolling = Math.hypot(jx, jy) <= jmax;
@@ -1353,7 +1540,8 @@ function simulate(cfg, alphaDeg, record = false) {
     if (record && i % 4 === 0) pts.push({ t, px, py, b, vx, vy, slip: s, q: q.slice(), c: cl, oil: o, wl: V.norm(mtv(Rm, om)) });
     else if (!record && i % 10 === 0) pts.push({ t, px, py, b, vx, vy, slip: s });
     vx += jx; vy += jy;
-    Lw = [Lw[0] + Rf * jy, Lw[1] - Rf * jx, Lw[2]];
+    if (r) Lw = V.add(Lw, V.cross(r, [jx, jy, g * dt])); // friction + normal force (= weight; the tiny bob is ignored)
+    else Lw = [Lw[0] + Rf * jy, Lw[1] - Rf * jx, Lw[2]];
     const omN = mv(rart(qToM(q), cfg.inert.Inv), Lw), wl = V.len(omN);
     if (wl > 1e-9) q = qNorm(qMul(qAxis(omN, wl * dt), q));
     px += vx * dt; py += vy * dt; t += dt; i++;
@@ -1620,7 +1808,7 @@ function readBallB(ballA) {
   if (!$('B_diff').checked) return ballA;
   const b = allBalls().find(x => x.id === $('B_ball').value); if (!b) return ballA;
   const wt = +$('B_wt').value || 15, sp = specAt(b, wt);
-  return { name: (b.brand && b.brand !== TYPES && b.brand !== MINE ? b.brand + ' ' : '') + b.name, core: b.core, cover: b.cover,
+  return { name: (b.brand && b.brand !== TYPES && b.brand !== MINE ? b.brand + ' ' : '') + b.name, core: b.core, cover: b.cover, absorb: b.absorb || '', coreKey: coreKeyOf(b),
     rg: sp ? sp[0] : +b.rg, diff: sp ? sp[1] : +b.diff, intdiff: sp ? sp[2] : (+b.intdiff || 0), weight: wt,
     grit: $('B_grit').value || b.grit, pin2psa: clamp(parseIn(b.pin2psa) || 6.75, 1, 6.75), color: $('B_color').value };
 }
@@ -1647,7 +1835,7 @@ function writeComputed(X, L, geo, ball) {
   const sys = document.querySelector(`input[name=${X}_sys]:checked`).value;
   const f = x => fmtIn(x).replace('"', '');
   if (sys === 'dual') { $(X + '_vp2p').value = f(L.p2p); $(X + '_vpsa').value = geo.psa2pap != null ? f(geo.psa2pap) : 'n/a'; $(X + '_vbuf').value = f(geo.buffer); }
-  else { $(X + '_da').value = ball.core === 'asym' ? Math.round(L.da) : ''; $(X + '_p2p').value = f(L.p2p); $(X + '_val').value = Math.round(L.val); }
+  else { $(X + '_da').value = Math.round(L.da); $(X + '_p2p').value = f(L.p2p); $(X + '_val').value = Math.round(L.val); }
 }
 
 /* ==================== state ==================== */
@@ -1688,20 +1876,21 @@ function readState() {
   }
   lane.calibOil = store.get('xing.calibOil', {})[lane.calibKey] || 1; // oil friction (only set when the shot had a pin hit)
   const ball = {
-    name: $('ballName').value || $('ballPreset').selectedOptions[0]?.textContent || 'Ball', core: $('core').value, cover: $('cover').value,
+    name: $('ballName').value || $('ballPreset').selectedOptions[0]?.textContent || 'Ball', core: $('core').value, cover: $('cover').value, absorb: $('absorb').value, coreKey: coreKeyOf(allBalls().find(x => x.id === $('ballPreset').value)), games: Math.max(0, num('wearGames') || 0),
     rg: num('rg') || 2.5, diff: isFinite(num('diff')) ? num('diff') : 0.045, intdiff: isFinite(num('intdiff')) ? num('intdiff') : 0,
     grit: $('grit').value, pin2psa: clamp(parseIn($('pin2psa').value) || 6.75, 1, 6.75), color: $('ballColor').value, weight: +$('ballWt').value || 15,
+    stat: { top: num('stTop') || 0, side: num('stSide') || 0, fing: num('stFing') || 0 },
   };
   const grip = { span: parseIn($('span').value) || 4.75, fspace: parseIn($('fspace').value) || 1.25, fit: gripFit() };
   return { b, lane, ball, grip, compare: $('compare').checked && cloud.can('compare') };
 }
 
 /* ==================== explanations ==================== */
-function explainDA(da, sym) { if (sym) return 'Symmetric ball: drilling angle doesn’t apply (no PSA).'; return da < 35 ? 'Low drilling angle: the ball starts reading the lane early.' : da <= 55 ? 'Medium drilling angle: benchmark timing.' : 'High drilling angle: pushes the hook further down the lane.'; }
+function explainDA(da, sym) { if (sym) return da < 35 ? 'Symmetric ball, low drilling angle: the drilling keeps the core round (little int. diff), so the motion stays smooth and even.' : da <= 55 ? 'Symmetric ball, medium drilling angle: the drilling adds some int. diff, so it turns a bit more like an asymmetric.' : 'Symmetric ball, high drilling angle: the holes beside the core make it act asymmetric (more int. diff), so it turns later and sharper.'; return da < 35 ? 'Low drilling angle: the ball starts reading the lane early.' : da <= 55 ? 'Medium drilling angle: benchmark timing.' : 'High drilling angle: pushes the hook further down the lane.'; }
 function explainP2P(p) { return p < 2.5 ? 'Pin close to the PAP: little flare, early stable roll, very controllable.' : p < 3.2 ? 'Moderate flare, early and smooth.' : p <= 4.2 ? 'Max-flare zone: the most hook this core can give.' : p <= 5.2 ? 'Length with a strong move downlane.' : 'Long pin: maximum length, less total hook.'; }
 function explainVAL(v) { return v < 35 ? 'Low VAL angle: quick, sharp response at the breakpoint.' : v <= 55 ? 'Medium VAL angle: balanced transition.' : 'High VAL angle: smooth, gradual transition.'; }
-function explainSum(da, val, sym, chartSym) {
-  if (sym) return `Symmetric ball: the Rule of the N doesn’t apply, so the drilling angle doesn’t change when it revs up. Pin-to-PAP sets the flare, and the VAL angle changes the drilled RG and differential.${chartSym ? ' (The maker’s chart still lists a drilling angle: it sets where the thumb hole goes, which shifts the drilled specs a little.)' : ''}`;
+function explainSum(da, val, sym) {
+  if (sym) return `Symmetric ball: the drilling angle sets where the holes sit around the core, which decides how asymmetric the drilled ball gets. The Rule of the N timing applies in proportion to that drilled int. diff; pin-to-PAP still sets the flare.`;
   const s = Math.round(da + val);
   const n = s < N_NARROW ? 'Narrow N: the pin-to-spin line sits close to the PAP, so the ball revs up and reads the lane sooner'
     : s <= N_WIDE ? 'Neutral N: a balanced, benchmark transition'
@@ -1759,6 +1948,126 @@ function disposeTree(o) { o.traverse(n => { n.geometry?.dispose?.(); if (n.mater
 
 // the cover is not drawn where a hole opening marked the stencil (see BallView.drillHole)
 const holeCut = m => Object.assign(m, { stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc });
+/* Core shapes for the 3D view ("Core" toggle). Keyed by brand|core name, so every ball with that core gets it.
+   prof = our own simplified lathe profile of a symmetric core, modelled on the shape in the maker's published core
+   picture (the picture itself isn't in the app): [height along the pin axis, radius], both as a fraction of the ball
+   radius, from the pin end down. wts = the weights the picture is for; other weights get the generic shape. */
+const coreKeyOf = b => b?.info?.k ? `${b.brand}|${b.info.k}`.toLowerCase() : '';
+const SEE_THROUGH = { transparent: true, opacity: 0.28, depthWrite: false };
+const CORE_SHAPES = {
+  'radical|rattler': { src: 'modelled on Radical’s Rattler Big Bite core picture (16-14 lb)', wts: [14, 16], prof: [
+    [0.62, 0], [0.62, 0.25], [0.58, 0.30], [0.47, 0.33], [0.45, 0.42], [0.40, 0.47], [0.25, 0.51], [0.12, 0.49], [0.08, 0.45],
+    [0.05, 0.56], [-0.02, 0.59], [-0.16, 0.58], [-0.28, 0.51], [-0.33, 0.44], [-0.36, 0.40], [-0.42, 0.37], [-0.44, 0.33],
+    [-0.47, 0.34], [-0.54, 0.30], [-0.60, 0.24], [-0.62, 0]] },
+  // asymmetric: the turned body plus a round side lobe (drawn square to the PSA: see BallView.core)
+  'radical|guru': { src: 'modelled on Radical’s Guru Oracle Pearl core picture (16-14 lb)', wts: [14, 16], prof: [
+    [0.62, 0], [0.62, 0.22], [0.55, 0.27], [0.40, 0.30], [0.30, 0.40], [0.15, 0.47], [0, 0.48], [-0.15, 0.46], [-0.30, 0.40],
+    [-0.42, 0.36], [-0.48, 0.33], [-0.55, 0.33], [-0.58, 0.28], [-0.66, 0.26], [-0.70, 0]],
+    lobe: { h: 0.1, reach: 0.8, r: 0.27 } },
+  // light bulb: round head, ribbed neck, and a separate flip block at the bottom (block = [top, bottom, radius, color])
+  'storm|c3 centripetal control': { src: 'modelled on Storm’s C3 Centripetal Control core picture (bowwwl.com)', wts: [14, 16], color: 0xd9dcdf, prof: [
+    [0.62, 0], [0.62, 0.12], [0.58, 0.28], [0.50, 0.40], [0.38, 0.48], [0.22, 0.51], [0.10, 0.49], [-0.02, 0.44], [-0.12, 0.36],
+    [-0.20, 0.33], [-0.24, 0.37], [-0.30, 0.38], [-0.36, 0.36], [-0.38, 0]],
+    block: [-0.38, -0.63, 0.35, 0xc8202a] },
+  /* Storm, from the core pictures on bowwwl.com (scaled to the ball outline in each picture) and, for Atmos A.I., the
+     360° view on stormbowling.com. Asymmetric ones: sp = stretch of the wide side, si = thickness toward the PSA. The
+     pictures show which way the core is wide, not where the PSA is; the wide side is drawn square to the PSA (physics). */
+  'storm|element tour a.i.': { src: 'modelled on Storm’s Element Tour A.I. core picture', wts: [14, 16], color: 0x3a3c40, sp: 1.1, si: 0.8, prof: [
+    [0.66, 0], [0.66, 0.30], [0.58, 0.46], [0.50, 0.40], [0.42, 0.56], [0.30, 0.48], [0.20, 0.62], [0.06, 0.52], [-0.04, 0.64], [-0.18, 0.54],
+    [-0.28, 0.62], [-0.42, 0.52], [-0.50, 0.56], [-0.62, 0.42], [-0.68, 0]] },
+  'storm|solarion a.i.': { src: 'modelled on Storm’s Solarion A.I. core picture', wts: [14, 16], color: 0xc9ccd0, prof: [
+    [0.67, 0], [0.67, 0.30], [0.60, 0.33], [0.34, 0.33], [0.30, 0.30], [-0.46, 0.30], [-0.62, 0.33], [-0.65, 0]],
+    lobe: { h: -0.06, reach: 0.62, r: 0.38, both: true }, block: [-0.65, -0.82, 0.36, 0xc8202a] },
+  'storm|catalyst a.i.': { src: 'modelled on Storm’s Catalyst A.I. core picture', wts: [14, 16], color: 0xc9ccd0, sp: 1.1, si: 0.85, prof: [
+    [0.74, 0], [0.72, 0.12], [0.62, 0.30], [0.45, 0.45], [0.20, 0.56], [-0.10, 0.60], [-0.35, 0.56], [-0.55, 0.48], [-0.58, 0]],
+    block: [-0.58, -0.82, 0.44, 0xc8202a] },
+  'storm|torsion a.i.': { src: 'modelled on Storm’s Torsion A.I. core picture', wts: [14, 16], color: 0xc9ccd0, prof: [
+    [0.67, 0], [0.67, 0.25], [0.58, 0.30], [0.52, 0.42], [0.44, 0.34], [0.36, 0.52], [0.26, 0.44], [0.14, 0.58], [0.04, 0.48],
+    [-0.08, 0.56], [-0.20, 0.48], [-0.34, 0.54], [-0.48, 0.50], [-0.58, 0.46], [-0.58, 0]],
+    block: [-0.58, -0.79, 0.42, 0xc8202a] },
+  'storm|radius': { src: 'modelled on Storm’s Radius core picture', wts: [14, 16], color: 0xd9dcdf, prof: [
+    [0.69, 0], [0.69, 0.20], [0.62, 0.45], [0.48, 0.64], [0.32, 0.71], [0.22, 0.66], [0.16, 0.42], [0.10, 0.40], [-0.55, 0.40], [-0.55, 0]],
+    block: [-0.55, -0.79, 0.42, 0xc8202a] },
+  'storm|rad-tq': { src: 'modelled on Storm’s RAD-TQ core picture (the inner diamond; the clear outer shell isn’t drawn)', wts: [14, 16], color: 0x2c2a22, si: 0.45, segs: 4, prof: [
+    [0.62, 0], [0.30, 0.16], [0, 0.30], [-0.30, 0.16], [-0.62, 0]],
+    block: [-0.65, -0.90, 0.58, 0xc8202a] },
+  'storm|velocity': { src: 'modelled on Storm’s Velocity core picture', wts: [14, 16], color: 0xd9dcdf, segs: 8, prof: [
+    [0.62, 0], [0.62, 0.30], [0.50, 0.45], [0.30, 0.60], [0.05, 0.68], [-0.20, 0.64], [-0.40, 0.55], [-0.46, 0.50], [-0.46, 0]],
+    block: [-0.46, -0.68, 0.45, 0xc8202a] },
+  'storm|sentinel': { src: 'modelled on Storm’s Sentinel core picture', wts: [14, 16], color: 0xd9dcdf, segs: 4, si: 0.5, prof: [
+    [0.62, 0], [0.62, 0.70], [0.35, 0.70], [0.15, 0.35], [-0.15, 0.35], [-0.35, 0.70], [-0.62, 0.70], [-0.62, 0]] },
+  'storm|id a.i.': { src: 'modelled on Storm’s ID A.I. core picture', wts: [14, 16], color: 0xb9bcc0, segs: 4, si: 0.8, prof: [
+    [0.58, 0], [0.58, 0.42], [-0.58, 0.42], [-0.58, 0]],
+    lobe: { h: 0.05, reach: 0.64, r: 0.30 } },
+  'storm|inverted fe2': { src: 'modelled on Storm’s Inverted Fe2 core picture', wts: [14, 16], color: 0xa8743a, prof: [
+    [0.65, 0], [0.65, 0.06], [0.62, 0.07], [0.60, 0.14], [0.55, 0.22], [0.45, 0.29], [0.35, 0.30], [0.25, 0.29], [0.15, 0.22], [0.08, 0.10], [0.05, 0]],
+    block: [-0.70, -0.86, 0.55, 0xc8202a] },
+  'storm|atmos a.i.': { src: 'modelled on the Atmos A.I. core in Storm’s 360° view (Monsoon page)', wts: [14, 16], color: 0xc9ccd0, prof: [
+    [0.79, 0], [0.78, 0.20], [0.70, 0.45], [0.55, 0.62], [0.37, 0.67], [0.18, 0.62], [0, 0.48], [-0.20, 0.32], [-0.30, 0.26], [-0.47, 0.28], [-0.50, 0]],
+    block: [-0.50, -0.71, 0.42, 0xc8202a] },
+};
+/* Generic core from the numbers, when there's no picture: a light-bulb shape along the pin axis, longer for a higher
+   differential (mass along the pin axis = low RG there); an asymmetric core gets a side lobe square to the PSA, bigger for a
+   higher int. diff. Illustration, not the ball's real core. */
+function coreModel(ball) {
+  const c = CORE_SHAPES[ball.coreKey], wt = +ball.weight || 15;
+  let m;
+  if (c && wt >= c.wts[0] && wt <= c.wts[1]) m = { ...c, lobe: c.lobe || null, block: c.block || null };
+  else {
+    const e = clamp((+ball.diff || 0.04) / 0.055, 0.2, 1.3), half = 0.38 + 0.22 * e, prof = [];
+    for (let i = 0; i <= 24; i++) { const t = 1 - 2 * i / 24, s = Math.sqrt(Math.max(0, 1 - t * t)); prof.push([half * t, 0.42 * Math.pow(s, 0.8) * (1 - 0.3 * Math.max(0, t))]); }
+    const mb = ball.core === 'asym' ? clamp(+ball.intdiff || 0, 0, 0.04) : 0;
+    m = { prof, lobe: mb ? { h: 0.05, reach: 0.5 + 10 * mb, r: 0.14 + 4 * mb } : null, src: 'generic shape from the specs' };
+  }
+  return ball.core === 'asym' ? fitCore(m, +ball.diff || 0, +ball.intdiff || 0) : m;
+}
+/* Physics of the drawn core. Core-local frame: x = wide side (eInt), y = pin (eLow), z = PSA (eHigh); uniform density,
+   moments about the ball's center. A one-sided lobe is a protrusion and points at the mass bias (+z), as makers draw it;
+   a lobe straight through both sides is a wide side and lies along x. The turned body and the block get stretched by
+   sp along x and si along z; for a linear stretch their second moments scale exactly (int x^2 -> sp^3 si Sx,
+   y^2 -> sp si Sy, z^2 -> sp si^3 Sz), so the grid runs once per core, unstretched. The lobe isn't stretched. */
+function coreMoments(m) {
+  const P = m.prof, n = m.segs || 72, ph0 = n === 4 ? Math.PI / 4 : 0, seg = 2 * Math.PI / n, L = m.lobe, B = m.block;
+  const rAt = h => { for (let i = 0; i + 1 < P.length; i++) { const [h0, r0] = P[i], [h1, r1] = P[i + 1];
+    if (h <= h0 && h >= h1) return h0 === h1 ? Math.max(r0, r1) : r0 + (r1 - r0) * (h0 - h) / (h0 - h1); } return 0; };
+  const N = 52, W = 1.3, st = 2 * W / N, S = [0, 0, 0], Lm = [0, 0, 0];
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) for (let k = 0; k < N; k++) {
+    const x = -W + (i + 0.5) * st, y = -W + (j + 0.5) * st, z = -W + (k + 0.5) * st, rho = Math.hypot(x, z), r = rAt(y);
+    let body = false;
+    if (r > 0) { let bound = r;
+      if (n < 24) { const a = ((Math.atan2(x, z) - ph0) % seg + seg) % seg; bound = r * Math.cos(Math.PI / n) / Math.cos(a - Math.PI / n); }
+      body = rho <= bound; }
+    if (!body && B) body = y <= B[0] && y >= B[1] && rho <= B[2];
+    if (body) { S[0] += x * x; S[1] += y * y; S[2] += z * z; continue; }
+    if (L && (L.both ? Math.abs(x) <= L.reach && Math.hypot(y - L.h, z) <= L.r : z >= 0 && z <= L.reach && Math.hypot(x, y - L.h) <= L.r)) {
+      Lm[0] += x * x; Lm[1] += y * y; Lm[2] += z * z; }
+  }
+  return { S, Lm };
+}
+/* Size the core square to the pin so its own inertia gives the ball's int. diff / diff ratio, which with
+   X, Y, Z = int x^2, y^2, z^2 is (I_psa - I_int) / (I_psa - I_pin) = (X - Z) / (Y - Z). Search width sp and
+   thickness toward the PSA si (both must still fit in the ball, and the pin must stay clearly the low-RG axis),
+   staying as close as it can to the traced shape. */
+const coreFitCache = new Map();
+function fitCore(m, diff, intdiff) {
+  if (!(diff > 0)) return m;
+  const t = clamp(intdiff / diff, 0, 0.95), key = JSON.stringify([m.src, m.prof.length, m.lobe, m.sp, m.si, t.toFixed(3)]);
+  if (coreFitCache.has(key)) return { ...m, ...coreFitCache.get(key) };
+  if (!m.mom) m.mom = coreMoments(m);
+  const { S, Lm } = m.mom, sp0 = m.sp || 1, si0 = m.si || 1;
+  const reach = Math.max(...m.prof.map(p => p[1]), m.block ? m.block[2] : 0, 0.05), fitsTo = 0.92 / reach;
+  let best = null;
+  for (let a = 0; a <= 60; a++) for (let b = 0; b <= 60; b++) {
+    const sp = 0.5 * Math.pow(Math.min(2.5, fitsTo) / 0.5, a / 60), si = 0.3 * Math.pow(Math.min(1.6, fitsTo) / 0.3, b / 60);
+    const X = sp ** 3 * si * S[0] + Lm[0], Y = sp * si * S[1] + Lm[1], Z = sp * si ** 3 * S[2] + Lm[2];
+    if (Y - Z < 0.15 * Y) continue;          // pin not clearly the low axis
+    const got = (X - Z) / (Y - Z), cost = (got - t) ** 2 + 0.004 * (Math.log(sp / sp0) ** 2 + Math.log(si / si0) ** 2);
+    if (!best || cost < best.cost) best = { cost, sp, si, got };
+  }
+  const fit = best ? { sp: best.sp, si: best.si, fit: { target: t, got: best.got } } : {};
+  coreFitCache.set(key, fit);
+  return { ...m, ...fit };
+}
 class BallView {
   constructor(host) {
     this.host = host;
@@ -1784,7 +2093,7 @@ class BallView {
   /* RG contour map (as in Powerhouse Blueprint): each point on the cover is colored by the drilled ball's RG about the
      axis through that point, sqrt(a^T I a). Low RG sits at the pin, high RG on the PSA side; a free axis migrates roughly
      along one contour, so the map shows where the PAP can go. Dark lines every 1/8 of the low-to-high range. */
-  rgContours(I, hs) {
+  rgContours(I, hs, see) {
     const geo = new THREE.SphereGeometry(R, 120, 80), pos = geo.attributes.position, n = pos.count;
     const rg = new Float32Array(n); let lo = Infinity, hi = -Infinity;
     for (let i = 0; i < n; i++) {
@@ -1796,7 +2105,7 @@ class BallView {
     const col = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { const c = cmap((rg[i] - lo) / span); col.set(c, i * 3); }
     geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    this.group.add(new THREE.Mesh(geo, holeCut(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 }))));
+    this.group.add(new THREE.Mesh(geo, holeCut(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0, ...(see ? SEE_THROUGH : {}) }))));
     // iso-lines by marching triangles over the sphere mesh
     const idx = geo.index.array, seg = [], P = k => new THREE.Vector3(pos.getX(k), pos.getY(k), pos.getZ(k));
     for (let L = 1; L < 8; L++) {
@@ -1842,6 +2151,30 @@ class BallView {
     const rim = new THREE.Mesh(new THREE.RingGeometry(1, 1 + 0.06 / a, 48), new THREE.MeshBasicMaterial({ color: 0x9aa3ad, side: THREE.DoubleSide }));
     rim.quaternion.copy(mask.quaternion); rim.scale.set(a, bw, 1); rim.position.copy(out.clone().multiplyScalar(R + 0.006)); this.group.add(rim);
   }
+  /* The core inside a see-through cover: lathe profile around the pin axis (eLow) and a grey rod to the pin. Asymmetric:
+     a one-sided protrusion points at the mass bias (eHigh), as makers draw it; the wide side lies square to the PSA, and
+     its width comes from fitCore, so the drawn shape's own inertia matches the ball's int. diff / diff (physics: mass out
+     along a direction raises the RG about the two axes square to it). User's call 2026-11-12. */
+  core(ball, inert, hs) {
+    const m = coreModel(ball), disp = a => new THREE.Vector3(hs * a[0], a[1], a[2]).normalize(), up = new THREE.Vector3(0, 1, 0);
+    const mat = new THREE.MeshStandardMaterial({ color: m.color ?? (ball.core === 'asym' ? 0x9b3fb5 : 0xf2e64b), roughness: 0.35, metalness: 0.05, side: THREE.DoubleSide });
+    const yAx = disp(inert.eLow), zAx = disp(inert.eHigh), xAx = disp(inert.eInt);
+    // segs: 72 = round; 4 = a box (phi turns it square to the PSA); 8 = faceted. sp stretches the wide side (eInt), si the PSA side.
+    const body = new THREE.Mesh(new THREE.LatheGeometry(m.prof.slice().reverse().map(([h, r]) => new THREE.Vector2(Math.max(r, 0) * R, h * R)), m.segs || 72, m.segs === 4 ? Math.PI / 4 : 0), mat);
+    body.matrixAutoUpdate = false; body.matrix.makeBasis(xAx.clone().multiplyScalar(m.sp || 1), yAx, zAx.clone().multiplyScalar(m.si || 1)); this.group.add(body);
+    if (m.block) { const [h0, h1, br, col] = m.block, b = new THREE.Mesh(new THREE.CylinderGeometry(br * R, br * R, (h0 - h1) * R, 48), new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.1 }));
+      b.matrixAutoUpdate = false; b.matrix.makeBasis(xAx.clone().multiplyScalar(m.sp || 1), yAx, zAx.clone().multiplyScalar(m.si || 1)).setPosition(yAx.clone().multiplyScalar((h0 + h1) / 2 * R)); this.group.add(b); }
+    const rod = (dir, from, rad) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad, R - from, 16), new THREE.MeshStandardMaterial({ color: 0x8c9096, roughness: 0.5 }));
+      r.quaternion.setFromUnitVectors(up, dir); r.position.copy(dir.clone().multiplyScalar((R + from) / 2)); this.group.add(r); };
+    rod(yAx, m.prof[0][0] * R, 0.12);
+    if (m.lobe) { // a round bar from the axis: one-sided = protrusion toward the mass bias; both = straight through, along the wide side
+      const L = m.lobe, len = L.reach * R, base = yAx.clone().multiplyScalar(L.h * R), dir = L.both ? xAx : zAx;
+      const c = new THREE.Mesh(new THREE.CylinderGeometry(L.r * R, L.r * R, L.both ? 2 * len : len, 48, 1, false), mat);
+      c.quaternion.setFromUnitVectors(up, dir); c.position.copy(base.clone().add(dir.clone().multiplyScalar(L.both ? 0 : len / 2))); this.group.add(c);
+    }
+    this.coreFit = m.fit || null;
+    this.coreSrc = m.src;
+  }
   face(vec) { const d = this.camera.position.length(); const v = new THREE.Vector3(...vec).normalize().multiplyScalar(d); this.camera.position.copy(v); this.controls.update(); }
   update(d) {
     disposeTree(this.group); this.group.clear();
@@ -1850,9 +2183,11 @@ class BallView {
     const rough = GRIT_ROUGH[d.ball.grit] ?? .5;
     const mat = new THREE.MeshPhysicalMaterial({ color: d.ball.color, roughness: rough, clearcoat: rough < .3 ? 0.8 : 0.1, clearcoatRoughness: rough < .3 ? 0.1 : 0.6,
       iridescence: d.ball.cover === 'pearl' ? 0.6 : 0, iridescenceIOR: 1.5, sheen: d.ball.cover === 'pearl' ? 0.4 : 0 });
+    const see = !!(d.showCore && d.inert); if (see) Object.assign(mat, SEE_THROUGH);
     holeCut(mat);
-    if (d.showContours && d.inertI) this.rgContours(d.inertI, hs);
+    if (d.showContours && d.inertI) this.rgContours(d.inertI, hs, see);
     else this.group.add(new THREE.Mesh(new THREE.SphereGeometry(R, 96, 64), mat));
+    this.coreSrc = ''; if (see) this.core(d.ball, d.inert, hs);
     // gripping holes, drilled: each opening is cut out of the cover (stencil), and through it you see the bore —
     // a cylinder down the hole's pitched line to its depth — so size, oval and pitch all show
     for (const h of d.geo.holes) this.drillHole(h, hs);
@@ -2274,7 +2609,7 @@ function analyze(state, X, rec) {
   const th = tilt.v * D2R, ph = rot.v * D2R, axis = [-Math.cos(th) * Math.cos(ph), -Math.cos(th) * Math.sin(ph), Math.sin(th)];
   const thr = throwFor(state.b, state.ball);
   const cfg = { mph: thr.mph, rpm: thr.rpm, tilt: tilt.v, rot: rot.v, laydown: state.lane.laydown,
-    inert: inertia(spec, geo), fr: makeFriction(state.lane, state.ball, L), q0: releaseOrientation(state.b, geo, axis) };
+    inert: inertia(spec, geo), fr: makeFriction(state.lane, state.ball, L, spec), q0: releaseOrientation(state.b, geo, axis) };
   // aim from the entered laydown; if the ball would need the gutter (or can't get there), find a playable laydown
   const tryLay = lay => { const c = { ...cfg, laydown: lay }; const a = aim(c); const run = simulate(c, a.alpha); const st = motionStats(run, a.alpha); return { c, a, run, st }; };
   const playable = r => r.a.status === 'ok' && (r.st.gutter == null || r.st.gutter >= 60) && r.st.bpBoard >= 3;
@@ -2337,6 +2672,7 @@ function analyze(state, X, rec) {
   const warns = [...L.warn];
   for (const h of geo.holes) if (gcDist(h.p, geo.pin) < h.d / 2 + 0.1) warns.push(`Pin lands in/at the ${h.name} hole — fine on modern balls, but tell the driller.`);
   if (geo.psa) for (const h of geo.holes) if (gcDist(h.p, geo.psa) < h.d / 2 + 0.1) warns.push(`PSA lands at the ${h.name} hole.`);
+  { const st = state.ball.stat || {}; if ([st.top, st.side, st.fing].some(v => Math.abs(v || 0) > STATIC_MAX)) warns.push(`Static weight over ${STATIC_MAX} oz in one direction isn’t legal in USBC play (no balance holes since 2020).`); }
   if (fl.hits.length) warns.push(`Flare rings may run into the ${fl.hits.join(' and ')} hole${fl.hits.length > 1 ? 's' : ''} — the driller should check, and may shift the layout.`);
   else if (fl.near.length) warns.push(`Flare rings pass within 1" of the ${fl.near.join(' and ')} — less than the usual 1" safety buffer for release variation.`);
   if (state.lane.auto && !mine) {
@@ -2372,7 +2708,7 @@ function compute() {
   renderStats(state, res);
   if (THREE) {
     { const vlsA = res.A?.L.sys === 'vls'; document.querySelectorAll('[data-sys]').forEach(e => e.classList.toggle('hidden', (e.dataset.sys === 'vls') !== vlsA)); }
-    for (const X of ['A', 'B']) if (res[X]) views[X].update({ hand: state.b.hand, ball: res[X].ball, geo: res[X].geo, fl: res[X].fl, L: res[X].L, run: res[X].run, tilt: rec.tilt.both ? rec.tilt.both.tDiam : rec.tilt.v, ringPap: rec.tilt.both && Math.abs(rec.tilt.both.papShift) > 0.05 ? rec.tilt.both.papFix : null, showRings: $('showRings').checked, showLines: $('showLines').checked, showContours: $('showContours').checked, inertI: res[X].cfg.inert.I, inert: res[X].cfg.inert });
+    for (const X of ['A', 'B']) if (res[X]) views[X].update({ hand: state.b.hand, ball: res[X].ball, geo: res[X].geo, fl: res[X].fl, L: res[X].L, run: res[X].run, tilt: rec.tilt.both ? rec.tilt.both.tDiam : rec.tilt.v, ringPap: rec.tilt.both && Math.abs(rec.tilt.both.papShift) > 0.05 ? rec.tilt.both.papFix : null, showRings: $('showRings').checked, showLines: $('showLines').checked, showContours: $('showContours').checked, showCore: $('showCore').checked, inertI: res[X].cfg.inert.I, inert: res[X].cfg.inert });
     const vA = views.A && views.A.rgRange, onC = $('showContours').checked;
     $('rgLegend').classList.toggle('hidden', !onC);
     if (onC && vA) $('rgLegendTxt').textContent = `RG contours (A): ${vA[0].toFixed(3)} low → ${vA[1].toFixed(3)} high, lines every ${((vA[1] - vA[0]) / 8).toFixed(4)}`;
@@ -2414,17 +2750,23 @@ function renderRead(state, rec, res) {
     <details class="adv"><summary>Why this recommendation</summary><ul class="why">${rec.why.map(w => `<li>${w}</li>`).join('')}</ul></details>
     ${warns.length ? `<ul class="warns">${warns.map(w => `<li>${w}</li>`).join('')}</ul>` : ''}`;
 }
+// static weights as a shop writes them: "1 oz top, 0.5 oz negative side"
+function statTxt(ball) {
+  const st = ball.stat || {}, o = v => `${+Math.abs(v).toFixed(2)} oz`, out = [];
+  if (st.top) out.push(`${o(st.top)} ${st.top > 0 ? 'top' : 'bottom'}`);
+  if (st.side) out.push(`${o(st.side)} ${st.side > 0 ? 'positive side' : 'negative side'}`);
+  if (st.fing) out.push(`${o(st.fing)} ${st.fing > 0 ? 'finger' : 'thumb'}`);
+  return out.join(', ');
+}
 function layoutBlock(state, X, r) {
   const sym = state.ball.core === 'sym', hand = state.b.hand === 'L' ? 'left' : 'right';
   const L = r.L, g = r.geo, surf = surfaceRec(r.s, state.ball);
-  // Radical's symmetric charts still use a drilling angle: it sets where the thumb (and the drilled PSA) lands vs the pin and CG
-  const chartSym = sym && !!r.stats.spec.chart;
   // the drill sheet's own order: the three Dual Angle numbers first, then where the pin and PSA land from the grip center
   const mark = (p) => `${fmtIn(Math.abs(p.over))} over, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}<small>${p.over >= 0 ? 'toward the PAP side' : 'away from the PAP side'}</small>`;
   const psa = r.psaOU || r.dpsaOU;
   return `<div>
     <div class="ds-figs" aria-label="Layout ${X}, Dual Angle">
-      <div><b>${sym && !chartSym ? '—' : Math.round(L.da) + '°'}</b><span>drilling angle${sym && !chartSym ? ' (n/a, symmetric)' : ''}</span></div>
+      <div><b>${Math.round(L.da)}°</b><span>drilling angle${sym ? ' (sets the drilled int. diff)' : ''}</span></div>
       <div><b>${fmtIn(L.p2p)}</b><span>pin to PAP</span></div>
       <div><b>${Math.round(L.val)}°</b><span>VAL angle</span></div>
     </div>
@@ -2442,16 +2784,17 @@ function layoutBlock(state, X, r) {
         : 'pin-up layouts add about 0.01–0.02, pin-down about −0.01, pin below the ring finger about −0.05'})</span></dd>
       <dt>Holes</dt><dd>${g.holes.map(h => `${h.name} ${fmt64(h.d)}"${h.w > h.d ? ` (oval ${fmt64(h.w)}")` : ''}`).join(', ')} <span class="hint">(${g.holes.fromFit ? 'drilled from the Fit specs card: spans, sizes, oval, pitches' : g.holes.sizesFromFit ? 'sizes from the Fit specs card; placed by the Grip card span until the fit has cut-to-cut spans, hole sizes and the bridge' : 'stock sizes placed by the Grip card span — fill in the Fit specs card to drill the real holes'})</span></dd>
       <dt>Surface</dt><dd>${surf.grit}</dd>
+      ${statTxt(state.ball) ? `<dt>Static weight</dt><dd>${statTxt(state.ball)} <span class="hint">(center of mass ${(Math.hypot(...r.stats.spec.cg) * 12).toFixed(3)}" off center; simulated)</span></dd>` : ''}
     </dl>
     <ul class="why simple-only">
-      <li>${explainDA(L.da, sym && !chartSym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(L.da, L.val, sym, chartSym)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
+      <li>${explainDA(L.da, sym)}</li><li>${explainP2P(L.p2p)}</li><li>${explainVAL(L.val)}</li><li>${explainSum(L.da, L.val, sym)}</li><li>${explainPin(L.pin)}</li><li>${surf.note}</li>
     </ul>
     <p class="hint adv">${surf.note} Measurements are from the center of the grip, the same way the PAP is measured (${hand}-handed view).</p>
   </div>`;
 }
 function renderLayout(state, res) {
-  { const L = res.A.L, sym = state.ball.core === 'sym' && !res.A.stats.spec.chart;
-    $('jumpSum').innerHTML = `<b>Layout</b>${sym ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°`; }
+  { const L = res.A.L;
+    $('jumpSum').innerHTML = `<b>Layout</b>${Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°`; }
   $('layOutA').innerHTML = layoutBlock(state, 'A', res.A); $('layOutB').innerHTML = res.B ? layoutBlock({ ...state, ball: res.B.ball }, 'B', res.B) : ''; }
 function myLineRows(state, s, f) {
   const m = s.mine, R_ = state.b.hand !== 'L';
@@ -2529,7 +2872,7 @@ function onTiltSource(id) {
   for (const o of TILT_SOURCES) if (o !== id && !(TILT_PAIR.includes(id) && TILT_PAIR.includes(o))) $(o).value = '';
 }
 document.querySelector('main').addEventListener('input', e => {
-  if (e.target.id === 'patPreset' || e.target.closest('#logBox')) return; // typing a shot in doesn't change the simulation
+  if (e.target.id === 'patPreset' || e.target.id === 'patSearch' || e.target.closest('#logBox')) return; // typing a shot in doesn't change the simulation
   if (['patLen', 'patVol', 'patShape'].includes(e.target.id)) { $('patPreset').value = 'custom'; patternUI(); }
   onTiltSource(e.target.id);
   if (e.target.id === 'tilt' && e.target.value !== '') for (const o of TILT_SOURCES) $(o).value = '';
@@ -2564,6 +2907,63 @@ function patternUI() {
 }
 $('patPreset').addEventListener('change', e => { const p = PATTERNS[e.target.value]; if (p) { $('patLen').value = p.len; $('patVol').value = p.vol; $('patShape').value = p.shape; } patternUI(); schedule(); });
 fillPatterns(); patternUI();
+/* pattern search: same combobox as the ball search, over every option in the Pattern list (real + generic) */
+const PAT_MAX = 40; let patIdx = [], patShown = [], patSel = -1;
+function fillPatSearch() {
+  patIdx = [...$('patPreset').options].map(o => {
+    const grp = o.parentElement.label || '', p = o.value.startsWith('k:') ? ALL_PATTERNS[+o.value.slice(2)] : null;
+    const name = p ? p.n : o.text, sub = p ? `${grp} · ${p.d} ft · ${p.ra}:1 · ${p.v} mL` : grp;
+    const words = p ? `${p.d}ft ${p.d}' ${p.ra}:1 ${p.d < 38 ? 'short' : p.d > 43 ? 'long' : 'medium'} ${p.ra < 4.5 ? 'sport' : 'house recreational'}` : '';
+    return { v: o.value, name, sub, low: ' ' + name.toLowerCase(), t: `${name} ${sub} ${words}`.toLowerCase() };
+  });
+}
+function patHits(q) {
+  const words = q.trim().toLowerCase().replace(/(\d)\s+(ft|feet)\b/g, '$1ft').split(/\s+/).filter(Boolean); if (!words.length) return [];
+  const rank = e => words.reduce((s, w) => s + (e.low.includes(' ' + w) ? 0 : e.low.includes(w) ? 1 : 2), 0);
+  return patIdx.filter(e => words.every(w => e.t.includes(w))).map(e => [rank(e), e]).sort((a, b) => a[0] - b[0]).map(r => r[1]);
+}
+function closePatSearch() { const inp = $('patSearch'); $('patSearchList').hidden = true; patSel = -1; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); }
+function drawPatSearch() {
+  const inp = $('patSearch'), list = $('patSearchList');
+  if (!inp.value.trim()) return closePatSearch();
+  const hits = patHits(inp.value); patShown = hits.slice(0, PAT_MAX); patSel = -1; list.innerHTML = '';
+  if (!hits.length) list.innerHTML = '<div class="bs-none">No pattern matches that.</div>';
+  patShown.forEach((e, i) => {
+    const d = document.createElement('div'); d.className = 'bs-opt'; d.id = 'psOpt' + i; d.dataset.i = i;
+    d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false');
+    const n = document.createElement('b'), s = document.createElement('small'); n.textContent = e.name; s.textContent = e.sub;
+    d.append(n, s); list.append(d);
+  });
+  if (hits.length > PAT_MAX) { const m = document.createElement('div'); m.className = 'bs-more'; m.textContent = `${hits.length - PAT_MAX} more — keep typing to narrow it down`; list.append(m); }
+  list.hidden = false; list.scrollTop = 0; inp.setAttribute('aria-expanded', 'true'); inp.removeAttribute('aria-activedescendant');
+}
+function markPatSearch() {
+  const inp = $('patSearch');
+  $('patSearchList').querySelectorAll('.bs-opt').forEach((d, i) => { const on = i === patSel; d.classList.toggle('on', on); d.setAttribute('aria-selected', on); if (on) d.scrollIntoView({ block: 'nearest' }); });
+  if (patSel >= 0) inp.setAttribute('aria-activedescendant', 'psOpt' + patSel); else inp.removeAttribute('aria-activedescendant');
+}
+function choosePattern(e) {
+  $('patSearch').value = e.name; $('patSearch').title = ''; closePatSearch();
+  const sel = $('patPreset'); sel.value = e.v; sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+fillPatSearch();
+$('patSearch').addEventListener('input', drawPatSearch);
+$('patSearch').addEventListener('focus', () => { if ($('patSearchList').hidden) drawPatSearch(); });
+$('patSearch').addEventListener('blur', closePatSearch);
+$('patSearch').addEventListener('keydown', e => {
+  const open = !$('patSearchList').hidden, n = patShown.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); if (!open) { drawPatSearch(); return; } if (!n) return;
+    patSel = e.key === 'ArrowDown' ? (patSel + 1) % n : (patSel <= 0 ? n - 1 : patSel - 1); markPatSearch();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (open && patSel >= 0) return choosePattern(patShown[patSel]);
+    const q = e.target.value.trim().toLowerCase(), exact = patIdx.find(x => x.name.toLowerCase() === q), hits = exact ? [exact] : patHits(q);
+    if (hits.length === 1) choosePattern(hits[0]); else e.target.title = 'More than one pattern matches — pick one from the list';
+  } else if (e.key === 'Escape' && open) { e.preventDefault(); closePatSearch(); }
+});
+$('patSearchList').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the box so blur doesn't close it first
+$('patSearchList').addEventListener('click', e => { e.preventDefault(); const d = e.target.closest('.bs-opt'); if (d) choosePattern(patShown[+d.dataset.i]); });
 document.addEventListener('click', e => { const f = e.target.closest('[data-upsell]')?.dataset.upsell; if (f) cloud.require(f); });
 { // Free: Auto line shows as a Pro option; picking it opens the upsell and falls back to "Pocket from laydown"
   const o = $('lineMode').querySelector('option[value="auto"]');
@@ -2585,7 +2985,7 @@ $('readCard').addEventListener('click', e => {
    two-handed / no-thumb starts. Shown for a ball with a chart, and for any ball when the bowler is two-handed. */
 function makerLayouts(ball, style) {
   const ch = chartFor(ball), out = [];
-  if (ch) for (const [id, name, da, p2p, val, idf, df, rgPap] of ch.rows) out.push({ key: id, label: `${id} – ${name}: ${da}° × ${fmtIn(p2p)} × ${val}° (int ${idf.toFixed(3)}, diff ${df.toFixed(3)}, RG at PAP ${rgPap.toFixed(3)})`, L: { da, p2p, val, pin: 'up' } });
+  if (ch) for (const [id, name, da, p2p, val, idf, df, rgPap] of ch.rows) out.push({ key: id, label: `${id} – ${name}: ${da}° × ${fmtIn(p2p)} × ${val}° (int ${idf.toFixed(3)}, diff ${df.toFixed(3)}${ch.rgOk === false ? '' : `, RG at PAP ${rgPap.toFixed(3)}`})`, L: { da, p2p, val, pin: 'up' } });
   if (ch || style === '2H') for (const [key, name, L, note] of TWO_HAND_LAYOUTS) out.push({ key, label: `${name}: ${L.da}° × ${fmtIn(L.p2p)} × ${L.val}° — ${note}`, L });
   return { out, ch };
 }
@@ -2610,7 +3010,7 @@ for (const X of ['A', 'B']) $('card' + X).addEventListener('click', e => {
   else { const cur = resolveLayout(readRawLayout('A'), st.ball); const s = strengthOf(cur); setLayoutInputs('B', q === 'control' ? CONTROL : stepLayout(s, q === 'weaker' ? 1 : -1).layout); }
   compute();
 });
-$('showRings').addEventListener('change', compute); $('showLines').addEventListener('change', compute); $('showContours').addEventListener('change', compute);
+$('showRings').addEventListener('change', compute); $('showLines').addEventListener('change', compute); $('showContours').addEventListener('change', compute); $('showCore').addEventListener('change', compute);
 $('viewLayout').addEventListener('click', () => { for (const X of ['A', 'B']) if (views[X]?.layoutVec) { views[X].userMoved = false; views[X].face(views[X].layoutVec); } });
 $('viewGrip').addEventListener('click', () => { for (const X of ['A', 'B']) views[X]?.face([0, 0.1, 1]); });
 $('viewPap').addEventListener('click', () => { for (const X of ['A', 'B']) if (views[X]?.papVec) views[X].face(views[X].papVec); });
@@ -2746,10 +3146,12 @@ $('ballSearch').addEventListener('keydown', e => {
 });
 $('ballSearchList').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the box so blur doesn't close it first
 $('ballSearchList').addEventListener('click', e => { e.preventDefault(); /* no label activation */ const d = e.target.closest('.bs-opt'); if (d) chooseBall(searchShown[+d.dataset.i]); });
+// static weights belong to the drilled ball: a different ball starts level, an arsenal ball brings its own
+function setStatic(st) { $('stTop').value = st?.top || 0; $('stSide').value = st?.side || 0; $('stFing').value = st?.fing || 0; }
 function loadBall(id) {
-  const b = allBalls().find(x => x.id === id); if (!b) { $('ballNote').textContent = 'Enter the ball specs in Advanced mode.'; $('ballSpecs').innerHTML = ''; fillWeights(null); return; }
+  const b = allBalls().find(x => x.id === id); setStatic(b?.stat); $('wearGames').value = b?.games || 0; if (!b) { $('ballNote').textContent = 'Enter the ball specs in Advanced mode.'; $('ballSpecs').innerHTML = ''; fillWeights(null); return; }
   $('ballName').value = b.brand && b.brand !== TYPES && b.brand !== MINE ? `${b.brand} ${b.name}` : b.name; $('core').value = b.core; $('rg').value = b.rg; $('diff').value = b.diff; $('intdiff').value = b.intdiff;
-  $('cover').value = b.cover; $('grit').value = b.grit; $('pin2psa').value = b.pin2psa; $('ballColor').value = b.color || '#5b2a86';
+  $('cover').value = b.cover; $('absorb').value = b.absorb || ''; $('grit').value = b.grit; $('pin2psa').value = b.pin2psa; $('ballColor').value = b.color || '#5b2a86';
   $('ballNote').textContent = b.note || (b.mine ? 'Saved on this device.' : '');
   fillWeights(b, b.weight); applyWeight();
 }
@@ -2784,6 +3186,7 @@ function renderBallSpecs(b, wt) {
     <dl class="kv">
       ${row('Ball', `<b>${b.brand && b.brand !== TYPES && b.brand !== MINE ? b.brand + ' ' : ''}${b.name}</b>`)}
       ${x ? row('Coverstock', `${x.cv} <span class="hint">(${x.ct})</span>`) : row('Cover', b.cover)}
+      ${row('Oil absorption', b.absorb ? ABSORB_LABEL[b.absorb] : `${ABSORB_LABEL[absorbAuto(b.cover)]} <span class="hint">(usual for the cover type)</span>`)}
       ${x ? row('Core', `${x.k} <span class="hint">(${x.s === 'asym' ? 'asymmetric' : 'symmetric'})</span>`) : row('Core', b.core === 'asym' ? 'asymmetric' : 'symmetric')}
       ${x ? row('Box finish', x.f) : ''}
       ${x ? row('Released', `${x.d}${x.i ? ' · international release' : ' · US release'}${x.x ? ' · <b>discontinued</b>' : ''}`) : ''}
@@ -2810,7 +3213,7 @@ for (const [btn, fn] of [['rc_vUse', rcVideo], ['rc_oUse', rcRings]]) $(btn).add
 $('ballSave').addEventListener('click', () => {
   const st = readState(); const mine = store.get('layoutlab.balls', []);
   const id = 'my-' + st.ball.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const rec = { id, name: st.ball.name, core: st.ball.core, rg: st.ball.rg, diff: st.ball.diff, intdiff: st.ball.intdiff, cover: st.ball.cover, grit: st.ball.grit, pin2psa: $('pin2psa').value, color: st.ball.color, weight: st.ball.weight };
+  const rec = { id, name: st.ball.name, core: st.ball.core, rg: st.ball.rg, diff: st.ball.diff, intdiff: st.ball.intdiff, cover: st.ball.cover, absorb: st.ball.absorb, grit: st.ball.grit, pin2psa: $('pin2psa').value, color: st.ball.color, weight: st.ball.weight, stat: st.ball.stat, games: st.ball.games };
   const i = mine.findIndex(b => b.id === id); if (i >= 0) mine[i] = rec; else mine.push(rec);
   store.set('layoutlab.balls', mine); fillBallSelect(id); $('ballNote').textContent = 'Saved on this device.';
 });
@@ -3250,6 +3653,7 @@ function openBallAdmin() {
       <label class="f"><span>Core name</span><input id="baCore" maxlength="80" autocomplete="off"></label>
       <label class="f"><span>Coverstock</span><input id="baCover" maxlength="80" autocomplete="off" placeholder="e.g. HK22 Hybrid"></label>
       <label class="f"><span>Cover type</span><select id="baCt">${COVER_TYPES.map(t => `<option>${t}</option>`).join('')}</select></label>
+      <label class="f" title="From the maker or USBC's oil absorption time, if you have it (90 min or longer = slow). Leave on Auto otherwise."><span>Oil absorption</span><select id="baAbs"><option value="">Auto (from cover type)</option><option value="fast">Fast</option><option value="med">Medium</option><option value="slow">Slow</option></select></label>
       <label class="f"><span>Factory finish</span><input id="baFin" maxlength="80" autocomplete="off" placeholder="e.g. 3000 Abralon"></label>
       <table class="wts"><tr><th>Weight</th><th>RG</th><th>Differential</th><th>Int. diff (asym)</th></tr>
         ${ALL_WTS.map(w => `<tr><td>${w} lb${w === 15 ? ' *' : ''}</td><td><input data-w="${w}" data-k="0" inputmode="decimal" placeholder="${w === 15 ? '2.500' : ''}"></td><td><input data-w="${w}" data-k="1" inputmode="decimal" placeholder="${w === 15 ? '0.045' : ''}"></td><td><input data-w="${w}" data-k="2" inputmode="decimal"></td></tr>`).join('')}</table>
@@ -3288,12 +3692,12 @@ function openBallAdmin() {
       r.append(who, acts); box.append(r);
     });
   };
-  const fromCatalog = c => ({ brand: c.brand, name: c.name, rel: c.released ? c.released.slice(0, 7) : '', sym: c.core_type, core: c.core, cover: c.coverstock, ct: c.cover_type, fin: c.finish, w: c.weights || { 15: [c.rg, c.diff, c.mb_diff] }, retired: c.discontinued });
-  const fromBuiltin = x => { const r = relOf(x); return { brand: x.b, name: x.n, rel: r ? `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, '0')}` : '', sym: x.s, core: x.k, cover: x.cv, ct: COVER_TYPES.find(t => t.toLowerCase() === (x.ct || '').toLowerCase()) || COVER_TYPES.find(t => coverKeyOf(t) === x.c) || COVER_TYPES[0], fin: x.f, w: x.w || { 15: [x.rg, x.df, x.mb] }, retired: !!x.x }; };
+  const fromCatalog = c => ({ brand: c.brand, name: c.name, rel: c.released ? c.released.slice(0, 7) : '', sym: c.core_type, core: c.core, cover: c.coverstock, ct: c.cover_type, abs: c.oil_absorb || '', fin: c.finish, w: c.weights || { 15: [c.rg, c.diff, c.mb_diff] }, retired: c.discontinued });
+  const fromBuiltin = x => { const r = relOf(x); return { brand: x.b, name: x.n, rel: r ? `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, '0')}` : '', sym: x.s, core: x.k, cover: x.cv, ct: COVER_TYPES.find(t => t.toLowerCase() === (x.ct || '').toLowerCase()) || COVER_TYPES.find(t => coverKeyOf(t) === x.c) || COVER_TYPES[0], abs: x.ab || '', fin: x.f, w: x.w || { 15: [x.rg, x.df, x.mb] }, retired: !!x.x }; };
   const open = (v, row) => {
     editing = row; form.hidden = false; msg('');
     q('#baBrand').value = v?.brand || ''; q('#baName').value = v?.name || ''; q('#baRel').value = v?.rel || ''; q('#baSym').value = v?.sym === 'asym' ? 'asym' : 'sym';
-    q('#baCore').value = v?.core || ''; q('#baCover').value = v?.cover || ''; q('#baCt').value = v?.ct || COVER_TYPES[0]; q('#baFin').value = v?.fin || ''; q('#baRetired').checked = !!v?.retired;
+    q('#baCore').value = v?.core || ''; q('#baCover').value = v?.cover || ''; q('#baCt').value = v?.ct || COVER_TYPES[0]; q('#baAbs').value = v?.abs || ''; q('#baFin').value = v?.fin || ''; q('#baRetired').checked = !!v?.retired;
     form.querySelectorAll('[data-w]').forEach(i => { const s = v?.w?.[i.dataset.w]; i.value = s && s[+i.dataset.k] != null && s[+i.dataset.k] !== '' ? (+s[+i.dataset.k]).toFixed(3) : ''; });
     q('[data-a=remove]').hidden = !row;
     (v ? q('#baRel') : q('#baBrand')).focus(); form.scrollIntoView({ block: 'nearest' });
@@ -3325,7 +3729,7 @@ function openBallAdmin() {
     if (!w[15]) return msg('15 lb RG and differential are required.', 'err');
     const rel = q('#baRel').value;
     const row = { brand: brandV, name: nameV, released: rel ? rel + '-01' : null, core_type: sym, core: q('#baCore').value.trim() || null, coverstock: q('#baCover').value.trim() || null,
-      cover_type: q('#baCt').value, finish: q('#baFin').value.trim() || null, weights: w, rg: w[15][0], diff: w[15][1], mb_diff: w[15][2], discontinued: q('#baRetired').checked };
+      cover_type: q('#baCt').value, oil_absorb: q('#baAbs').value || null, finish: q('#baFin').value.trim() || null, weights: w, rg: w[15][0], diff: w[15][1], mb_diff: w[15][2], discontinued: q('#baRetired').checked };
     // correcting a built-in ball that was already corrected: update that entry instead of making a duplicate
     const same = catalog.find(c => keyOf(c.brand, c.name) === keyOf(brandV, nameV));
     if (!editing && same) editing = same;
@@ -3456,7 +3860,7 @@ function makeRecord() {
   };
 }
 const ouTxt = p => p ? `${fmtIn(Math.abs(p.over))} ${p.over >= 0 ? 'over' : 'over (other side)'}, ${fmtIn(Math.abs(p.up))} ${p.up >= 0 ? 'up' : 'down'}` : 'n/a';
-const layTxt = r => `${r.ball.core === 'sym' ? '—' : r.layout.da + '°'} × ${fmtIn(r.layout.p2p)} × ${r.layout.val}° pin ${r.layout.pin}`;
+const layTxt = r => `${r.layout.da}° × ${fmtIn(r.layout.p2p)} × ${r.layout.val}° pin ${r.layout.pin}`;
 const vlsTxt = r => `${fmtIn(r.vls.p2p)} × ${r.vls.psa2pap != null ? fmtIn(r.vls.psa2pap) : 'n/a'} × ${fmtIn(r.vls.buf)}`;
 const GRIT_LABEL = { '360': '360', '500': '500', '1000': '1000', '1500': '1500', '2000': '2000', '3000': '3000', '4000': '4000', '1500p': '1500 + polish', 'polish': 'polish' };
 
@@ -3498,7 +3902,8 @@ function loadRecord(r) {
   if (pb) fillBallSelect(pb.id);
   fillWeights(pb, b.weight || +r.weight || 15); $('arsWeight').value = $('ballWt').value; renderBallSpecs(pb, +$('ballWt').value);
   $('ballName').value = b.name; $('core').value = b.core; $('rg').value = b.rg; $('diff').value = b.diff; $('intdiff').value = b.intdiff;
-  $('cover').value = b.cover; $('grit').value = b.grit; $('pin2psa').value = fmtIn(b.pin2psa).replace('"', ''); $('ballColor').value = b.color;
+  $('cover').value = b.cover; $('absorb').value = b.absorb || ''; $('grit').value = b.grit; $('pin2psa').value = fmtIn(b.pin2psa).replace('"', ''); $('ballColor').value = b.color;
+  setStatic(b.stat); $('wearGames').value = b.games || 0;
   setLayoutInputs('A', r.layout); compute();
 }
 $('arsTable').addEventListener('click', e => {
@@ -3515,7 +3920,7 @@ function quickMotion(state, ball, L0) {
   const L = resolveLayout({ ...L0, sys: 'dual' }, ball), geo = placeAll(state.b, ball, state.grip, L);
   const tilt = estTilt(state.b), rot = estRot(state.b), spec = drilledSpecs(ball, L, geo);
   const th = tilt.v * D2R, ph = rot.v * D2R, axis = [-Math.cos(th) * Math.cos(ph), -Math.cos(th) * Math.sin(ph), Math.sin(th)];
-  const cfg = { ...throwFor(state.b, ball), tilt: tilt.v, rot: rot.v, laydown: state.lane.laydown, inert: inertia(spec, geo), fr: makeFriction(state.lane, ball, L), q0: releaseOrientation(state.b, geo, axis) };
+  const cfg = { ...throwFor(state.b, ball), tilt: tilt.v, rot: rot.v, laydown: state.lane.laydown, inert: inertia(spec, geo), fr: makeFriction(state.lane, ball, L, spec), q0: releaseOrientation(state.b, geo, axis) };
   const run = lay => { const c = { ...cfg, laydown: lay }, a = aim(c), rr = simulate(c, a.alpha), st = motionStats(rr, a.alpha); lineScore(st, rr, state.lane.eff); st.ok = a.status === 'ok' && (st.gutter == null || st.gutter >= 60) && st.bpBoard >= 3; st.laydown = lay; return st; };
   if (!state.lane.auto) return run(state.lane.laydown);
   // same Auto line rule as the main view (best expected strike), on a coarser laydown grid to stay quick
@@ -3576,7 +3981,7 @@ function printBallSheet(name, r) {
   $('sheet').innerHTML = `${letterhead()}<h1>Drill sheet — ${name}</h1><div>${r.date}${r.driller ? ' · drilled by ' + r.driller : ''}${r.serial ? ' · serial ' + r.serial : ''}</div>
     <h2>Bowler (at time of drilling)</h2>${bowlerHead(name, r.bowler)}
     <h2>Fit card</h2>${fitPrintCard(r.fit, { name, date: r.date, hand: r.bowler.hand, pap: { over: r.bowler.papOver, up: r.bowler.papUp }, ball: r.ball.name, wgt: r.weight, sn: r.serial })}
-    <h2>Ball</h2><p><b>${r.ball.name}</b> — ${r.weight || '?'} lb, ${r.ball.core === 'asym' ? 'asymmetric' : 'symmetric'}, ${r.ball.cover}, RG ${r.ball.rg}, diff ${r.ball.diff}${r.ball.core === 'asym' ? ', int. diff ' + r.ball.intdiff : ''}. Surface: ${GRIT_LABEL[r.ball.grit] || r.ball.grit} (recommended ${r.surface}).</p>
+    <h2>Ball</h2><p><b>${r.ball.name}</b> — ${r.weight || '?'} lb, ${r.ball.core === 'asym' ? 'asymmetric' : 'symmetric'}, ${r.ball.cover}, RG ${r.ball.rg}, diff ${r.ball.diff}${r.ball.core === 'asym' ? ', int. diff ' + r.ball.intdiff : ''}. Surface: ${GRIT_LABEL[r.ball.grit] || r.ball.grit} (recommended ${r.surface}).${statTxt(r.ball) ? ` Static: ${statTxt(r.ball)}.` : ''}</p>
     <h2>Layout</h2><table><tr><th>Dual Angle</th><th>VLS (P2P × PSA-PAP × buffer)</th><th>Pin position</th><th>PSA position</th></tr>
     <tr><td>${layTxt(r)}</td><td>${vlsTxt(r)}</td><td>${ouTxt(r.pinOU)}</td><td>${ouTxt(r.psaOU)}</td></tr></table>
     <p style="font-size:9pt">Positions measured from the grip center like the PAP. Predicted on ${r.pattern}: breakpoint board ${isFinite(r.pred.bpBoard) ? r.pred.bpBoard.toFixed(1) : '—'} at ${isFinite(r.pred.bpFt) ? r.pred.bpFt.toFixed(0) : '—'} ft, ${isFinite(r.pred.hook) ? r.pred.hook.toFixed(1) : '—'} boards of hook, entry ${isFinite(r.pred.entry) ? r.pred.entry.toFixed(1) : '—'}°.</p>
@@ -3745,7 +4150,7 @@ function logShot(strike) {
   const rec = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: new Date().toISOString(),
     pattern: state.lane.pat ? state.lane.pat.n : 'generic', calibKey: state.lane.calibKey,
-    ball: state.ball.name, color: state.ball.color, layout: `${state.ball.core === 'sym' ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°`,
+    ball: state.ball.name, color: state.ball.color, layout: `${Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°`,
     lay, target, missBoards, missDir: missBoards ? missDir : null, arr,
     bp: opt('calBoard'), ft: opt('calFt'), hit: opt('calHit'), bad: $('calBad').checked,
     leave: strike ? [] : [...shotPins].sort((a, b) => a - b), pinType: $('pinType').value || null,
@@ -3875,7 +4280,7 @@ function calibShot(state, lay, arrows) {
   const cfg = { ...throwFor(state.b, ball), tilt: tilt.v, rot: rot.v, laydown: lay, inert: inertia(spec, geo), q0: releaseOrientation(state.b, geo, axis) };
   // one try at backend factor kb and oil factor ko: re-aim through the arrows each time (oil friction changes the heads)
   return (kb, ko = 1) => {
-    const c = { ...cfg, fr: makeFriction({ ...state.lane, calib: kb, calibOil: ko }, ball, L) }, alpha = alphaThrough(c, arrows);
+    const c = { ...cfg, fr: makeFriction({ ...state.lane, calib: kb, calibOil: ko }, ball, L, spec) }, alpha = alphaThrough(c, arrows);
     const run = simulate(c, alpha), st = motionStats(run, alpha), im = pocketImpact(run, +ball.weight || 15);
     st.hit = im && !im.miss ? im.board : st.pins; st.impact = im;
     return { kb, ko, st };
@@ -3943,10 +4348,10 @@ $('btnPrint').addEventListener('click', () => {
       <dt>Bridge</dt>${dd(f.fit_bridge, '"')}
     </dl></section>
     <section class="pchk-sec"><h3>Layout A</h3><div>
-      <div class="pchk-fig">${sym && !res.A.stats.spec.chart ? '—' : Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</div>
+      <div class="pchk-fig">${Math.round(L.da) + '°'} × ${fmtIn(L.p2p)} × ${Math.round(L.val)}°</div>
       <dl style="margin-top:8px"><dt>Pin</dt><dd>${where(res.A.pinOU)}</dd>${psa ? `<dt>PSA</dt><dd>${where(psa)}</dd>` : ''}</dl>
     </div></section>
-    ${res.B ? `<section class="pchk-sec"><h3>Layout B</h3><div class="pchk-fig">${sym ? '—' : Math.round(res.B.L.da) + '°'} × ${fmtIn(res.B.L.p2p)} × ${Math.round(res.B.L.val)}°</div></section>` : ''}
+    ${res.B ? `<section class="pchk-sec"><h3>Layout B</h3><div class="pchk-fig">${Math.round(res.B.L.da) + '°'} × ${fmtIn(res.B.L.p2p)} × ${Math.round(res.B.L.val)}°</div></section>` : ''}
     <section class="pchk-sec"><h3>Ball</h3><dl>
       <dt>Ball</dt><dd>${escH(state.ball.name || '—')}</dd>
       <dt>Weight</dt>${dd(String(state.ball.weight || ''), ' lb')}
@@ -3964,13 +4369,13 @@ function printDrillSheet() {
   if (views.A) imgs.push(views.A.renderer.domElement.toDataURL('image/png'));
   if (res.B && views.B) imgs.push(views.B.renderer.domElement.toDataURL('image/png'));
   drawLane2D(last.laneState); imgs.push($('lane2d').toDataURL('image/png'));
-  const row = (X, r) => `<tr><td><b>${X}</b></td><td>${sym ? 'n/a' : Math.round(r.L.da) + '°'} × ${fmtIn(r.L.p2p)} × ${Math.round(r.L.val)}°, pin ${r.L.pin}</td>
+  const row = (X, r) => `<tr><td><b>${X}</b></td><td>${Math.round(r.L.da) + '°'} × ${fmtIn(r.L.p2p)} × ${Math.round(r.L.val)}°, pin ${r.L.pin}</td>
     <td>${fmtIn(r.L.p2p)} × ${r.geo.psa2pap != null ? fmtIn(r.geo.psa2pap) : 'n/a'} × ${fmtIn(r.geo.buffer)}</td><td>${ou(r.pinOU)}</td><td>${r.psaOU ? ou(r.psaOU) : r.dpsaOU ? ou(r.dpsaOU) + ' (after drilling)' : 'n/a'}</td>
     <td>${surfaceRec(r.s, state.ball).grit}</td><td>BP ${r.stats.bpBoard.toFixed(1)} @ ${r.stats.bpFt.toFixed(0)} ft; entry ${r.stats.entry.toFixed(1)}°</td></tr>`;
   const warns = [...res.A.warns, ...(res.B ? res.B.warns : [])];
   $('sheet').innerHTML = `${letterhead()}
     <h1>Drill sheet — ${state.b.name || 'Bowler'}</h1>
-    <div>${new Date().toLocaleDateString()} · ${state.ball.name}</div>
+    <div>${new Date().toLocaleDateString()} · ${state.ball.name}${statTxt(state.ball) ? ` · static: ${statTxt(state.ball)}` : ''}</div>
     <h2>Bowler</h2>
     <table><tr><th>Hand / style</th><th>PAP</th><th>Speed</th><th>Revs</th><th>Tilt / rotation</th><th>Lane</th></tr>
     <tr><td>${state.b.hand === 'L' ? 'Left' : 'Right'} · ${state.b.style === '2H' ? 'two-handed' : 'one-handed'}</td><td>${fmtIn(state.b.papOver)} over, ${fmtIn(Math.abs(state.b.papUp))} ${state.b.papUp >= 0 ? 'up' : 'down'}</td>
@@ -4001,6 +4406,367 @@ const replacedMine = (() => {
 })();
 $('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(b => !b.disc).length} current${DB_BALLS.some(b => b.disc) ? ` + ${DB_BALLS.filter(b => b.disc).length} retired, kept ${KEEP_YEARS} years from release` : ''}). New releases are added as they come out${catalog.length ? `; ${catalog.length} added or corrected since ${BALL_DB_DATE}` : ''}.`
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
+/* ---------- Shop: plug colors ----------
+   Match a plug to the ball's cover. The color math lives in js/plug-color.js (loaded only for a Shop account).
+   Synced keys: xing.plug.recipes (saved recipes, with a 96px photo thumbnail), xing.plug.tints (tint calibrations),
+   xing.plug.settings (batch), xing.plug.ballColors (cover colors remembered per ball when a recipe is saved).
+   The card is hidden, not shown locked, for anyone without Shop. The gate runs in the browser only. */
+let PC = null; // the plug-color module once loaded
+const pcS = { ball: null, targets: [], thumb: '', results: null, saveOpen: false, filter: '', min: 0, picker: null };
+const pcEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pcSet = () => ({ ...PC.DEFAULT_PLUG_SETTINGS, ...(store.get('xing.plug.settings', {}) || {}) });
+const pcKit = () => PC.kitTints(store.get('xing.plug.tints', {}) || {});
+const pcRecipes = () => store.get('xing.plug.recipes', []) || [];
+const pcSw = (hex, cls = '') => `<span class="pc-sw ${cls}" style="background:${pcEsc(hex)}" title="${pcEsc(hex)}"></span>`;
+const pcBallName = b => (b.brand === MINE || b.brand === TYPES ? b.label : `${b.brand} ${b.label}`);
+const pcStars = (n, edit, id = '') => `<span class="pc-stars" role="${edit ? 'group' : 'img'}" aria-label="${edit ? 'How did it turn out' : `${n} of 5 stars`}">${[1, 2, 3, 4, 5].map(k => edit
+  ? `<button type="button" data-a="star" data-n="${k}" data-id="${pcEsc(id)}" class="${k <= n ? 'on' : ''}" aria-pressed="${k <= n}" aria-label="${k} star${k > 1 ? 's' : ''}">★</button>`
+  : `<span class="${k <= n ? 'on' : ''}">★</span>`).join('')}</span>`;
+
+async function plugGate() {
+  const on = cloud.can('plugcolor');
+  $('plugCard').classList.toggle('hidden', !on);
+  if (!on || PC) return;
+  try { PC = await import('./js/plug-color.js'); } catch (e) { console.warn('[plug] color module did not load', e); return; }
+  plugInit();
+}
+
+function plugInit() {
+  pcS.picker = pcPicker($('pcPicker'), { maxSpots: 3, onChange: r => { pcS.targets = r.hexes; pcS.thumb = r.thumb || ''; pcS.results = null; pcDrawTargets(); $('pcResults').innerHTML = ''; } });
+  // ball search: every typed word must appear in the brand or name
+  const inp = $('pcBall'), list = $('pcBallList');
+  let hits = [], sel = -1;
+  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); sel = -1; };
+  const draw = () => {
+    const words = inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return close();
+    hits = allBalls().filter(b => { const t = `${b.brand} ${b.label}`.toLowerCase(); return words.every(w => t.includes(w)); }).slice(0, 30);
+    list.innerHTML = hits.length ? hits.map((b, i) => `<span class="bs-opt${i === sel ? ' on' : ''}" role="option" id="pcOpt${i}" data-i="${i}" aria-selected="${i === sel}"><b>${pcEsc(b.label)}</b><small>${pcEsc(b.brand)}</small></span>`).join('')
+      : '<span class="bs-none">No ball matches that.</span>';
+    list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    if (sel >= 0) inp.setAttribute('aria-activedescendant', 'pcOpt' + sel);
+  };
+  const pick = i => { const b = hits[i]; if (!b) return; pcS.ball = { id: b.id, label: pcBallName(b), brand: b.brand, name: b.name || b.label, color: b.color }; inp.value = ''; close(); pcDrawBall(); };
+  inp.addEventListener('input', () => { sel = -1; draw(); });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!hits.length) return; sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length; draw(); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(sel >= 0 ? sel : 0); }
+    else if (e.key === 'Escape') close();
+  });
+  inp.addEventListener('blur', () => setTimeout(close, 150));
+  list.addEventListener('mousedown', e => { const o = e.target.closest('[data-i]'); if (o) { e.preventDefault(); pick(+o.dataset.i); } });
+  $('pcBallInfo').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'unball') { pcS.ball = null; pcDrawBall(); }
+    if (a.dataset.a === 'cover') pcAddTargets([a.dataset.hex]);
+    if (a.dataset.a === 'covers') pcAddTargets(JSON.parse(a.dataset.hexes), true);
+  });
+  $('pcTargets').addEventListener('input', e => { const i = e.target.dataset.i; if (e.target.type === 'color' && i != null) { pcS.targets[+i] = e.target.value; pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets(false); } });
+  $('pcTargets').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'rm') pcS.targets.splice(+a.dataset.i, 1);
+    if (a.dataset.a === 'add') pcS.targets.push(pcS.targets.at(-1) || '#2a4fb0');
+    if (a.dataset.a === 'clear') pcS.targets = [];
+    pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets();
+  });
+  $('pcGo').addEventListener('click', pcCompute);
+  $('pcResults').addEventListener('click', pcResultsClick);
+  $('pcResults').addEventListener('input', e => { if (e.target.id === 'pcNotes') pcS.notes = e.target.value; });
+  $('pcSearch').addEventListener('input', e => { pcS.filter = e.target.value; pcDrawRecs(); });
+  $('pcMin').addEventListener('click', e => { const b = e.target.closest('[data-min]'); if (!b) return; pcS.min = +b.dataset.min; [...$('pcMin').children].forEach(x => x.classList.toggle('on', x === b)); pcDrawRecs(); });
+  $('pcRecs').addEventListener('click', pcRecsClick);
+  // tints and batch
+  const st = pcSet();
+  $('pcBatchName').value = st.batchName; $('pcBatchSize').value = st.batchSize;
+  $('pcBatchName').addEventListener('change', e => { store.set('xing.plug.settings', { ...pcSet(), batchName: e.target.value.trim() || PC.DEFAULT_PLUG_SETTINGS.batchName }); pcRefresh(); });
+  $('pcBatchSize').addEventListener('change', e => { const v = Math.min(4, Math.max(0.25, +e.target.value || 1)); e.target.value = v; store.set('xing.plug.settings', { ...pcSet(), batchSize: v }); pcRefresh(); });
+  $('pcTints').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    const id = a.dataset.id;
+    if (a.dataset.a === 'cal') pcCalibrate(id);
+    if (a.dataset.a === 'uncal') { const c = { ...(store.get('xing.plug.tints', {}) || {}) }; delete c[id]; store.set('xing.plug.tints', c); pcRefresh(); }
+  });
+  $('pcResetCal').addEventListener('click', () => { if (confirm('Go back to the starting colors for every tint? Your calibrations are removed.')) { store.set('xing.plug.tints', {}); pcRefresh(); } });
+  pcDrawBall(); pcDrawTargets(); pcDrawRecs(); pcDrawTints();
+}
+// batch or calibration changed: recipes on screen are recomputed with the new kit
+function pcRefresh() { pcDrawTints(); if (pcS.results) pcCompute(); }
+
+function pcCovers(b) {
+  const saved = (store.get('xing.plug.ballColors', {}) || {})[b.id];
+  if (saved?.length) return { colors: saved, names: saved.map((_, i) => (saved.length > 1 ? (i ? `Accent ${i}` : 'Main') : 'Saved')), kind: 'saved' };
+  const mc = b.brand !== MINE && b.brand !== TYPES ? PC.multiColorCover(b.brand, b.name) : null;
+  if (mc) return { ...mc, kind: 'list' };
+  return b.color ? { colors: [b.color], names: ['App color'], kind: 'render' } : null;
+}
+function pcDrawBall() {
+  const b = pcS.ball, box = $('pcBallInfo');
+  if (!b) { box.innerHTML = '<p class="hint" style="margin:0">Saving a recipe with the ball remembers its colors here next time.</p>'; return; }
+  const c = pcCovers(b);
+  const why = { saved: 'The colors you matched last time for this ball.', list: 'Cover colors from the ball list. They’re approximate: a photo of the actual ball matches better.',
+    render: 'This ball has no cover colors on file yet. The color shown is only the one the app draws it in, so take a photo for a real match.' }[c?.kind] || '';
+  box.innerHTML = `<div class="pc-chosen"><b>${pcEsc(b.label)}</b><button class="btn sm" type="button" data-a="unball">Change ball</button></div>
+    ${c ? `<div class="pc-covers" style="margin-top:8px">${c.colors.map((h, i) => `<button class="pc-cover" type="button" data-a="cover" data-hex="${pcEsc(h)}" aria-label="Match ${pcEsc(c.names[i])} (${pcEsc(h)})">${pcSw(h)}${pcEsc(c.names[i])}</button>`).join('')}
+      ${c.colors.length > 1 ? `<button class="btn sm" type="button" data-a="covers" data-hexes='${pcEsc(JSON.stringify(c.colors))}'>Match all ${c.colors.length} as a swirl</button>` : ''}</div>
+      <p class="hint">${why}</p>` : ''}`;
+}
+function pcAddTargets(hexes, replace) {
+  pcS.targets = replace ? hexes.slice(0, 3) : [...pcS.targets, ...hexes].slice(-3);
+  pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets();
+}
+function pcDrawTargets(full = true) {
+  const t = pcS.targets, n = t.length;
+  $('pcGo').disabled = !n; $('pcGo').textContent = n > 1 ? 'Get swirl recipes' : 'Get recipes';
+  if (!full) { t.forEach((h, i) => { const r = $('pcTargets').querySelector(`[data-t="${i}"]`); if (r) { r.querySelector('.pc-sw').style.background = h; r.querySelector('.pc-mono').textContent = h; } }); return; }
+  $('pcTargets').innerHTML = `${n ? `<div class="pc-targets">${t.map((h, i) => `<div class="pc-target" data-t="${i}">${pcSw(h, 'lg')}
+      <div class="row"><span><b>${n > 1 ? (i ? `Accent ${i}` : 'Main color') : 'Color'}</b><br><span class="pc-mono">${pcEsc(h)}</span></span>
+      <input type="color" value="${pcEsc(h)}" data-i="${i}" aria-label="Fine-tune color ${i + 1}"></div>
+      <button class="btn sm" type="button" data-a="rm" data-i="${i}">Remove</button></div>`).join('')}</div>`
+    : '<p class="hint" style="margin:0">Tap spots on the photo, pick a cover color above, or add a color by hand.</p>'}
+    <div class="row" style="margin-top:8px">${n < 3 ? '<button class="btn sm" type="button" data-a="add">+ Add a color by hand</button>' : ''}${n ? '<button class="btn sm" type="button" data-a="clear">Clear colors</button>' : ''}</div>`;
+}
+
+function pcCompute() {
+  if (!pcS.targets.length) return;
+  $('pcResults').innerHTML = '<p class="hint">Working out recipes…</p>';
+  setTimeout(() => { // let the message paint; the search takes a moment on a phone
+    const tints = pcKit(), { batchSize } = pcSet(), recipes = pcRecipes();
+    const prev = pcS.results;
+    pcS.results = pcS.targets.map((hex, i) => {
+      const old = prev?.[i]?.hex === hex ? prev[i] : null;
+      return { hex, opts: PC.recipeOptions(hex, { tints, recipes, batchSize }), opt: 0, drops: null, pearlId: old?.pearlId || '', pearlDrops: old?.pearlDrops || 2, adj: false };
+    });
+    pcS.saveOpen = false; pcS.notes = ''; pcS.rating = 0;
+    pcDrawResults();
+  }, 20);
+}
+function pcCurrent(r) {
+  const drops = r.drops || r.opts[r.opt]?.drops || {}, s = pcSet();
+  return { drops, ...PC.evaluateRecipe(drops, r.hex, { tints: pcKit(), batchSize: s.batchSize }) };
+}
+function pcDrawResults() {
+  const R = pcS.results; if (!R) { $('pcResults').innerHTML = ''; return; }
+  const tints = pcKit(), main = tints.filter(t => !t.pearl), pearls = tints.filter(t => t.pearl), s = pcSet(), swirl = R.length > 1;
+  const maxDrops = Math.min(24, Math.max(4, Math.round(12 * s.batchSize)));
+  const step = (label, a, val, max, extra = '', sw = '') => `<div class="pc-stp"><span>${sw}${pcEsc(label)}</span>
+    <button class="btn sm" type="button" data-a="${a}" data-d="-1" ${extra} aria-label="One drop less ${pcEsc(label)}" ${val <= 0 ? 'disabled' : ''}>−</button><output>${val}</output>
+    <button class="btn sm" type="button" data-a="${a}" data-d="1" ${extra} aria-label="One drop more ${pcEsc(label)}" ${val >= max ? 'disabled' : ''}>+</button></div>`;
+  $('pcResults').innerHTML = `<div class="pc-step"><h3><b>4</b> ${swirl ? 'Swirl recipes' : 'Recipe'}</h3>
+    <p class="hint" style="margin:0">Drops per ${pcEsc(s.batchName)}. Test-mix a small batch first: cured color and tint strength vary from kit to kit. ΔE is how far apart the target and the mix look; under 2 is hard to tell apart.</p>
+    ${swirl ? `<p class="pc-tip"><b>Pouring a swirl:</b> mix and pour the main color first, then pour the accent${R.length > 2 ? 's' : ''} in streaks and swirl once or twice with a stick. Stir more and the colors blend into one.</p>` : ''}
+    ${R.map((r, i) => {
+      const c = pcCurrent(r), q = PC.matchQuality(c.deltaE), o = r.opts[r.opt], pearl = pearls.find(p => p.id === r.pearlId);
+      return `<section class="pc-res" data-i="${i}" aria-label="${swirl ? (i ? `Accent ${i}` : 'Main color') : 'Recipe'}">
+        <div class="pc-res-h"><h3>${swirl ? (i ? `Accent ${i}` : 'Main color') : 'Match'}</h3><span class="pc-q ${q.toLowerCase()}">${q} match · ΔE ${c.deltaE.toFixed(1)}</span></div>
+        <div class="pc-cmp"><figure>${pcSw(r.hex, 'lg')}<figcaption>Target <span class="pc-mono">${pcEsc(r.hex)}</span></figcaption></figure>
+          <figure>${pcSw(c.hex, 'lg')}<figcaption>Predicted mix <span class="pc-mono">${pcEsc(c.hex)}</span></figcaption></figure></div>
+        <div class="row" role="group" aria-label="Recipe options">${r.opts.map((x, k) => `<button class="pc-chip${!r.drops && r.opt === k ? ' on' : ''}" type="button" data-a="opt" data-k="${k}" aria-pressed="${!r.drops && r.opt === k}">${x.history ? `★ Your recipe` : pcEsc(x.label)}</button>`).join('')}${r.drops ? '<span class="pc-chip on">Adjusted</span>' : ''}</div>
+        ${!r.drops && o?.history ? `<p class="hint" style="margin:0">You rated this ${o.history.rating}★${o.history.ball ? ` on the ${pcEsc(o.history.ball)}` : ''}, for a color ΔE ${o.history.de.toFixed(1)} from this one.</p>` : ''}
+        <p class="pc-recipe">${pcEsc(PC.dropsText(c.drops, main))}</p>
+        ${pearl && r.pearlDrops > 0 ? `<p class="pc-pearl">+ ${pcEsc(pearl.name)} ${r.pearlDrops} <small>(effect only, not part of the color match)</small></p>` : ''}
+        <p class="hint" style="margin:0">${c.total} drop${c.total === 1 ? '' : 's'} of tint in all</p>
+        <div class="row"><button class="btn sm" type="button" data-a="adj" aria-expanded="${r.adj}">${r.adj ? 'Done adjusting' : 'Adjust drops'}</button>
+          ${pearls.length ? `<div class="seg" role="group" aria-label="Pearl"><button type="button" data-a="pearl" data-p="" class="${!r.pearlId ? 'on' : ''}">No pearl</button>${pearls.map(p => `<button type="button" data-a="pearl" data-p="${p.id}" class="${r.pearlId === p.id ? 'on' : ''}">${pcEsc(p.name)}</button>`).join('')}</div>` : ''}</div>
+        ${pearl ? step(`${pearl.name} drops`, 'pdrop', r.pearlDrops, 12) : ''}
+        ${r.adj ? `<div class="pc-adj">${main.map(t => step(t.name, 'drop', c.drops[t.id] || 0, maxDrops, `data-t="${t.id}"`, pcSw(t.calib?.hex || t.hex))).join('')}</div>` : ''}
+      </section>`;
+    }).join('')}
+    ${pcS.saveOpen ? `<div class="pc-save"><b>Save this recipe</b>
+        <div>${pcS.ball ? `For the <b>${pcEsc(pcS.ball.label)}</b>. Its colors are remembered for next time.` : 'No ball picked. Pick one in step 1 to save the recipe with it.'}</div>
+        <label class="f"><span>Notes</span><textarea id="pcNotes" placeholder="Cure time, how it came out, tweaks">${pcEsc(pcS.notes || '')}</textarea></label>
+        <div class="f"><span>How did it turn out? Rate it later if you haven’t poured yet. Recipes rated 4★ or 5★ are offered first for a close color.</span>${pcStars(pcS.rating || 0, true, '__new')}</div>
+        <div class="row"><button class="btn primary" type="button" data-a="dosave">Save recipe</button><button class="btn" type="button" data-a="nosave">Cancel</button></div></div>`
+      : '<div class="row" style="margin-top:12px"><button class="btn primary" type="button" data-a="save">Save recipe</button></div>'}
+  </div>`;
+}
+function pcResultsClick(e) {
+  const a = e.target.closest('[data-a]'); if (!a || !pcS.results) return;
+  const sec = a.closest('[data-i]'), r = sec ? pcS.results[+sec.dataset.i] : null, act = a.dataset.a;
+  if (act === 'opt') { r.opt = +a.dataset.k; r.drops = null; }
+  else if (act === 'adj') r.adj = !r.adj;
+  else if (act === 'pearl') r.pearlId = a.dataset.p;
+  else if (act === 'pdrop') r.pearlDrops = Math.min(12, Math.max(0, r.pearlDrops + +a.dataset.d));
+  else if (act === 'drop') { const d = { ...pcCurrent(r).drops }, v = Math.max(0, (d[a.dataset.t] || 0) + +a.dataset.d); if (v) d[a.dataset.t] = v; else delete d[a.dataset.t]; r.drops = d; }
+  else if (act === 'save') pcS.saveOpen = true;
+  else if (act === 'nosave') pcS.saveOpen = false;
+  else if (act === 'star') { const n = +a.dataset.n; pcS.rating = pcS.rating === n ? 0 : n; }
+  else if (act === 'dosave') return pcSave();
+  else return;
+  const focusKey = a.dataset.a + (a.dataset.t || a.dataset.k || a.dataset.p || a.dataset.n || '') + (a.dataset.d || '') + (sec?.dataset.i || '');
+  pcDrawResults();
+  // keep keyboard focus on the same control after the redraw
+  const again = [...$('pcResults').querySelectorAll('[data-a]')].find(x => x.dataset.a + (x.dataset.t || x.dataset.k || x.dataset.p || x.dataset.n || '') + (x.dataset.d || '') + (x.closest('[data-i]')?.dataset.i || '') === focusKey);
+  (again && !again.disabled ? again : null)?.focus();
+}
+function pcSave() {
+  const s = pcSet(), swirl = pcS.results.length > 1;
+  const rec = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), createdAt: Date.now(), ballId: pcS.ball?.id || '', ballLabel: pcS.ball?.label || '',
+    mode: swirl ? 'swirl' : 'single', notes: (pcS.notes || '').trim(), rating: pcS.rating || 0, thumb: pcS.thumb || '', batchSize: s.batchSize, batchName: s.batchName,
+    spots: pcS.results.map(r => { const c = pcCurrent(r); return { targetHex: r.hex, drops: c.drops, pearlId: r.pearlId || undefined, pearlDrops: r.pearlId ? r.pearlDrops : undefined, predictedHex: c.hex, deltaE: +c.deltaE.toFixed(2) }; }) };
+  store.set('xing.plug.recipes', [rec, ...pcRecipes()]);
+  if (pcS.ball) store.set('xing.plug.ballColors', { ...(store.get('xing.plug.ballColors', {}) || {}), [pcS.ball.id]: pcS.results.map(r => r.hex) });
+  pcS.saveOpen = false; pcDrawResults(); pcDrawRecs(); pcDrawBall();
+  const ok = document.createElement('p'); ok.className = 'hint'; ok.setAttribute('role', 'status'); ok.textContent = `Saved${pcS.ball ? ` for the ${pcS.ball.label}` : ''}. It’s in Saved recipes below.`;
+  $('pcResults').querySelector('.pc-step').append(ok);
+}
+function pcDrawRecs() {
+  const all = pcRecipes(), tints = pcKit(), q = pcS.filter.trim().toLowerCase();
+  const list = all.filter(r => (r.rating || 0) >= pcS.min && (!q || `${r.ballLabel} ${r.notes} ${r.spots.map(x => PC.spotText(x, tints)).join(' ')}`.toLowerCase().includes(q)));
+  $('pcCount').textContent = all.length ? `${all.length} saved` : '';
+  $('pcRecs').innerHTML = list.length ? list.map(r => `<li class="pc-rec" data-id="${pcEsc(r.id)}">${r.thumb ? `<img src="${pcEsc(r.thumb)}" alt="">` : '<span class="ph"></span>'}
+      <div class="who"><b>${pcEsc(r.ballLabel || 'No ball')}</b><small>${new Date(r.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} · ${r.mode === 'swirl' ? 'Swirl' : 'One color'} · drops per ${pcEsc(r.batchName)}</small>
+        ${r.spots.map(x => `<span class="row" style="flex-wrap:nowrap;align-items:flex-start">${pcSw(x.targetHex)}<span class="pc-mono">${pcEsc(PC.spotText(x, tints))}</span></span>`).join('')}
+        ${r.notes ? `<small>${pcEsc(r.notes)}</small>` : ''}
+        ${pcStars(r.rating || 0, true, r.id)}</div>
+      <div class="acts"><button class="btn sm" type="button" data-a="open">Open</button><button class="btn sm" type="button" data-a="del">Delete</button></div></li>`).join('')
+    : `<li class="pc-none">${all.length ? 'No saved recipe matches that.' : 'Nothing saved yet. Get a recipe above and save it.'}</li>`;
+}
+function pcRecsClick(e) {
+  const a = e.target.closest('[data-a]'); if (!a) return;
+  const id = a.dataset.id || a.closest('[data-id]')?.dataset.id, all = pcRecipes(), r = all.find(x => x.id === id); if (!r) return;
+  if (a.dataset.a === 'star') { const n = +a.dataset.n; store.set('xing.plug.recipes', all.map(x => (x.id === id ? { ...x, rating: x.rating === n ? 0 : n } : x))); pcDrawRecs(); $('pcRecs').querySelector(`[data-id="${CSS.escape(id)}"] [data-n="${n}"]`)?.focus(); }
+  if (a.dataset.a === 'del' && confirm(`Delete this saved recipe${r.ballLabel ? ` for the ${r.ballLabel}` : ''}?`)) { store.set('xing.plug.recipes', all.filter(x => x.id !== id)); pcDrawRecs(); }
+  if (a.dataset.a === 'open') {
+    const b = r.ballId && allBalls().find(x => x.id === r.ballId);
+    pcS.ball = b ? { id: b.id, label: pcBallName(b), brand: b.brand, name: b.name || b.label, color: b.color } : r.ballLabel ? { id: r.ballId || '', label: r.ballLabel } : null;
+    pcS.targets = r.spots.map(x => x.targetHex); pcS.thumb = r.thumb || '';
+    pcDrawBall(); pcDrawTargets();
+    pcS.results = r.spots.map(x => ({ hex: x.targetHex, opts: [{ label: 'Saved recipe', drops: { ...x.drops } }], opt: 0, drops: null, pearlId: x.pearlId || '', pearlDrops: x.pearlDrops || 2, adj: false }));
+    pcS.saveOpen = false; pcDrawResults();
+    $('pcResults').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }
+}
+function pcDrawTints() {
+  const tints = pcKit();
+  $('pcTints').innerHTML = tints.map(t => `<li>${pcSw(t.calib?.hex || t.hex, 'md')}<span><b>${pcEsc(t.name)}</b><small>${t.pearl ? 'Pearl: an effect, not used to match the color' : t.calib ? `Calibrated: ${t.calib.drops} drops per ${t.calib.batchSize} batch` : 'Starting guess'}</small></span>
+    ${t.pearl ? '' : `<button class="btn sm" type="button" data-a="cal" data-id="${t.id}">${t.calib ? 'Calibrate again' : 'Calibrate'}</button>${t.calib ? `<button class="btn sm" type="button" data-a="uncal" data-id="${t.id}">Use starting guess</button>` : ''}`}</li>`).join('');
+}
+function pcCalibrate(id) {
+  const t = pcKit().find(x => x.id === id); if (!t) return;
+  const s = pcSet(); let drops = t.calib?.drops || 2, hex = '';
+  const d = document.createElement('dialog'); d.className = 'xd pc-cal';
+  d.innerHTML = `<div class="body"><h2>Calibrate ${pcEsc(t.name)}</h2>
+    <ol><li>Pour a small puck of only ${pcEsc(t.name)} in the plug material, counting the drops per ${pcEsc(s.batchName)}.</li>
+      <li>Let it cure, then photograph it in even light. Put a white card in the shot if you can.</li>
+      <li>Tap the middle of the puck (and the white card), set the drop count, and save.</li></ol>
+    <div class="pc-stp"><span>Drops in the puck</span><button class="btn sm" type="button" data-d="-1" aria-label="One drop less">−</button><output>${drops}</output><button class="btn sm" type="button" data-d="1" aria-label="One drop more">+</button></div>
+    <div class="pc-calpick"></div><div class="pc-calcmp"></div>
+    <div class="row2"><button class="btn" type="button" data-a="cancel">Cancel</button><button class="btn primary" type="button" data-a="ok" disabled>Save calibration</button></div></div>`;
+  document.body.append(d);
+  d.addEventListener('close', () => d.remove());
+  const out = d.querySelector('output'), ok = d.querySelector('[data-a=ok]');
+  d.querySelector('.pc-stp').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (!b) return; drops = Math.min(24, Math.max(1, drops + +b.dataset.d)); out.textContent = drops; });
+  pcPicker(d.querySelector('.pc-calpick'), { maxSpots: 1, fixed: true, onChange: r => {
+    hex = r.hexes[0] || ''; ok.disabled = !hex;
+    d.querySelector('.pc-calcmp').innerHTML = hex ? `<div class="pc-cmp"><figure>${pcSw(hex, 'lg')}<figcaption>Your puck <span class="pc-mono">${pcEsc(hex)}</span></figcaption></figure><figure>${pcSw(t.calib?.hex || t.hex, 'lg')}<figcaption>${t.calib ? 'Calibrated now' : 'Starting guess'}</figcaption></figure></div>` : '';
+  } });
+  d.querySelector('[data-a=cancel]').addEventListener('click', () => d.close());
+  ok.addEventListener('click', () => { store.set('xing.plug.tints', { ...(store.get('xing.plug.tints', {}) || {}), [id]: { hex, drops, batchSize: s.batchSize } }); d.close(); pcRefresh(); });
+  d.showModal();
+}
+
+/* photo picker: take or choose a photo, tap (or drag) 1–3 spots with a loupe, optional white-card tap.
+   Each spot averages a small disc with glare and specks trimmed. onChange({ hexes, thumb }) after every change. */
+function pcPicker(host, { maxSpots = 3, fixed = false, onChange }) {
+  const LOUPE = 112, ZOOM = 6;
+  let photo = null, spots = [null, null, null], wb = null, active = 0, mode = 'spot', n = fixed ? maxSpots : 1, drag = false;
+  host.innerHTML = `<div class="row"><button class="btn sm primary" type="button" data-a="cam">Take photo</button><button class="btn sm" type="button" data-a="lib">Choose photo</button>
+      <input type="file" accept="image/*" capture="environment" class="vh" tabindex="-1" aria-hidden="true" data-in><input type="file" accept="image/*" class="vh" tabindex="-1" aria-hidden="true" data-in></div>
+    <p class="pc-err" hidden></p>
+    <div class="pc-photo" style="margin-top:8px"><div class="pc-empty">${fixed ? 'Photograph the cured puck.' : 'Photograph the ball in even light, without flash glare. A white card in the shot helps the colors.'} The photo stays on this device; only a small thumbnail is saved with a recipe.</div>
+      <div class="pc-box" hidden><canvas class="pc-cv" role="img" aria-label="Ball photo: tap the colors to match"></canvas><canvas class="pc-loupe" width="${LOUPE}" height="${LOUPE}" hidden></canvas></div></div>
+    <div class="pc-ptools" hidden>
+      ${fixed ? '' : `<div class="seg" role="group" aria-label="How many colors" style="justify-self:start">${[1, 2, 3].slice(0, maxSpots).map(k => `<button type="button" data-n="${k}">${k === 1 ? 'One color' : `${k}-color swirl`}</button>`).join('')}</div>`}
+      <div class="row pc-spots"></div><p class="hint pc-phint" style="margin:0"></p></div>`;
+  const [camIn, libIn] = host.querySelectorAll('[data-in]'), err = host.querySelector('.pc-err'), box = host.querySelector('.pc-box'), cv = host.querySelector('.pc-cv'),
+    lp = host.querySelector('.pc-loupe'), tools = host.querySelector('.pc-ptools'), empty = host.querySelector('.pc-empty');
+  const emit = () => {
+    if (!photo) return;
+    const gains = wb ? PC.whiteGains(PC.sampleArea(photo.data, wb.x, wb.y)) : null, hexes = [];
+    let first = null;
+    for (let i = 0; i < n; i++) { const s = spots[i]; if (!s) continue; first = first || s; hexes.push(PC.linToHex(PC.applyGains(PC.sampleArea(photo.data, s.x, s.y), gains))); }
+    onChange({ hexes, thumb: first ? thumb(first) : '' });
+  };
+  const thumb = (s, size = 96) => { // a square crop around the first spot, small enough for the synced record
+    const side = Math.round(Math.min(photo.w, photo.h) * 0.45), sx = Math.min(Math.max(0, Math.round(s.x * photo.w - side / 2)), photo.w - side), sy = Math.min(Math.max(0, Math.round(s.y * photo.h - side / 2)), photo.h - side);
+    const c = document.createElement('canvas'); c.width = c.height = size; c.getContext('2d').drawImage(photo.canvas, sx, sy, side, side, 0, 0, size, size);
+    return c.toDataURL('image/jpeg', 0.7);
+  };
+  const size = () => {
+    if (!photo) return;
+    const W = host.clientWidth || 300, H = Math.min(Math.round(W * photo.h / photo.w), 520), w = Math.round(H * photo.w / photo.h);
+    box.style.width = w + 'px'; box.style.height = H + 'px'; cv.style.width = w + 'px'; cv.style.height = H + 'px';
+    const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = w * dpr; cv.height = H * dpr; paint();
+  };
+  const paint = () => {
+    const g = cv.getContext('2d'), dpr = cv.width / parseFloat(cv.style.width);
+    g.drawImage(photo.canvas, 0, 0, cv.width, cv.height);
+    const mark = (s, label, ring) => {
+      const x = s.x * cv.width, y = s.y * cv.height, r = Math.max(PC.sampleRadius(photo.w, photo.h) * cv.width / photo.w, 6 * dpr);
+      g.lineWidth = 2 * dpr; g.strokeStyle = '#fff'; g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke();
+      g.lineWidth = dpr; g.strokeStyle = ring; g.beginPath(); g.arc(x, y, r + 2 * dpr, 0, 7); g.stroke();
+      g.fillStyle = 'rgba(0,0,0,.7)'; g.fillRect(x + 8 * dpr, y - 22 * dpr, (label.length * 8 + 12) * dpr, 18 * dpr);
+      g.fillStyle = '#fff'; g.font = `600 ${13 * dpr}px system-ui`; g.fillText(label, x + 13 * dpr, y - 8 * dpr);
+    };
+    for (let i = 0; i < n; i++) if (spots[i]) mark(spots[i], String(i + 1), '#000');
+    if (wb) mark(wb, 'W', '#0af');
+  };
+  const tools2 = () => {
+    tools.hidden = !photo;
+    tools.querySelectorAll('[data-n]').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
+    host.querySelector('.pc-spots').innerHTML = (n > 1 ? Array.from({ length: n }, (_, i) => `<button class="pc-chip${mode === 'spot' && active === i ? ' on' : ''}" type="button" data-s="${i}" aria-pressed="${mode === 'spot' && active === i}">${i ? `Accent ${i}` : 'Main'}${spots[i] ? ' ✓' : ''}</button>`).join('') : '')
+      + `<button class="pc-chip${mode === 'wb' ? ' on' : ''}" type="button" data-wb aria-pressed="${mode === 'wb'}">${wb ? 'White card ✓' : 'Tap a white card'}</button>${wb ? '<button class="btn sm" type="button" data-nowb>Clear white card</button>' : ''}`;
+    host.querySelector('.pc-phint').textContent = mode === 'wb' ? 'Tap something white in the photo (a card or paper). It corrects the light’s color cast.'
+      : `Tap or drag on the ${fixed ? 'puck' : 'ball'}${n > 1 ? ` to place the ${active ? `accent ${active}` : 'main color'} spot` : ''}. The loupe shows the exact area that’s averaged.`;
+  };
+  const load = async file => {
+    if (!file) return;
+    err.hidden = true;
+    try {
+      let src, sw, sh;
+      try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); sw = src.width; sh = src.height; }
+      catch { const url = URL.createObjectURL(file), img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('That file isn’t a photo the browser can read.')); img.src = url; }); URL.revokeObjectURL(url); src = img; sw = img.naturalWidth; sh = img.naturalHeight; }
+      const k = Math.min(1, 1600 / Math.max(sw, sh)), w = Math.max(1, Math.round(sw * k)), h = Math.max(1, Math.round(sh * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(src, 0, 0, w, h);
+      photo = { canvas: c, data: g.getImageData(0, 0, w, h), w, h }; spots = [null, null, null]; wb = null; active = 0; mode = 'spot';
+      empty.hidden = true; box.hidden = false; size(); tools2();
+    } catch (e) { err.textContent = e.message || 'That photo couldn’t be opened.'; err.hidden = false; }
+  };
+  host.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.a === 'cam') camIn.click(); else if (b.dataset.a === 'lib') libIn.click();
+    else if (b.dataset.n) { n = +b.dataset.n; if (active >= n) active = 0; mode = 'spot'; paint(); tools2(); emit(); }
+    else if (b.dataset.s != null) { mode = 'spot'; active = +b.dataset.s; tools2(); }
+    else if ('wb' in b.dataset) { mode = mode === 'wb' ? 'spot' : 'wb'; tools2(); }
+    else if ('nowb' in b.dataset) { wb = null; paint(); tools2(); emit(); }
+  });
+  [camIn, libIn].forEach(i => i.addEventListener('change', () => { load(i.files[0]); i.value = ''; }));
+  const at = e => { const r = cv.getBoundingClientRect(); return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)), px: e.clientX - r.left, py: e.clientY - r.top, w: r.width }; };
+  const place = p => {
+    if (mode === 'wb') wb = { x: p.x, y: p.y }; else spots[active] = { x: p.x, y: p.y };
+    paint();
+    // loupe beside and above the finger, kept inside the photo
+    const g = lp.getContext('2d'), half = LOUPE / ZOOM / 2, rr = PC.sampleRadius(photo.w, photo.h) * ZOOM;
+    g.imageSmoothingEnabled = false; g.fillStyle = '#000'; g.fillRect(0, 0, LOUPE, LOUPE);
+    g.drawImage(photo.canvas, p.x * photo.w - half, p.y * photo.h - half, half * 2, half * 2, 0, 0, LOUPE, LOUPE);
+    g.lineWidth = 2; g.strokeStyle = '#fff'; g.beginPath(); g.arc(LOUPE / 2, LOUPE / 2, Math.min(rr, LOUPE / 2 - 2), 0, 7); g.stroke();
+    let lx = p.px < p.w / 2 ? p.px + 24 : p.px - LOUPE - 24, ly = p.py - LOUPE - 24;
+    if (ly < 0) ly = p.py + 24;
+    lp.style.left = Math.min(Math.max(0, lx), Math.max(0, p.w - LOUPE)) + 'px'; lp.style.top = ly + 'px'; lp.hidden = false;
+  };
+  cv.addEventListener('pointerdown', e => { if (!photo) return; cv.setPointerCapture(e.pointerId); drag = true; place(at(e)); });
+  cv.addEventListener('pointermove', e => { if (drag) place(at(e)); });
+  const up = () => {
+    if (!drag) return; drag = false; lp.hidden = true;
+    if (mode === 'wb') mode = 'spot'; else if (active < n - 1 && !spots[active + 1]) active++;
+    tools2(); emit();
+  };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  new ResizeObserver(() => { if (photo) size(); }).observe(host);
+  return {};
+}
+plugGate(); cloud.onChange(plugGate);
+
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
 { const hdr = document.querySelector('header'), setHdr = () => document.documentElement.style.setProperty('--hdr', hdr.offsetHeight + 'px');
   setHdr(); new ResizeObserver(setHdr).observe(hdr); } // the sticky inputs column sits just under the header

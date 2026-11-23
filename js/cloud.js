@@ -15,7 +15,8 @@ const SUPABASE_KEY = 'sb_publishable_yyPXb_0hDXRKt1_z_H_ung_5Pq1iI6n'; // publis
 const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 const AUTH_STORAGE_KEY = 'sb-yeoraqksuvaohauxvvgt-auth-token';
 
-export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode', 'xing.shop'];
+export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode', 'xing.shop',
+  'xing.plug.recipes', 'xing.plug.tints', 'xing.plug.settings', 'xing.plug.ballColors']; // Shop: plug color recipes, tint calibration, batch, remembered ball colors
 const PAID_PLANS = ['pro', 'shop'];
 const PAID_STATUS = ['trialing', 'active', 'past_due'];
 
@@ -120,11 +121,15 @@ if (user) {
    Table public.balls: everyone reads, only an admin writes (enforced by the database). Loaded before the app starts
    and cached on this device, so the list still works offline. */
 const CATALOG_CACHE = 'xing.catalogCache';
-const BALL_COLS = 'id,brand,name,rg,diff,mb_diff,coverstock,cover_type,core,core_type,finish,weights,released,discontinued,updated_at';
+// oil_absorb comes from migration 20261112_ball_oil_absorb; until that's applied the read falls back to the old columns
+const BALL_COLS_OLD = 'id,brand,name,rg,diff,mb_diff,coverstock,cover_type,core,core_type,finish,weights,released,discontinued,updated_at';
+let BALL_COLS = BALL_COLS_OLD + ',oil_absorb';
 export let catalog = parse(ls.get(CATALOG_CACHE), []);
 if (sb) {
   try {
-    const { data, error } = await withTimeout(sb.from('balls').select(BALL_COLS).order('brand').order('name'), 6000);
+    const get = () => withTimeout(sb.from('balls').select(BALL_COLS).order('brand').order('name'), 6000);
+    let { data, error } = await get();
+    if (error?.code === '42703') { BALL_COLS = BALL_COLS_OLD; ({ data, error } = await get()); } // column not there yet
     if (error) throw error;
     catalog = data; ls.set(CATALOG_CACHE, JSON.stringify(data));
   } catch (e) { console.warn('[cloud] ball catalog not loaded, using this device’s copy', e?.message || e); }
@@ -136,6 +141,7 @@ export const ballAdmin = {
   async save(row) {
     if (!sb || !user) throw new Error('Sign in first.');
     try {
+      if (!BALL_COLS.includes('oil_absorb')) delete row.oil_absorb; // database not migrated yet
       const q = row.id ? sb.from('balls').update(row).eq('id', row.id) : sb.from('balls').insert(row);
       const { data, error } = await withTimeout(q.select(BALL_COLS).single(), 10000); if (error) throw error;
       catalog = [...catalog.filter(b => b.id !== data.id), data]; ls.set(CATALOG_CACHE, JSON.stringify(catalog)); return data;
@@ -470,7 +476,8 @@ const FEATURES = {
   export:   { label: 'Exporting your data', tier: 'pro' },
   advanced: { label: 'Advanced mode', tier: 'pro' },
   customers: { label: 'The customer list', tier: 'shop' },
-  branding: { label: 'Your shop’s name and logo on printouts', tier: 'shop' }
+  branding: { label: 'Your shop’s name and logo on printouts', tier: 'shop' },
+  plugcolor: { label: 'Plug color matching', tier: 'shop' }
 };
 function openUpsell(feature) {
   const f = FEATURES[feature], plan = f?.tier === 'shop' ? 'Shop' : 'Pro';
@@ -479,7 +486,7 @@ function openUpsell(feature) {
     <ul>
       <li><b>Free</b>: one bowler with up to 9 balls in the arsenal, every ball in the database, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
       <li><b>Pro</b> (bowlers): up to 5 bowlers with unlimited arsenals, plus Advanced mode (ball specs, track and rev measuring, My line, lane calibration), Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
-      <li><b>Shop</b> (pro shops): everything in Pro with unlimited bowlers, plus the customer list and your shop’s name and logo on printouts.</li>
+      <li><b>Shop</b> (pro shops): everything in Pro with unlimited bowlers, plus the customer list, your shop’s name and logo on printouts, and plug color matching.</li>
     </ul>
     <div class="hint">${user ? 'Online checkout is coming soon.' : 'Create a free account first, then upgrade.'}</div>
     <div class="row2">
