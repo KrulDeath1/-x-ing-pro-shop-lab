@@ -558,6 +558,7 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <div id="laneSet" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
       <h2>Lane</h2>
       <div class="grid2">
+        <label class="f full"><span>Search patterns</span><span class="bs-wrap"><input id="patSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="patSearchList" placeholder="Type a name, length or ratio — e.g. shark, 2026, 41 ft, sport"><div id="patSearchList" class="bs-list" role="listbox" hidden></div></span></label>
         <label class="f full"><span>Pattern</span><select id="patPreset"></select></label>
         <p class="hint f full" id="patInfo" style="margin:0"></p>
         <label class="f adv"><span>Length (ft)</span><input id="patLen" type="number" value="40"></label>
@@ -2871,7 +2872,7 @@ function onTiltSource(id) {
   for (const o of TILT_SOURCES) if (o !== id && !(TILT_PAIR.includes(id) && TILT_PAIR.includes(o))) $(o).value = '';
 }
 document.querySelector('main').addEventListener('input', e => {
-  if (e.target.id === 'patPreset' || e.target.closest('#logBox')) return; // typing a shot in doesn't change the simulation
+  if (e.target.id === 'patPreset' || e.target.id === 'patSearch' || e.target.closest('#logBox')) return; // typing a shot in doesn't change the simulation
   if (['patLen', 'patVol', 'patShape'].includes(e.target.id)) { $('patPreset').value = 'custom'; patternUI(); }
   onTiltSource(e.target.id);
   if (e.target.id === 'tilt' && e.target.value !== '') for (const o of TILT_SOURCES) $(o).value = '';
@@ -2906,6 +2907,63 @@ function patternUI() {
 }
 $('patPreset').addEventListener('change', e => { const p = PATTERNS[e.target.value]; if (p) { $('patLen').value = p.len; $('patVol').value = p.vol; $('patShape').value = p.shape; } patternUI(); schedule(); });
 fillPatterns(); patternUI();
+/* pattern search: same combobox as the ball search, over every option in the Pattern list (real + generic) */
+const PAT_MAX = 40; let patIdx = [], patShown = [], patSel = -1;
+function fillPatSearch() {
+  patIdx = [...$('patPreset').options].map(o => {
+    const grp = o.parentElement.label || '', p = o.value.startsWith('k:') ? ALL_PATTERNS[+o.value.slice(2)] : null;
+    const name = p ? p.n : o.text, sub = p ? `${grp} · ${p.d} ft · ${p.ra}:1 · ${p.v} mL` : grp;
+    const words = p ? `${p.d}ft ${p.d}' ${p.ra}:1 ${p.d < 38 ? 'short' : p.d > 43 ? 'long' : 'medium'} ${p.ra < 4.5 ? 'sport' : 'house recreational'}` : '';
+    return { v: o.value, name, sub, low: ' ' + name.toLowerCase(), t: `${name} ${sub} ${words}`.toLowerCase() };
+  });
+}
+function patHits(q) {
+  const words = q.trim().toLowerCase().replace(/(\d)\s+(ft|feet)\b/g, '$1ft').split(/\s+/).filter(Boolean); if (!words.length) return [];
+  const rank = e => words.reduce((s, w) => s + (e.low.includes(' ' + w) ? 0 : e.low.includes(w) ? 1 : 2), 0);
+  return patIdx.filter(e => words.every(w => e.t.includes(w))).map(e => [rank(e), e]).sort((a, b) => a[0] - b[0]).map(r => r[1]);
+}
+function closePatSearch() { const inp = $('patSearch'); $('patSearchList').hidden = true; patSel = -1; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); }
+function drawPatSearch() {
+  const inp = $('patSearch'), list = $('patSearchList');
+  if (!inp.value.trim()) return closePatSearch();
+  const hits = patHits(inp.value); patShown = hits.slice(0, PAT_MAX); patSel = -1; list.innerHTML = '';
+  if (!hits.length) list.innerHTML = '<div class="bs-none">No pattern matches that.</div>';
+  patShown.forEach((e, i) => {
+    const d = document.createElement('div'); d.className = 'bs-opt'; d.id = 'psOpt' + i; d.dataset.i = i;
+    d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false');
+    const n = document.createElement('b'), s = document.createElement('small'); n.textContent = e.name; s.textContent = e.sub;
+    d.append(n, s); list.append(d);
+  });
+  if (hits.length > PAT_MAX) { const m = document.createElement('div'); m.className = 'bs-more'; m.textContent = `${hits.length - PAT_MAX} more — keep typing to narrow it down`; list.append(m); }
+  list.hidden = false; list.scrollTop = 0; inp.setAttribute('aria-expanded', 'true'); inp.removeAttribute('aria-activedescendant');
+}
+function markPatSearch() {
+  const inp = $('patSearch');
+  $('patSearchList').querySelectorAll('.bs-opt').forEach((d, i) => { const on = i === patSel; d.classList.toggle('on', on); d.setAttribute('aria-selected', on); if (on) d.scrollIntoView({ block: 'nearest' }); });
+  if (patSel >= 0) inp.setAttribute('aria-activedescendant', 'psOpt' + patSel); else inp.removeAttribute('aria-activedescendant');
+}
+function choosePattern(e) {
+  $('patSearch').value = e.name; $('patSearch').title = ''; closePatSearch();
+  const sel = $('patPreset'); sel.value = e.v; sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+fillPatSearch();
+$('patSearch').addEventListener('input', drawPatSearch);
+$('patSearch').addEventListener('focus', () => { if ($('patSearchList').hidden) drawPatSearch(); });
+$('patSearch').addEventListener('blur', closePatSearch);
+$('patSearch').addEventListener('keydown', e => {
+  const open = !$('patSearchList').hidden, n = patShown.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); if (!open) { drawPatSearch(); return; } if (!n) return;
+    patSel = e.key === 'ArrowDown' ? (patSel + 1) % n : (patSel <= 0 ? n - 1 : patSel - 1); markPatSearch();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (open && patSel >= 0) return choosePattern(patShown[patSel]);
+    const q = e.target.value.trim().toLowerCase(), exact = patIdx.find(x => x.name.toLowerCase() === q), hits = exact ? [exact] : patHits(q);
+    if (hits.length === 1) choosePattern(hits[0]); else e.target.title = 'More than one pattern matches — pick one from the list';
+  } else if (e.key === 'Escape' && open) { e.preventDefault(); closePatSearch(); }
+});
+$('patSearchList').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the box so blur doesn't close it first
+$('patSearchList').addEventListener('click', e => { e.preventDefault(); const d = e.target.closest('.bs-opt'); if (d) choosePattern(patShown[+d.dataset.i]); });
 document.addEventListener('click', e => { const f = e.target.closest('[data-upsell]')?.dataset.upsell; if (f) cloud.require(f); });
 { // Free: Auto line shows as a Pro option; picking it opens the upsell and falls back to "Pocket from laydown"
   const o = $('lineMode').querySelector('option[value="auto"]');
