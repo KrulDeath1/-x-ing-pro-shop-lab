@@ -14,6 +14,7 @@ fs.rmSync(out, { recursive: true, force: true });
 // the app at /app/
 copy(path.join(root, 'x-ing-pro-shop-lab.html'), path.join(out, 'app', 'index.html'));
 copy(path.join(root, 'js', 'cloud.js'), path.join(out, 'app', 'js', 'cloud.js'));
+copy(path.join(root, 'js', 'plug-color.js'), path.join(out, 'app', 'js', 'plug-color.js')); // Shop: plug color matching
 
 // the front page at /
 const list = fs.readFileSync(path.join(landing, 'tools', 'loaded-files.txt'), 'utf8').split('\n').map(s => s.trim()).filter(Boolean);

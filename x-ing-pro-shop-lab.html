@@ -156,6 +156,81 @@ dialog.cust { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48
 .balladm .tabs .on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
 .balladm .tag { font-size: var(--fs-meta); padding: 1px 7px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-left: 6px; }
 @media (max-width: 520px) { .cust-form { grid-template-columns: 1fr; } .cust-row { flex-wrap: wrap; } .cust-row .acts { width: 100%; justify-content: flex-end; } }
+/* Shop: plug colors card. Numbered steps, swatches as the only colour, recipes lettered in the shop face. */
+.pc-lead { margin: 0 0 4px; max-width: 68ch; text-wrap: pretty; }
+.pc-step { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; display: grid; gap: 8px; }
+.pc-step h3 { margin: 0; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 8px; }
+.pc-step h3 b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--panel); font: 700 13px/1 var(--font-ui); }
+.pc-count { font: 400 var(--fs-meta)/1 var(--font-ui); text-transform: none; letter-spacing: 0; color: var(--ink-2); }
+.pc-sw { display: inline-block; width: 22px; height: 22px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); vertical-align: middle; flex: none; }
+.pc-sw.lg { width: 100%; height: 64px; border-radius: 10px; display: block; }
+.pc-sw.md { width: 36px; height: 36px; border-radius: 8px; }
+.pc-covers { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pc-cover { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: var(--fs-meta); cursor: pointer; min-height: 32px; }
+.pc-cover:hover { border-color: var(--ink-2); }
+.pc-cover .pc-sw { width: 24px; height: 24px; border-radius: 50%; }
+.pc-chosen { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.pc-chosen b { font-weight: 600; }
+.pc-photo { position: relative; }
+.pc-empty { border: 1px dashed var(--line); border-radius: 10px; padding: 22px 14px; text-align: center; color: var(--ink-2); font-size: var(--fs-meta); background: var(--panel-2); }
+.pc-box { position: relative; margin: 0 auto; }
+.pc-box canvas.pc-cv { display: block; border-radius: 8px; touch-action: none; cursor: crosshair; }
+.pc-loupe { position: absolute; width: 112px; height: 112px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,.4); pointer-events: none; }
+.pc-ptools { margin-top: 8px; display: grid; gap: 8px; }
+.pc-ptools[hidden] { display: none; }
+.pc-chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 99px; padding: 4px 12px; font: inherit; font-size: var(--fs-meta); font-weight: 600; cursor: pointer; min-height: 32px; }
+.pc-chip.on { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.pc-err { color: #c0392b; font-size: var(--fs-meta); margin: 4px 0 0; }
+.pc-targets { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pc-target { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.pc-target .pc-sw.lg { height: 48px; }
+.pc-target .row { justify-content: space-between; flex-wrap: nowrap; }
+.pc-target input[type=color] { width: 40px; height: 32px; padding: 2px; flex: none; }
+.pc-mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.pc-res { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 12px; display: grid; gap: 8px; background: var(--panel-2); }
+.pc-res-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pc-res-h h3 { margin: 0; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; }
+.pc-q { font-size: var(--fs-meta); font-weight: 700; padding: 2px 9px; border-radius: 99px; background: var(--chip); }
+.pc-q.great { background: color-mix(in srgb, var(--good) 18%, var(--panel)); color: var(--good); }
+.pc-q.rough { background: var(--warn-bg); color: var(--warn-ink); }
+.pc-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pc-cmp figure { margin: 0; display: grid; gap: 3px; }
+.pc-cmp figcaption { font-size: var(--fs-meta); color: var(--ink-2); }
+.pc-recipe { margin: 0; font: 700 22px/1.2 var(--font-shop); letter-spacing: .01em; font-variant-numeric: tabular-nums; text-wrap: balance; }
+.pc-pearl { margin: 0; font-weight: 600; }
+.pc-pearl small { font-weight: 400; color: var(--ink-2); }
+.pc-adj { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
+.pc-stp { display: flex; align-items: center; gap: 6px; }
+.pc-stp > span { flex: 1; display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pc-stp .pc-sw { width: 16px; height: 16px; border-radius: 4px; }
+.pc-stp output { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pc-stp .btn { width: 32px; padding: 0; }
+.pc-tip { margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--chip); max-width: 68ch; }
+.pc-save { display: grid; gap: 8px; padding: 12px; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.pc-save textarea, .pc-rec textarea { width: 100%; min-height: 56px; resize: vertical; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
+.pc-stars { display: inline-flex; gap: 2px; }
+.pc-stars button { border: 0; background: none; padding: 0 3px; font-size: 22px; line-height: 1; color: var(--line); cursor: pointer; min-height: 32px; }
+.pc-stars button.on, .pc-stars span.on { color: #d99a00; }
+.pc-stars span { color: var(--line); font-size: 15px; }
+.pc-recs { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.pc-rec { display: flex; gap: 10px; align-items: flex-start; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+.pc-rec img, .pc-rec .ph { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: none; background: var(--panel-2); border: 1px solid var(--line); }
+.pc-rec .who { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pc-rec .who b { font-weight: 600; overflow-wrap: anywhere; }
+.pc-rec .who small { color: var(--ink-2); font-size: 12px; }
+.pc-rec .who .pc-mono { overflow-wrap: anywhere; }
+.pc-rec .acts { display: flex; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+.pc-rec .sws { display: flex; gap: 3px; }
+.pc-none { padding: 14px 4px; color: var(--ink-2); font-size: var(--fs-meta); }
+.pc-kit { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 10px; }
+.pc-kit summary { cursor: pointer; font: 700 15px/1.2 var(--font-shop); text-transform: uppercase; letter-spacing: .05em; min-height: 32px; display: flex; align-items: center; }
+.pc-tints { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 2px; }
+.pc-tints li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.pc-tints li > span { flex: 1 1 140px; min-width: 0; display: grid; }
+.pc-tints li small { color: var(--ink-2); font-size: 12px; }
+dialog.xd.pc-cal { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
+.pc-cal ol { margin: 0; padding-left: 18px; font-size: 13px; }
+@media (max-width: 520px) { .pc-rec { flex-wrap: wrap; } .pc-rec .acts { width: 100%; } .pc-recipe { font-size: 20px; } }
 input, select { width: 100%; min-width: 0; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; }
 input:disabled { opacity: .65; }
 /* One focus ring for every control, shown for keyboard focus (and on every text field, where the browser shows it on click too). */
@@ -570,6 +645,34 @@ dialog.pchk { width: min(560px, calc(100vw - 32px)); }
       <h2 style="margin-top:14px" data-plan="coverage">Arsenal coverage <span id="covWhere" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
       <canvas id="covChart" role="img" aria-label="Arsenal coverage chart" style="width:100%;height:320px;display:block;border-radius:10px;background:var(--panel-2)"></canvas>
       <p class="hint">Each ball is simulated for this bowler on the selected pattern (on its own best line when Auto line is on, otherwise from the laydown board). Right = more length (later breakpoint), up = more hook. Gaps on the chart are where the next ball should go. The hollow ring is the ball and layout currently on screen.</p>
+    </div>
+
+    <!-- Shop only: hidden (not shown locked) for guests, Free and Pro. Filled in by the plug color code near the end of the script. -->
+    <div class="card adv hidden" id="plugCard" aria-labelledby="plugTitle">
+      <h2 id="plugTitle">Plug colors <span>— drop recipes to match a cover</span></h2>
+      <p class="pc-lead">Pick the ball or photograph it, tap the colors you want the plug to match, and get drop recipes for your tint kit. A recipe is a starting point: test-mix a small batch before you plug the ball.</p>
+      <div class="pc-step"><h3><b>1</b> Ball</h3>
+        <label class="f"><span>Find the ball (optional)</span><span class="bs-wrap"><input id="pcBall" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pcBallList" placeholder="Brand or ball name"><span class="bs-list" id="pcBallList" role="listbox" aria-label="Matching balls" hidden></span></span></label>
+        <div id="pcBallInfo"></div>
+      </div>
+      <div class="pc-step"><h3><b>2</b> Photo</h3><div id="pcPicker"></div></div>
+      <div class="pc-step"><h3><b>3</b> Colors to match</h3>
+        <div id="pcTargets"></div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="pcGo" disabled>Get recipes</button></div>
+      </div>
+      <div id="pcResults" aria-live="polite"></div>
+      <div class="pc-step"><h3>Saved recipes <span class="pc-count" id="pcCount"></span></h3>
+        <div class="row pc-filter"><input id="pcSearch" type="search" autocomplete="off" placeholder="Search ball, notes or tints" aria-label="Search saved recipes" style="flex:1 1 220px;width:auto">
+          <div class="seg" id="pcMin" role="group" aria-label="Show recipes rated"><button type="button" data-min="0" class="on">All</button><button type="button" data-min="4">4★ and up</button><button type="button" data-min="5">5★</button></div></div>
+        <ul class="pc-recs" id="pcRecs"></ul>
+      </div>
+      <details class="pc-kit" id="pcKit"><summary>Tints and batch size</summary>
+        <p class="hint">Tech-Line HD plug material with the kit’s 12 tints, measured in drops per batch. The tint colors start as rough guesses. Calibrate a tint by photographing a small cured puck of it, and every recipe after that uses your kit’s real color.</p>
+        <div class="grid2" style="margin-top:10px"><label class="f"><span>Batch name</span><input id="pcBatchName" maxlength="40"></label><label class="f"><span>Batch size (1 = one standard cup)</span><input id="pcBatchSize" type="number" min="0.25" max="4" step="0.25" inputmode="decimal"></label></div>
+        <p class="hint">Double the batch and each drop is half as strong. Calibrate again after you change the size.</p>
+        <ul class="pc-tints" id="pcTints"></ul>
+        <div class="row"><button class="btn sm" type="button" id="pcResetCal">Reset all calibrations</button></div>
+      </details>
     </div>
 
     <div class="card" id="spareCard">
@@ -4245,6 +4348,367 @@ const replacedMine = (() => {
 })();
 $('dbInfo').innerHTML = `Ball list: ${DB_BALLS.length} balls (${DB_BALLS.filter(b => !b.disc).length} current${DB_BALLS.some(b => b.disc) ? ` + ${DB_BALLS.filter(b => b.disc).length} retired, kept ${KEEP_YEARS} years from release` : ''}). New releases are added as they come out${catalog.length ? `; ${catalog.length} added or corrected since ${BALL_DB_DATE}` : ''}.`
   + (replacedMine.length ? `<br>Now in the official list, so removed from My balls: ${replacedMine.join(', ')}.` : '');
+/* ---------- Shop: plug colors ----------
+   Match a plug to the ball's cover. The color math lives in js/plug-color.js (loaded only for a Shop account).
+   Synced keys: xing.plug.recipes (saved recipes, with a 96px photo thumbnail), xing.plug.tints (tint calibrations),
+   xing.plug.settings (batch), xing.plug.ballColors (cover colors remembered per ball when a recipe is saved).
+   The card is hidden, not shown locked, for anyone without Shop. The gate runs in the browser only. */
+let PC = null; // the plug-color module once loaded
+const pcS = { ball: null, targets: [], thumb: '', results: null, saveOpen: false, filter: '', min: 0, picker: null };
+const pcEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pcSet = () => ({ ...PC.DEFAULT_PLUG_SETTINGS, ...(store.get('xing.plug.settings', {}) || {}) });
+const pcKit = () => PC.kitTints(store.get('xing.plug.tints', {}) || {});
+const pcRecipes = () => store.get('xing.plug.recipes', []) || [];
+const pcSw = (hex, cls = '') => `<span class="pc-sw ${cls}" style="background:${pcEsc(hex)}" title="${pcEsc(hex)}"></span>`;
+const pcBallName = b => (b.brand === MINE || b.brand === TYPES ? b.label : `${b.brand} ${b.label}`);
+const pcStars = (n, edit, id = '') => `<span class="pc-stars" role="${edit ? 'group' : 'img'}" aria-label="${edit ? 'How did it turn out' : `${n} of 5 stars`}">${[1, 2, 3, 4, 5].map(k => edit
+  ? `<button type="button" data-a="star" data-n="${k}" data-id="${pcEsc(id)}" class="${k <= n ? 'on' : ''}" aria-pressed="${k <= n}" aria-label="${k} star${k > 1 ? 's' : ''}">★</button>`
+  : `<span class="${k <= n ? 'on' : ''}">★</span>`).join('')}</span>`;
+
+async function plugGate() {
+  const on = cloud.can('plugcolor');
+  $('plugCard').classList.toggle('hidden', !on);
+  if (!on || PC) return;
+  try { PC = await import('./js/plug-color.js'); } catch (e) { console.warn('[plug] color module did not load', e); return; }
+  plugInit();
+}
+
+function plugInit() {
+  pcS.picker = pcPicker($('pcPicker'), { maxSpots: 3, onChange: r => { pcS.targets = r.hexes; pcS.thumb = r.thumb || ''; pcS.results = null; pcDrawTargets(); $('pcResults').innerHTML = ''; } });
+  // ball search: every typed word must appear in the brand or name
+  const inp = $('pcBall'), list = $('pcBallList');
+  let hits = [], sel = -1;
+  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); sel = -1; };
+  const draw = () => {
+    const words = inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return close();
+    hits = allBalls().filter(b => { const t = `${b.brand} ${b.label}`.toLowerCase(); return words.every(w => t.includes(w)); }).slice(0, 30);
+    list.innerHTML = hits.length ? hits.map((b, i) => `<span class="bs-opt${i === sel ? ' on' : ''}" role="option" id="pcOpt${i}" data-i="${i}" aria-selected="${i === sel}"><b>${pcEsc(b.label)}</b><small>${pcEsc(b.brand)}</small></span>`).join('')
+      : '<span class="bs-none">No ball matches that.</span>';
+    list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    if (sel >= 0) inp.setAttribute('aria-activedescendant', 'pcOpt' + sel);
+  };
+  const pick = i => { const b = hits[i]; if (!b) return; pcS.ball = { id: b.id, label: pcBallName(b), brand: b.brand, name: b.name || b.label, color: b.color }; inp.value = ''; close(); pcDrawBall(); };
+  inp.addEventListener('input', () => { sel = -1; draw(); });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!hits.length) return; sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length; draw(); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(sel >= 0 ? sel : 0); }
+    else if (e.key === 'Escape') close();
+  });
+  inp.addEventListener('blur', () => setTimeout(close, 150));
+  list.addEventListener('mousedown', e => { const o = e.target.closest('[data-i]'); if (o) { e.preventDefault(); pick(+o.dataset.i); } });
+  $('pcBallInfo').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'unball') { pcS.ball = null; pcDrawBall(); }
+    if (a.dataset.a === 'cover') pcAddTargets([a.dataset.hex]);
+    if (a.dataset.a === 'covers') pcAddTargets(JSON.parse(a.dataset.hexes), true);
+  });
+  $('pcTargets').addEventListener('input', e => { const i = e.target.dataset.i; if (e.target.type === 'color' && i != null) { pcS.targets[+i] = e.target.value; pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets(false); } });
+  $('pcTargets').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'rm') pcS.targets.splice(+a.dataset.i, 1);
+    if (a.dataset.a === 'add') pcS.targets.push(pcS.targets.at(-1) || '#2a4fb0');
+    if (a.dataset.a === 'clear') pcS.targets = [];
+    pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets();
+  });
+  $('pcGo').addEventListener('click', pcCompute);
+  $('pcResults').addEventListener('click', pcResultsClick);
+  $('pcResults').addEventListener('input', e => { if (e.target.id === 'pcNotes') pcS.notes = e.target.value; });
+  $('pcSearch').addEventListener('input', e => { pcS.filter = e.target.value; pcDrawRecs(); });
+  $('pcMin').addEventListener('click', e => { const b = e.target.closest('[data-min]'); if (!b) return; pcS.min = +b.dataset.min; [...$('pcMin').children].forEach(x => x.classList.toggle('on', x === b)); pcDrawRecs(); });
+  $('pcRecs').addEventListener('click', pcRecsClick);
+  // tints and batch
+  const st = pcSet();
+  $('pcBatchName').value = st.batchName; $('pcBatchSize').value = st.batchSize;
+  $('pcBatchName').addEventListener('change', e => { store.set('xing.plug.settings', { ...pcSet(), batchName: e.target.value.trim() || PC.DEFAULT_PLUG_SETTINGS.batchName }); pcRefresh(); });
+  $('pcBatchSize').addEventListener('change', e => { const v = Math.min(4, Math.max(0.25, +e.target.value || 1)); e.target.value = v; store.set('xing.plug.settings', { ...pcSet(), batchSize: v }); pcRefresh(); });
+  $('pcTints').addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    const id = a.dataset.id;
+    if (a.dataset.a === 'cal') pcCalibrate(id);
+    if (a.dataset.a === 'uncal') { const c = { ...(store.get('xing.plug.tints', {}) || {}) }; delete c[id]; store.set('xing.plug.tints', c); pcRefresh(); }
+  });
+  $('pcResetCal').addEventListener('click', () => { if (confirm('Go back to the starting colors for every tint? Your calibrations are removed.')) { store.set('xing.plug.tints', {}); pcRefresh(); } });
+  pcDrawBall(); pcDrawTargets(); pcDrawRecs(); pcDrawTints();
+}
+// batch or calibration changed: recipes on screen are recomputed with the new kit
+function pcRefresh() { pcDrawTints(); if (pcS.results) pcCompute(); }
+
+function pcCovers(b) {
+  const saved = (store.get('xing.plug.ballColors', {}) || {})[b.id];
+  if (saved?.length) return { colors: saved, names: saved.map((_, i) => (saved.length > 1 ? (i ? `Accent ${i}` : 'Main') : 'Saved')), kind: 'saved' };
+  const mc = b.brand !== MINE && b.brand !== TYPES ? PC.multiColorCover(b.brand, b.name) : null;
+  if (mc) return { ...mc, kind: 'list' };
+  return b.color ? { colors: [b.color], names: ['App color'], kind: 'render' } : null;
+}
+function pcDrawBall() {
+  const b = pcS.ball, box = $('pcBallInfo');
+  if (!b) { box.innerHTML = '<p class="hint" style="margin:0">Saving a recipe with the ball remembers its colors here next time.</p>'; return; }
+  const c = pcCovers(b);
+  const why = { saved: 'The colors you matched last time for this ball.', list: 'Cover colors from the ball list. They’re approximate: a photo of the actual ball matches better.',
+    render: 'This ball has no cover colors on file yet. The color shown is only the one the app draws it in, so take a photo for a real match.' }[c?.kind] || '';
+  box.innerHTML = `<div class="pc-chosen"><b>${pcEsc(b.label)}</b><button class="btn sm" type="button" data-a="unball">Change ball</button></div>
+    ${c ? `<div class="pc-covers" style="margin-top:8px">${c.colors.map((h, i) => `<button class="pc-cover" type="button" data-a="cover" data-hex="${pcEsc(h)}" aria-label="Match ${pcEsc(c.names[i])} (${pcEsc(h)})">${pcSw(h)}${pcEsc(c.names[i])}</button>`).join('')}
+      ${c.colors.length > 1 ? `<button class="btn sm" type="button" data-a="covers" data-hexes='${pcEsc(JSON.stringify(c.colors))}'>Match all ${c.colors.length} as a swirl</button>` : ''}</div>
+      <p class="hint">${why}</p>` : ''}`;
+}
+function pcAddTargets(hexes, replace) {
+  pcS.targets = replace ? hexes.slice(0, 3) : [...pcS.targets, ...hexes].slice(-3);
+  pcS.results = null; $('pcResults').innerHTML = ''; pcDrawTargets();
+}
+function pcDrawTargets(full = true) {
+  const t = pcS.targets, n = t.length;
+  $('pcGo').disabled = !n; $('pcGo').textContent = n > 1 ? 'Get swirl recipes' : 'Get recipes';
+  if (!full) { t.forEach((h, i) => { const r = $('pcTargets').querySelector(`[data-t="${i}"]`); if (r) { r.querySelector('.pc-sw').style.background = h; r.querySelector('.pc-mono').textContent = h; } }); return; }
+  $('pcTargets').innerHTML = `${n ? `<div class="pc-targets">${t.map((h, i) => `<div class="pc-target" data-t="${i}">${pcSw(h, 'lg')}
+      <div class="row"><span><b>${n > 1 ? (i ? `Accent ${i}` : 'Main color') : 'Color'}</b><br><span class="pc-mono">${pcEsc(h)}</span></span>
+      <input type="color" value="${pcEsc(h)}" data-i="${i}" aria-label="Fine-tune color ${i + 1}"></div>
+      <button class="btn sm" type="button" data-a="rm" data-i="${i}">Remove</button></div>`).join('')}</div>`
+    : '<p class="hint" style="margin:0">Tap spots on the photo, pick a cover color above, or add a color by hand.</p>'}
+    <div class="row" style="margin-top:8px">${n < 3 ? '<button class="btn sm" type="button" data-a="add">+ Add a color by hand</button>' : ''}${n ? '<button class="btn sm" type="button" data-a="clear">Clear colors</button>' : ''}</div>`;
+}
+
+function pcCompute() {
+  if (!pcS.targets.length) return;
+  $('pcResults').innerHTML = '<p class="hint">Working out recipes…</p>';
+  setTimeout(() => { // let the message paint; the search takes a moment on a phone
+    const tints = pcKit(), { batchSize } = pcSet(), recipes = pcRecipes();
+    const prev = pcS.results;
+    pcS.results = pcS.targets.map((hex, i) => {
+      const old = prev?.[i]?.hex === hex ? prev[i] : null;
+      return { hex, opts: PC.recipeOptions(hex, { tints, recipes, batchSize }), opt: 0, drops: null, pearlId: old?.pearlId || '', pearlDrops: old?.pearlDrops || 2, adj: false };
+    });
+    pcS.saveOpen = false; pcS.notes = ''; pcS.rating = 0;
+    pcDrawResults();
+  }, 20);
+}
+function pcCurrent(r) {
+  const drops = r.drops || r.opts[r.opt]?.drops || {}, s = pcSet();
+  return { drops, ...PC.evaluateRecipe(drops, r.hex, { tints: pcKit(), batchSize: s.batchSize }) };
+}
+function pcDrawResults() {
+  const R = pcS.results; if (!R) { $('pcResults').innerHTML = ''; return; }
+  const tints = pcKit(), main = tints.filter(t => !t.pearl), pearls = tints.filter(t => t.pearl), s = pcSet(), swirl = R.length > 1;
+  const maxDrops = Math.min(24, Math.max(4, Math.round(12 * s.batchSize)));
+  const step = (label, a, val, max, extra = '', sw = '') => `<div class="pc-stp"><span>${sw}${pcEsc(label)}</span>
+    <button class="btn sm" type="button" data-a="${a}" data-d="-1" ${extra} aria-label="One drop less ${pcEsc(label)}" ${val <= 0 ? 'disabled' : ''}>−</button><output>${val}</output>
+    <button class="btn sm" type="button" data-a="${a}" data-d="1" ${extra} aria-label="One drop more ${pcEsc(label)}" ${val >= max ? 'disabled' : ''}>+</button></div>`;
+  $('pcResults').innerHTML = `<div class="pc-step"><h3><b>4</b> ${swirl ? 'Swirl recipes' : 'Recipe'}</h3>
+    <p class="hint" style="margin:0">Drops per ${pcEsc(s.batchName)}. Test-mix a small batch first: cured color and tint strength vary from kit to kit. ΔE is how far apart the target and the mix look; under 2 is hard to tell apart.</p>
+    ${swirl ? `<p class="pc-tip"><b>Pouring a swirl:</b> mix and pour the main color first, then pour the accent${R.length > 2 ? 's' : ''} in streaks and swirl once or twice with a stick. Stir more and the colors blend into one.</p>` : ''}
+    ${R.map((r, i) => {
+      const c = pcCurrent(r), q = PC.matchQuality(c.deltaE), o = r.opts[r.opt], pearl = pearls.find(p => p.id === r.pearlId);
+      return `<section class="pc-res" data-i="${i}" aria-label="${swirl ? (i ? `Accent ${i}` : 'Main color') : 'Recipe'}">
+        <div class="pc-res-h"><h3>${swirl ? (i ? `Accent ${i}` : 'Main color') : 'Match'}</h3><span class="pc-q ${q.toLowerCase()}">${q} match · ΔE ${c.deltaE.toFixed(1)}</span></div>
+        <div class="pc-cmp"><figure>${pcSw(r.hex, 'lg')}<figcaption>Target <span class="pc-mono">${pcEsc(r.hex)}</span></figcaption></figure>
+          <figure>${pcSw(c.hex, 'lg')}<figcaption>Predicted mix <span class="pc-mono">${pcEsc(c.hex)}</span></figcaption></figure></div>
+        <div class="row" role="group" aria-label="Recipe options">${r.opts.map((x, k) => `<button class="pc-chip${!r.drops && r.opt === k ? ' on' : ''}" type="button" data-a="opt" data-k="${k}" aria-pressed="${!r.drops && r.opt === k}">${x.history ? `★ Your recipe` : pcEsc(x.label)}</button>`).join('')}${r.drops ? '<span class="pc-chip on">Adjusted</span>' : ''}</div>
+        ${!r.drops && o?.history ? `<p class="hint" style="margin:0">You rated this ${o.history.rating}★${o.history.ball ? ` on the ${pcEsc(o.history.ball)}` : ''}, for a color ΔE ${o.history.de.toFixed(1)} from this one.</p>` : ''}
+        <p class="pc-recipe">${pcEsc(PC.dropsText(c.drops, main))}</p>
+        ${pearl && r.pearlDrops > 0 ? `<p class="pc-pearl">+ ${pcEsc(pearl.name)} ${r.pearlDrops} <small>(effect only, not part of the color match)</small></p>` : ''}
+        <p class="hint" style="margin:0">${c.total} drop${c.total === 1 ? '' : 's'} of tint in all</p>
+        <div class="row"><button class="btn sm" type="button" data-a="adj" aria-expanded="${r.adj}">${r.adj ? 'Done adjusting' : 'Adjust drops'}</button>
+          ${pearls.length ? `<div class="seg" role="group" aria-label="Pearl"><button type="button" data-a="pearl" data-p="" class="${!r.pearlId ? 'on' : ''}">No pearl</button>${pearls.map(p => `<button type="button" data-a="pearl" data-p="${p.id}" class="${r.pearlId === p.id ? 'on' : ''}">${pcEsc(p.name)}</button>`).join('')}</div>` : ''}</div>
+        ${pearl ? step(`${pearl.name} drops`, 'pdrop', r.pearlDrops, 12) : ''}
+        ${r.adj ? `<div class="pc-adj">${main.map(t => step(t.name, 'drop', c.drops[t.id] || 0, maxDrops, `data-t="${t.id}"`, pcSw(t.calib?.hex || t.hex))).join('')}</div>` : ''}
+      </section>`;
+    }).join('')}
+    ${pcS.saveOpen ? `<div class="pc-save"><b>Save this recipe</b>
+        <div>${pcS.ball ? `For the <b>${pcEsc(pcS.ball.label)}</b>. Its colors are remembered for next time.` : 'No ball picked. Pick one in step 1 to save the recipe with it.'}</div>
+        <label class="f"><span>Notes</span><textarea id="pcNotes" placeholder="Cure time, how it came out, tweaks">${pcEsc(pcS.notes || '')}</textarea></label>
+        <div class="f"><span>How did it turn out? Rate it later if you haven’t poured yet. Recipes rated 4★ or 5★ are offered first for a close color.</span>${pcStars(pcS.rating || 0, true, '__new')}</div>
+        <div class="row"><button class="btn primary" type="button" data-a="dosave">Save recipe</button><button class="btn" type="button" data-a="nosave">Cancel</button></div></div>`
+      : '<div class="row" style="margin-top:12px"><button class="btn primary" type="button" data-a="save">Save recipe</button></div>'}
+  </div>`;
+}
+function pcResultsClick(e) {
+  const a = e.target.closest('[data-a]'); if (!a || !pcS.results) return;
+  const sec = a.closest('[data-i]'), r = sec ? pcS.results[+sec.dataset.i] : null, act = a.dataset.a;
+  if (act === 'opt') { r.opt = +a.dataset.k; r.drops = null; }
+  else if (act === 'adj') r.adj = !r.adj;
+  else if (act === 'pearl') r.pearlId = a.dataset.p;
+  else if (act === 'pdrop') r.pearlDrops = Math.min(12, Math.max(0, r.pearlDrops + +a.dataset.d));
+  else if (act === 'drop') { const d = { ...pcCurrent(r).drops }, v = Math.max(0, (d[a.dataset.t] || 0) + +a.dataset.d); if (v) d[a.dataset.t] = v; else delete d[a.dataset.t]; r.drops = d; }
+  else if (act === 'save') pcS.saveOpen = true;
+  else if (act === 'nosave') pcS.saveOpen = false;
+  else if (act === 'star') { const n = +a.dataset.n; pcS.rating = pcS.rating === n ? 0 : n; }
+  else if (act === 'dosave') return pcSave();
+  else return;
+  const focusKey = a.dataset.a + (a.dataset.t || a.dataset.k || a.dataset.p || a.dataset.n || '') + (a.dataset.d || '') + (sec?.dataset.i || '');
+  pcDrawResults();
+  // keep keyboard focus on the same control after the redraw
+  const again = [...$('pcResults').querySelectorAll('[data-a]')].find(x => x.dataset.a + (x.dataset.t || x.dataset.k || x.dataset.p || x.dataset.n || '') + (x.dataset.d || '') + (x.closest('[data-i]')?.dataset.i || '') === focusKey);
+  (again && !again.disabled ? again : null)?.focus();
+}
+function pcSave() {
+  const s = pcSet(), swirl = pcS.results.length > 1;
+  const rec = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), createdAt: Date.now(), ballId: pcS.ball?.id || '', ballLabel: pcS.ball?.label || '',
+    mode: swirl ? 'swirl' : 'single', notes: (pcS.notes || '').trim(), rating: pcS.rating || 0, thumb: pcS.thumb || '', batchSize: s.batchSize, batchName: s.batchName,
+    spots: pcS.results.map(r => { const c = pcCurrent(r); return { targetHex: r.hex, drops: c.drops, pearlId: r.pearlId || undefined, pearlDrops: r.pearlId ? r.pearlDrops : undefined, predictedHex: c.hex, deltaE: +c.deltaE.toFixed(2) }; }) };
+  store.set('xing.plug.recipes', [rec, ...pcRecipes()]);
+  if (pcS.ball) store.set('xing.plug.ballColors', { ...(store.get('xing.plug.ballColors', {}) || {}), [pcS.ball.id]: pcS.results.map(r => r.hex) });
+  pcS.saveOpen = false; pcDrawResults(); pcDrawRecs(); pcDrawBall();
+  const ok = document.createElement('p'); ok.className = 'hint'; ok.setAttribute('role', 'status'); ok.textContent = `Saved${pcS.ball ? ` for the ${pcS.ball.label}` : ''}. It’s in Saved recipes below.`;
+  $('pcResults').querySelector('.pc-step').append(ok);
+}
+function pcDrawRecs() {
+  const all = pcRecipes(), tints = pcKit(), q = pcS.filter.trim().toLowerCase();
+  const list = all.filter(r => (r.rating || 0) >= pcS.min && (!q || `${r.ballLabel} ${r.notes} ${r.spots.map(x => PC.spotText(x, tints)).join(' ')}`.toLowerCase().includes(q)));
+  $('pcCount').textContent = all.length ? `${all.length} saved` : '';
+  $('pcRecs').innerHTML = list.length ? list.map(r => `<li class="pc-rec" data-id="${pcEsc(r.id)}">${r.thumb ? `<img src="${pcEsc(r.thumb)}" alt="">` : '<span class="ph"></span>'}
+      <div class="who"><b>${pcEsc(r.ballLabel || 'No ball')}</b><small>${new Date(r.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} · ${r.mode === 'swirl' ? 'Swirl' : 'One color'} · drops per ${pcEsc(r.batchName)}</small>
+        ${r.spots.map(x => `<span class="row" style="flex-wrap:nowrap;align-items:flex-start">${pcSw(x.targetHex)}<span class="pc-mono">${pcEsc(PC.spotText(x, tints))}</span></span>`).join('')}
+        ${r.notes ? `<small>${pcEsc(r.notes)}</small>` : ''}
+        ${pcStars(r.rating || 0, true, r.id)}</div>
+      <div class="acts"><button class="btn sm" type="button" data-a="open">Open</button><button class="btn sm" type="button" data-a="del">Delete</button></div></li>`).join('')
+    : `<li class="pc-none">${all.length ? 'No saved recipe matches that.' : 'Nothing saved yet. Get a recipe above and save it.'}</li>`;
+}
+function pcRecsClick(e) {
+  const a = e.target.closest('[data-a]'); if (!a) return;
+  const id = a.dataset.id || a.closest('[data-id]')?.dataset.id, all = pcRecipes(), r = all.find(x => x.id === id); if (!r) return;
+  if (a.dataset.a === 'star') { const n = +a.dataset.n; store.set('xing.plug.recipes', all.map(x => (x.id === id ? { ...x, rating: x.rating === n ? 0 : n } : x))); pcDrawRecs(); $('pcRecs').querySelector(`[data-id="${CSS.escape(id)}"] [data-n="${n}"]`)?.focus(); }
+  if (a.dataset.a === 'del' && confirm(`Delete this saved recipe${r.ballLabel ? ` for the ${r.ballLabel}` : ''}?`)) { store.set('xing.plug.recipes', all.filter(x => x.id !== id)); pcDrawRecs(); }
+  if (a.dataset.a === 'open') {
+    const b = r.ballId && allBalls().find(x => x.id === r.ballId);
+    pcS.ball = b ? { id: b.id, label: pcBallName(b), brand: b.brand, name: b.name || b.label, color: b.color } : r.ballLabel ? { id: r.ballId || '', label: r.ballLabel } : null;
+    pcS.targets = r.spots.map(x => x.targetHex); pcS.thumb = r.thumb || '';
+    pcDrawBall(); pcDrawTargets();
+    pcS.results = r.spots.map(x => ({ hex: x.targetHex, opts: [{ label: 'Saved recipe', drops: { ...x.drops } }], opt: 0, drops: null, pearlId: x.pearlId || '', pearlDrops: x.pearlDrops || 2, adj: false }));
+    pcS.saveOpen = false; pcDrawResults();
+    $('pcResults').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }
+}
+function pcDrawTints() {
+  const tints = pcKit();
+  $('pcTints').innerHTML = tints.map(t => `<li>${pcSw(t.calib?.hex || t.hex, 'md')}<span><b>${pcEsc(t.name)}</b><small>${t.pearl ? 'Pearl: an effect, not used to match the color' : t.calib ? `Calibrated: ${t.calib.drops} drops per ${t.calib.batchSize} batch` : 'Starting guess'}</small></span>
+    ${t.pearl ? '' : `<button class="btn sm" type="button" data-a="cal" data-id="${t.id}">${t.calib ? 'Calibrate again' : 'Calibrate'}</button>${t.calib ? `<button class="btn sm" type="button" data-a="uncal" data-id="${t.id}">Use starting guess</button>` : ''}`}</li>`).join('');
+}
+function pcCalibrate(id) {
+  const t = pcKit().find(x => x.id === id); if (!t) return;
+  const s = pcSet(); let drops = t.calib?.drops || 2, hex = '';
+  const d = document.createElement('dialog'); d.className = 'xd pc-cal';
+  d.innerHTML = `<div class="body"><h2>Calibrate ${pcEsc(t.name)}</h2>
+    <ol><li>Pour a small puck of only ${pcEsc(t.name)} in the plug material, counting the drops per ${pcEsc(s.batchName)}.</li>
+      <li>Let it cure, then photograph it in even light. Put a white card in the shot if you can.</li>
+      <li>Tap the middle of the puck (and the white card), set the drop count, and save.</li></ol>
+    <div class="pc-stp"><span>Drops in the puck</span><button class="btn sm" type="button" data-d="-1" aria-label="One drop less">−</button><output>${drops}</output><button class="btn sm" type="button" data-d="1" aria-label="One drop more">+</button></div>
+    <div class="pc-calpick"></div><div class="pc-calcmp"></div>
+    <div class="row2"><button class="btn" type="button" data-a="cancel">Cancel</button><button class="btn primary" type="button" data-a="ok" disabled>Save calibration</button></div></div>`;
+  document.body.append(d);
+  d.addEventListener('close', () => d.remove());
+  const out = d.querySelector('output'), ok = d.querySelector('[data-a=ok]');
+  d.querySelector('.pc-stp').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (!b) return; drops = Math.min(24, Math.max(1, drops + +b.dataset.d)); out.textContent = drops; });
+  pcPicker(d.querySelector('.pc-calpick'), { maxSpots: 1, fixed: true, onChange: r => {
+    hex = r.hexes[0] || ''; ok.disabled = !hex;
+    d.querySelector('.pc-calcmp').innerHTML = hex ? `<div class="pc-cmp"><figure>${pcSw(hex, 'lg')}<figcaption>Your puck <span class="pc-mono">${pcEsc(hex)}</span></figcaption></figure><figure>${pcSw(t.calib?.hex || t.hex, 'lg')}<figcaption>${t.calib ? 'Calibrated now' : 'Starting guess'}</figcaption></figure></div>` : '';
+  } });
+  d.querySelector('[data-a=cancel]').addEventListener('click', () => d.close());
+  ok.addEventListener('click', () => { store.set('xing.plug.tints', { ...(store.get('xing.plug.tints', {}) || {}), [id]: { hex, drops, batchSize: s.batchSize } }); d.close(); pcRefresh(); });
+  d.showModal();
+}
+
+/* photo picker: take or choose a photo, tap (or drag) 1–3 spots with a loupe, optional white-card tap.
+   Each spot averages a small disc with glare and specks trimmed. onChange({ hexes, thumb }) after every change. */
+function pcPicker(host, { maxSpots = 3, fixed = false, onChange }) {
+  const LOUPE = 112, ZOOM = 6;
+  let photo = null, spots = [null, null, null], wb = null, active = 0, mode = 'spot', n = fixed ? maxSpots : 1, drag = false;
+  host.innerHTML = `<div class="row"><button class="btn sm primary" type="button" data-a="cam">Take photo</button><button class="btn sm" type="button" data-a="lib">Choose photo</button>
+      <input type="file" accept="image/*" capture="environment" class="vh" tabindex="-1" aria-hidden="true" data-in><input type="file" accept="image/*" class="vh" tabindex="-1" aria-hidden="true" data-in></div>
+    <p class="pc-err" hidden></p>
+    <div class="pc-photo" style="margin-top:8px"><div class="pc-empty">${fixed ? 'Photograph the cured puck.' : 'Photograph the ball in even light, without flash glare. A white card in the shot helps the colors.'} The photo stays on this device; only a small thumbnail is saved with a recipe.</div>
+      <div class="pc-box" hidden><canvas class="pc-cv" role="img" aria-label="Ball photo: tap the colors to match"></canvas><canvas class="pc-loupe" width="${LOUPE}" height="${LOUPE}" hidden></canvas></div></div>
+    <div class="pc-ptools" hidden>
+      ${fixed ? '' : `<div class="seg" role="group" aria-label="How many colors" style="justify-self:start">${[1, 2, 3].slice(0, maxSpots).map(k => `<button type="button" data-n="${k}">${k === 1 ? 'One color' : `${k}-color swirl`}</button>`).join('')}</div>`}
+      <div class="row pc-spots"></div><p class="hint pc-phint" style="margin:0"></p></div>`;
+  const [camIn, libIn] = host.querySelectorAll('[data-in]'), err = host.querySelector('.pc-err'), box = host.querySelector('.pc-box'), cv = host.querySelector('.pc-cv'),
+    lp = host.querySelector('.pc-loupe'), tools = host.querySelector('.pc-ptools'), empty = host.querySelector('.pc-empty');
+  const emit = () => {
+    if (!photo) return;
+    const gains = wb ? PC.whiteGains(PC.sampleArea(photo.data, wb.x, wb.y)) : null, hexes = [];
+    let first = null;
+    for (let i = 0; i < n; i++) { const s = spots[i]; if (!s) continue; first = first || s; hexes.push(PC.linToHex(PC.applyGains(PC.sampleArea(photo.data, s.x, s.y), gains))); }
+    onChange({ hexes, thumb: first ? thumb(first) : '' });
+  };
+  const thumb = (s, size = 96) => { // a square crop around the first spot, small enough for the synced record
+    const side = Math.round(Math.min(photo.w, photo.h) * 0.45), sx = Math.min(Math.max(0, Math.round(s.x * photo.w - side / 2)), photo.w - side), sy = Math.min(Math.max(0, Math.round(s.y * photo.h - side / 2)), photo.h - side);
+    const c = document.createElement('canvas'); c.width = c.height = size; c.getContext('2d').drawImage(photo.canvas, sx, sy, side, side, 0, 0, size, size);
+    return c.toDataURL('image/jpeg', 0.7);
+  };
+  const size = () => {
+    if (!photo) return;
+    const W = host.clientWidth || 300, H = Math.min(Math.round(W * photo.h / photo.w), 520), w = Math.round(H * photo.w / photo.h);
+    box.style.width = w + 'px'; box.style.height = H + 'px'; cv.style.width = w + 'px'; cv.style.height = H + 'px';
+    const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = w * dpr; cv.height = H * dpr; paint();
+  };
+  const paint = () => {
+    const g = cv.getContext('2d'), dpr = cv.width / parseFloat(cv.style.width);
+    g.drawImage(photo.canvas, 0, 0, cv.width, cv.height);
+    const mark = (s, label, ring) => {
+      const x = s.x * cv.width, y = s.y * cv.height, r = Math.max(PC.sampleRadius(photo.w, photo.h) * cv.width / photo.w, 6 * dpr);
+      g.lineWidth = 2 * dpr; g.strokeStyle = '#fff'; g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke();
+      g.lineWidth = dpr; g.strokeStyle = ring; g.beginPath(); g.arc(x, y, r + 2 * dpr, 0, 7); g.stroke();
+      g.fillStyle = 'rgba(0,0,0,.7)'; g.fillRect(x + 8 * dpr, y - 22 * dpr, (label.length * 8 + 12) * dpr, 18 * dpr);
+      g.fillStyle = '#fff'; g.font = `600 ${13 * dpr}px system-ui`; g.fillText(label, x + 13 * dpr, y - 8 * dpr);
+    };
+    for (let i = 0; i < n; i++) if (spots[i]) mark(spots[i], String(i + 1), '#000');
+    if (wb) mark(wb, 'W', '#0af');
+  };
+  const tools2 = () => {
+    tools.hidden = !photo;
+    tools.querySelectorAll('[data-n]').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
+    host.querySelector('.pc-spots').innerHTML = (n > 1 ? Array.from({ length: n }, (_, i) => `<button class="pc-chip${mode === 'spot' && active === i ? ' on' : ''}" type="button" data-s="${i}" aria-pressed="${mode === 'spot' && active === i}">${i ? `Accent ${i}` : 'Main'}${spots[i] ? ' ✓' : ''}</button>`).join('') : '')
+      + `<button class="pc-chip${mode === 'wb' ? ' on' : ''}" type="button" data-wb aria-pressed="${mode === 'wb'}">${wb ? 'White card ✓' : 'Tap a white card'}</button>${wb ? '<button class="btn sm" type="button" data-nowb>Clear white card</button>' : ''}`;
+    host.querySelector('.pc-phint').textContent = mode === 'wb' ? 'Tap something white in the photo (a card or paper). It corrects the light’s color cast.'
+      : `Tap or drag on the ${fixed ? 'puck' : 'ball'}${n > 1 ? ` to place the ${active ? `accent ${active}` : 'main color'} spot` : ''}. The loupe shows the exact area that’s averaged.`;
+  };
+  const load = async file => {
+    if (!file) return;
+    err.hidden = true;
+    try {
+      let src, sw, sh;
+      try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); sw = src.width; sh = src.height; }
+      catch { const url = URL.createObjectURL(file), img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('That file isn’t a photo the browser can read.')); img.src = url; }); URL.revokeObjectURL(url); src = img; sw = img.naturalWidth; sh = img.naturalHeight; }
+      const k = Math.min(1, 1600 / Math.max(sw, sh)), w = Math.max(1, Math.round(sw * k)), h = Math.max(1, Math.round(sh * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(src, 0, 0, w, h);
+      photo = { canvas: c, data: g.getImageData(0, 0, w, h), w, h }; spots = [null, null, null]; wb = null; active = 0; mode = 'spot';
+      empty.hidden = true; box.hidden = false; size(); tools2();
+    } catch (e) { err.textContent = e.message || 'That photo couldn’t be opened.'; err.hidden = false; }
+  };
+  host.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.a === 'cam') camIn.click(); else if (b.dataset.a === 'lib') libIn.click();
+    else if (b.dataset.n) { n = +b.dataset.n; if (active >= n) active = 0; mode = 'spot'; paint(); tools2(); emit(); }
+    else if (b.dataset.s != null) { mode = 'spot'; active = +b.dataset.s; tools2(); }
+    else if ('wb' in b.dataset) { mode = mode === 'wb' ? 'spot' : 'wb'; tools2(); }
+    else if ('nowb' in b.dataset) { wb = null; paint(); tools2(); emit(); }
+  });
+  [camIn, libIn].forEach(i => i.addEventListener('change', () => { load(i.files[0]); i.value = ''; }));
+  const at = e => { const r = cv.getBoundingClientRect(); return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)), px: e.clientX - r.left, py: e.clientY - r.top, w: r.width }; };
+  const place = p => {
+    if (mode === 'wb') wb = { x: p.x, y: p.y }; else spots[active] = { x: p.x, y: p.y };
+    paint();
+    // loupe beside and above the finger, kept inside the photo
+    const g = lp.getContext('2d'), half = LOUPE / ZOOM / 2, rr = PC.sampleRadius(photo.w, photo.h) * ZOOM;
+    g.imageSmoothingEnabled = false; g.fillStyle = '#000'; g.fillRect(0, 0, LOUPE, LOUPE);
+    g.drawImage(photo.canvas, p.x * photo.w - half, p.y * photo.h - half, half * 2, half * 2, 0, 0, LOUPE, LOUPE);
+    g.lineWidth = 2; g.strokeStyle = '#fff'; g.beginPath(); g.arc(LOUPE / 2, LOUPE / 2, Math.min(rr, LOUPE / 2 - 2), 0, 7); g.stroke();
+    let lx = p.px < p.w / 2 ? p.px + 24 : p.px - LOUPE - 24, ly = p.py - LOUPE - 24;
+    if (ly < 0) ly = p.py + 24;
+    lp.style.left = Math.min(Math.max(0, lx), Math.max(0, p.w - LOUPE)) + 'px'; lp.style.top = ly + 'px'; lp.hidden = false;
+  };
+  cv.addEventListener('pointerdown', e => { if (!photo) return; cv.setPointerCapture(e.pointerId); drag = true; place(at(e)); });
+  cv.addEventListener('pointermove', e => { if (drag) place(at(e)); });
+  const up = () => {
+    if (!drag) return; drag = false; lp.hidden = true;
+    if (mode === 'wb') mode = 'spot'; else if (active < n - 1 && !spots[active + 1]) active++;
+    tools2(); emit();
+  };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  new ResizeObserver(() => { if (photo) size(); }).observe(host);
+  return {};
+}
+plugGate(); cloud.onChange(plugGate);
+
 const startBall = (DB_BALLS.find(b => b.brand === 'Hammer' && b.name === 'Zero Mercy Pearl') || DB_BALLS[0] || BALL_PRESETS[0]).id;
 { const hdr = document.querySelector('header'), setHdr = () => document.documentElement.style.setProperty('--hdr', hdr.offsetHeight + 'px');
   setHdr(); new ResizeObserver(setHdr).observe(hdr); } // the sticky inputs column sits just under the header

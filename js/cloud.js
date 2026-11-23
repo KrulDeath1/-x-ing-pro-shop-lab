@@ -15,7 +15,8 @@ const SUPABASE_KEY = 'sb_publishable_yyPXb_0hDXRKt1_z_H_ung_5Pq1iI6n'; // publis
 const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 const AUTH_STORAGE_KEY = 'sb-yeoraqksuvaohauxvvgt-auth-token';
 
-export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode', 'xing.shop'];
+export const KEYS = ['layoutlab.bowlers', 'layoutlab.balls', 'xing.calib', 'xing.calibOil', 'layoutlab.mode', 'xing.shop',
+  'xing.plug.recipes', 'xing.plug.tints', 'xing.plug.settings', 'xing.plug.ballColors']; // Shop: plug color recipes, tint calibration, batch, remembered ball colors
 const PAID_PLANS = ['pro', 'shop'];
 const PAID_STATUS = ['trialing', 'active', 'past_due'];
 
@@ -475,7 +476,8 @@ const FEATURES = {
   export:   { label: 'Exporting your data', tier: 'pro' },
   advanced: { label: 'Advanced mode', tier: 'pro' },
   customers: { label: 'The customer list', tier: 'shop' },
-  branding: { label: 'Your shop’s name and logo on printouts', tier: 'shop' }
+  branding: { label: 'Your shop’s name and logo on printouts', tier: 'shop' },
+  plugcolor: { label: 'Plug color matching', tier: 'shop' }
 };
 function openUpsell(feature) {
   const f = FEATURES[feature], plan = f?.tier === 'shop' ? 'Shop' : 'Pro';
@@ -484,7 +486,7 @@ function openUpsell(feature) {
     <ul>
       <li><b>Free</b>: one bowler with up to 9 balls in the arsenal, every ball in the database, layout recommendations, PAP, ball motion, the 3D drilled ball, the top-down lane, and import.</li>
       <li><b>Pro</b> (bowlers): up to 5 bowlers with unlimited arsenals, plus Advanced mode (ball specs, track and rev measuring, My line, lane calibration), Auto line and strike chance, the 3D lane, Compare A / B, arsenal coverage, printing drill and spec sheets, export, and the shot log with lane calibration.</li>
-      <li><b>Shop</b> (pro shops): everything in Pro with unlimited bowlers, plus the customer list and your shop’s name and logo on printouts.</li>
+      <li><b>Shop</b> (pro shops): everything in Pro with unlimited bowlers, plus the customer list, your shop’s name and logo on printouts, and plug color matching.</li>
     </ul>
     <div class="hint">${user ? 'Online checkout is coming soon.' : 'Create a free account first, then upgrade.'}</div>
     <div class="row2">
